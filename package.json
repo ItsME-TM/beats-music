@@ -9,8 +9,10 @@
     "lint": "eslint"
   },
   "dependencies": {
+    "autoprefixer": "^10.4.21",
     "firebase": "^12.2.1",
     "next": "15.5.2",
+    "postcss": "^8.5.6",
     "react": "19.1.0",
     "react-dom": "19.1.0"
   },
@@ -22,7 +24,7 @@
     "@types/react-dom": "^19",
     "eslint": "^9",
     "eslint-config-next": "15.5.2",
-    "tailwindcss": "^4",
+    "tailwindcss": "^4.1.13",
     "typescript": "^5"
   }
 }
