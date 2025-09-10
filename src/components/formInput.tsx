@@ -18,7 +18,7 @@ export default function FormInput ({type, placeholder, value, height, width, onC
             placeholder={placeholder}
             value={value}
             onChange={onChange}
-            className = {`w-[${width}] h-[${height}] text-white placeholder-white border-[1px] border-white pt-[14px] pr-[16px] pb-[14px] pl-[16px] rounded-[12px]`}
+            className = {`${width ?? ""} ${height ?? ""} text-white text-sm placeholder-white border border-white pt-3.5 pr-4 pb-3.5 pl-4 rounded-lg`}
         />
 
     );

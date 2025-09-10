@@ -11,7 +11,7 @@ export default function LoginButton({ text, onClick, width, height }: LoginButto
   return (
     <button
       onClick={onClick}
-      className={`bg-gradient-to-r from-blue-400 to-cyan-400 text-white w-[${width}] h-[${height}] pt-[14px] pr-[10px] pb-[14px] pl-[10px] border-[1px] border-[#17DCF5] rounded-[12px]`}
+      className={`bg-gradient-to-r from-blue-400 text-sm to-cyan-400 text-white ${width ?? ""} ${height ?? ""} pt-1 pr-2 pb-1 pl-2 border border-[#17DCF5] rounded-xl`}
     >
       {text}
     </button>

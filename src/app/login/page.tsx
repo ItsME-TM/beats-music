@@ -12,7 +12,7 @@ export default function Login(){
     return (
         <div>Logim
             <div>
-                <LoginButton text="Login" onClick={handleLogin} width="400px" height="55px"/>
+                <LoginButton text="Login" onClick={handleLogin} width="w-38" height="h-8"/>
             </div>
             <div>
                 <FormInput 
@@ -20,8 +20,8 @@ export default function Login(){
                     placeholder="email"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    width="400px"
-                    height="55px"
+                    width="w-38"
+                    height="h-8"
                 />
             </div>
         </div>
