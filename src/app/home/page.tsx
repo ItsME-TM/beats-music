@@ -2,6 +2,7 @@
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import useAuth from "@/components/authProvider";
+import SideBar from "@/components/sideBar";
 
 export default function HomePage(){
     const user = useAuth();
@@ -12,8 +13,11 @@ export default function HomePage(){
             router.push("/login");
         }
         }, [user, router]);
-        
+
     return(
-        <h1>Home Page</h1>
+        <div className="">
+            home
+        </div>
+        
     );
 }
