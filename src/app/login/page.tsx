@@ -3,11 +3,14 @@ import { useState } from "react";
 import LoginButton from "@/components/login-button";
 import FormInput from "@/components/formInput";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 
 export default function Login() {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [rememberMe, setRememberMe] = useState(false);
+
+    const router = useRouter();
 
     const handleLogin = () => {
         console.log('Login: ')
@@ -83,7 +86,7 @@ export default function Login() {
                                     checked:bg-blue-600 checked:border-white checked:border-2
                                     relative
                                     after:content-['✔'] after:absolute after:left-[2px] after:top-[-2px] after:text-black after:text-xs
-                                    checked:after:opacity-100 after:opacity-0
+                                    checked:after:opacity-100 after:opacity-0 cursor-pointer
                                 "
                             />
                             <label
@@ -100,7 +103,7 @@ export default function Login() {
                         <div>
                             <button 
                                 type="button"
-                                className="text-white text-xs mt-3"
+                                className="text-white text-xs mt-3 cursor-pointer"
                                 onClick={() => alert('Forgot password clicked')}
                                 >
                                 Forgot password ?
@@ -117,6 +120,38 @@ export default function Login() {
                             <Image src="/icons/google-logo.png" alt="google-logo" width={25} height={25}/>
                             <Image src="/icons/facebook-logo.png" alt="google-logo" width={25} height={25}/>
                             <Image src="/icons/github-logo.png" alt="google-logo" width={25} height={25}/>
+                        </div>
+                        <div>
+                            <button
+                                type="button"
+                                className="text-white text-xs mt-15 font-noto cursor-pointer"
+                                onClick={() => router.push('/register')}
+                                >
+                                Don&#39;t have an account? Signup
+                            </button>
+                        </div>
+                         <div className="flex mt-3 gap-7">
+                            <button
+                                type="button"
+                                className="text-white text-xs font-noto cursor-pointer"
+                                onClick={() => alert('Terms & Conditions clicked')}
+                                >
+                                Terms & Conditions
+                            </button>
+                            <button
+                                type="button"
+                                className="text-white text-xs font-noto cursor-pointer"
+                                onClick={() => alert('Support clicked')}
+                                >
+                                Support
+                            </button>
+                            <button
+                                type="button"
+                                className="text-white text-xs font-noto cursor-pointer"
+                                onClick={() => alert('Customer Care clicked')}
+                                >
+                                Customer Care
+                            </button>
                         </div>
                     </div>
                 </div>
