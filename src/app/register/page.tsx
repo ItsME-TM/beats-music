@@ -5,118 +5,141 @@ import { useRouter } from "next/navigation";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 import FormInput from "@/components/formInput";
 import LoginButton from "@/components/login-button";
-import { signInWithEmailAndPassword, signInWithPopup } from "firebase/auth";
+import { createUserWithEmailAndPassword, signInWithPopup } from "firebase/auth";
 import { auth, googleProvider } from "../firebase";
 import type { User } from "firebase/auth";
+import { updateProfile } from "firebase/auth";
 
 export default function RegisterPage() {
-    const [confirmPassword, setConfirmPassword] = useState('');
-    const [username, setUsername] = useState('');
-    const [email, setEmail] = useState('');
-    const [password, setPassword] = useState('');
-    const [agreeOurPolicy, setAgreeOurPolicy] = useState(false);
-    const [showPassword, setShowPassword] = useState(false);
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [username, setUsername] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [agreeOurPolicy, setAgreeOurPolicy] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
-    const router = useRouter();
-    
-    const handleSignIn = async () => {
-        if (!agreeOurPolicy) {
-                alert("You must agree to our policy to create an account.");
-                return;
-            }
-            try {
-                const userCredential = await signInWithEmailAndPassword(auth, email, password);
-                console.log("User signed in:", userCredential.user);
-                router.push("/home"); 
-            } catch (error) {
-                console.error("Error signing in:", error);
-                alert("Failed to create account. Please check your credentials and try again.");
-            }
-        };
+  const router = useRouter();
 
-    const handleGoogleLogin = async () => {
-        try {
-            const result = await signInWithPopup(auth, googleProvider);
-            console.log("Google user:", result.user);
-            router.push("/home");
-        } catch (error) {
-            console.error("Google login error:", error);
-            alert("Google login failed. Please try again.");
-        }
-    };
+  const handleSignUp = async () => {
+    if (!agreeOurPolicy) {
+      alert("You must agree to our policy to create an account.");
+      return;
+    }
+    if (password !== confirmPassword) {
+      alert("Passwords do not match. Please try again.");
+      return;
+    }
+    try {
+      const userCredential = await createUserWithEmailAndPassword(
+        auth,
+        email,
+        password
+      );
+      await updateProfile(userCredential.user, { displayName: username });
+      console.log("User signed up:", userCredential.user);
+      router.push("/home");
+    } catch (error: unknown) {
+      console.error("Error signing up:", error);
+      if (typeof error === "object" && error !== null && "code" in error && 
+        (error as {code: string}).code === "auth/email-already-in-use") {
+        alert(
+          "This email is already registered. Please log in or use a different email."
+        );
+      } else {
+        alert(
+          "Failed to create account. Please check your credentials and try again."
+        );
+      }
+    }
+  };
 
-    return (
-        <div className="w-screen flex items-center justify-center pr-20 pt-5 pl-15">
-            <div
-                className="w-90 rounded-xl pt-3 p-8 backdrop-blur-[53px] shadow-[-8px_4px_5px_0px_#0000003D]"
-                style={{
-                    background: `
+  const handleGoogleLogin = async () => {
+    try {
+      const result = await signInWithPopup(auth, googleProvider);
+      console.log("Google user:", result.user);
+      router.push("/home");
+    } catch (error) {
+      console.error("Google login error:", error);
+      alert("Google login failed. Please try again.");
+    }
+  };
+
+  return (
+    <div className="w-screen flex items-center justify-center pr-20 pt-5 pl-15">
+      <div
+        className="w-90 rounded-xl pt-3 p-8 backdrop-blur-[53px] shadow-[-8px_4px_5px_0px_#0000003D]"
+        style={{
+          background: `
                     linear-gradient(0deg, rgba(0, 0, 0, 0.14), rgba(0, 0, 0, 0.14)),
                     linear-gradient(321.23deg, rgba(191, 191, 191, 0.062) 5.98%, rgba(0, 0, 0, 0) 66.28%)
                     `,
-                    border: "1px solid",
-                    borderImageSource: `
+          border: "1px solid",
+          borderImageSource: `
                     linear-gradient(166.93deg, #AFAFAF 3.24%, rgba(96, 96, 96, 0) 96.43%),
                     linear-gradient(317.92deg, rgba(255, 255, 255, 0.6) 1.48%, rgba(0, 0, 0, 0) 67.95%)
-                    `
-                }}
+                    `,
+        }}
+      >
+        <h2 className="text-white text-2xl font-bold font-noto">
+          Open New Account
+        </h2>
+        <p className="text-gray-300 text-xs font-noto">
+          Enjoy your new spirit world
+        </p>
+        <div className="flex flex-col  h-97 items-center">
+          <div className="mt-4">
+            <FormInput
+              type="text"
+              placeholder="Username"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+              width="w-72"
+              height="h-10"
+            />
+          </div>
+          <div className="mt-2">
+            <FormInput
+              type="email"
+              placeholder="Email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              width="w-72"
+              height="h-10"
+            />
+          </div>
+          <div className="mt-2">
+            <FormInput
+              type={showPassword ? "text" : "password"}
+              placeholder="Password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              width="w-72"
+              height="h-10"
+            />
+            <span
+              className="relative left-65 bottom-7 cursor-pointer"
+              onClick={() => setShowPassword(!showPassword)}
             >
-                <h2 className="text-white text-2xl font-bold font-noto">Open New Account</h2>
-                <p className="text-gray-300 text-xs font-noto">Enjoy your new spirit world</p>
-                <div className="flex flex-col  h-97 items-center">
-                    <div className="mt-4">
-                        <FormInput 
-                            type="text"
-                            placeholder="Username"
-                            value={username}
-                            onChange={(e) => setUsername(e.target.value)}
-                            width="w-72"
-                            height="h-10"
-                        />
-                    </div>
-                    <div className="mt-2">
-                        <FormInput 
-                            type="email"
-                            placeholder="Email"
-                            value={email}
-                            onChange={(e) => setEmail(e.target.value)}
-                            width="w-72"
-                            height="h-10"
-                        />
-                    </div>
-                    <div className="mt-2">
-                        <FormInput 
-                            type={showPassword ? "text" : "password"}
-                            placeholder="Password"
-                            value={password}
-                            onChange={(e) => setPassword(e.target.value)}
-                            width="w-72"
-                            height="h-10"
-                        />
-                        <span 
-                            className="relative left-65 bottom-7 cursor-pointer"
-                            onClick={() => setShowPassword(!showPassword)}
-                        >
-                            {showPassword ? <FaEyeSlash size={15}/> : <FaEye size={15}/>}
-                        </span>
-                    </div>
-                    <div className="mt-0">
-                        <FormInput 
-                            type="password"
-                            placeholder="Confirm Password"
-                            value={confirmPassword}
-                            onChange={(e) => setConfirmPassword(e.target.value)}
-                            width="w-72"
-                            height="h-10"
-                        />
-                    </div>
-                    <div className="flex items-center justify-start w-full mt-2 ml-3">
-                        <input
-                            type="checkbox"
-                            id="agreeOurPolicy"
-                            checked={agreeOurPolicy}
-                            onChange={() => setAgreeOurPolicy(!agreeOurPolicy)}
-                            className="
+              {showPassword ? <FaEyeSlash size={15} /> : <FaEye size={15} />}
+            </span>
+          </div>
+          <div className="mt-0">
+            <FormInput
+              type="password"
+              placeholder="Confirm Password"
+              value={confirmPassword}
+              onChange={(e) => setConfirmPassword(e.target.value)}
+              width="w-72"
+              height="h-10"
+            />
+          </div>
+          <div className="flex items-center justify-start w-full mt-2 ml-3">
+            <input
+              type="checkbox"
+              id="agreeOurPolicy"
+              checked={agreeOurPolicy}
+              onChange={() => setAgreeOurPolicy(!agreeOurPolicy)}
+              className="
                                 appearance-none bg-gradient-to-b from-blue-500 via-blue-300 to-purple-500 w-4 h-4
                                 rounded-sm border border-gray-400
                                 checked:bg-blue-600 checked:border-white checked:border-2
@@ -124,41 +147,63 @@ export default function RegisterPage() {
                                 after:content-['✔'] after:absolute after:left-[2px] after:top-[-2px] after:text-black after:text-xs
                                 checked:after:opacity-100 after:opacity-0 cursor-pointer
                             "
-                        />
-                        <label
-                            htmlFor="agreeOurPolicy"
-                            className="ml-2 text-white text-xs"
-                            style={{ fontFamily: 'Noto Sans, sans-serif' }}
-                        >
-                            Agree Our Policy
-                        </label>
-                    </div>
-                    <div className="mt-5">
-                        <LoginButton text="Creat New Account" onClick={handleSignIn} width="w-72" height="h-10"/>
-                    </div>
-                    <div>
-                        <button
-                            type="button"
-                            className="text-white text-xs mt-3 font-noto cursor-pointer"
-                            onClick={() => router.push('/login')}
-                            >
-                            Do you have account? Login
-                        </button>
-                    </div>
-                    <div className="flex items-center my-5 w-full">
-                        <hr className="flex-grow border-t border-gray-600"/>
-                            <span className="mx-3 text-gray-400 text-xs font-noto">
-                                or
-                            </span>
-                        <hr className="flex-grow border-t border-gray-600"/>
-                    </div>
-                    <div className="flex mx-20 gap-4">
-                        <Image src="/icons/google-logo.png" alt="google-logo" width={25} height={25} className="cursor-pointer" onClick={handleGoogleLogin}/>
-                        <Image src="/icons/facebook-logo.png" alt="google-logo" width={25} height={25} className="cursor-pointer"/>
-                        <Image src="/icons/github-logo.png" alt="google-logo" width={25} height={25} className="cursor-pointer"/>
-                    </div>
-                </div>
-            </div>
+            />
+            <label
+              htmlFor="agreeOurPolicy"
+              className="ml-2 text-white text-xs"
+              style={{ fontFamily: "Noto Sans, sans-serif" }}
+            >
+              Agree Our Policy
+            </label>
+          </div>
+          <div className="mt-5">
+            <LoginButton
+              text="Creat New Account"
+              onClick={handleSignUp}
+              width="w-72"
+              height="h-10"
+            />
+          </div>
+          <div>
+            <button
+              type="button"
+              className="text-white text-xs mt-3 font-noto cursor-pointer"
+              onClick={() => router.push("/login")}
+            >
+              Do you have account? Login
+            </button>
+          </div>
+          <div className="flex items-center my-5 w-full">
+            <hr className="flex-grow border-t border-gray-600" />
+            <span className="mx-3 text-gray-400 text-xs font-noto">or</span>
+            <hr className="flex-grow border-t border-gray-600" />
+          </div>
+          <div className="flex mx-20 gap-4">
+            <Image
+              src="/icons/google-logo.png"
+              alt="google-logo"
+              width={25}
+              height={25}
+              className="cursor-pointer"
+              onClick={handleGoogleLogin}
+            />
+            <Image
+              src="/icons/facebook-logo.png"
+              alt="google-logo"
+              width={25}
+              height={25}
+              className="cursor-pointer"
+            />
+            <Image
+              src="/icons/github-logo.png"
+              alt="google-logo"
+              width={25}
+              height={25}
+              className="cursor-pointer"
+            />
+          </div>
         </div>
-    );
+      </div>
+    </div>
+  );
 }
