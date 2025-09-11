@@ -8,6 +8,7 @@ import { FaEye, FaEyeSlash } from "react-icons/fa";
 import { auth, googleProvider } from "../firebase";
 import { signInWithPopup } from "firebase/auth";
 import type { User } from "firebase/auth";
+import { signInWithEmailAndPassword } from "firebase/auth";
 
 export default function Login() {
     const [email, setEmail] = useState('');
@@ -18,16 +19,36 @@ export default function Login() {
 
     const router = useRouter();
 
-    const handleLogin = () => {
-        console.log('Login: ')
+    const handleLogin = async () => {
+       try{
+        const userCredential = await signInWithEmailAndPassword(auth, email, password);
+        console.log("User Logged in:", userCredential.user);
+        router.push('/home');
+       }catch(error: unknown){
+        console.error("Login error:", error);
+        if(typeof error === "object" && error !== null && "code"
+            in error && (error as {code: string}).code === "auth/wrong-password"
+        ){
+            alert("Incorrect password. Please try again.");
+        }
+        else if(typeof error === "object" &&
+            error !== null &&
+            "code" in error &&
+            (error as { code: string }).code === "auth/user-not-found"){
+            alert("No account found with this email. Please register first.");
+        }
+        else{
+            alert("Login failed. Please check your credentials and try again.");
+        }  
     }
+    };
 
     const handleGoogleLogin = async () => {
     try {
         const result = await signInWithPopup(auth, googleProvider);
         setGoogleUser(result.user);
         console.log("Google user:", result.user);
-        router.push("/home"); // Redirect to home or dashboard
+        router.push("/home"); 
     } catch (error) {
         console.error("Google login error:", error);
     }
