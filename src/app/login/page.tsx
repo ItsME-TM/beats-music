@@ -14,7 +14,7 @@ export default function Login() {
     }
 
     return (
-        <div className="flex"> {/* 2.5rem = 40px header height */}
+        <div className="flex"> 
             <div className="w-[60%] pl-25 pt-10 flex-clo">
                 {/* Left column content */}
                 <div>
@@ -77,18 +77,34 @@ export default function Login() {
                                 id="rememberMe"
                                 checked={rememberMe}
                                 onChange={() => setRememberMe(!rememberMe)}
-                                className="bg-gradient-to-b from-blue-500 via-blue-300 to-purple-500 w-4 h-4"
+                                className="
+                                    appearance-none bg-gradient-to-b from-blue-500 via-blue-300 to-purple-500 w-4 h-4
+                                    rounded-sm border border-gray-400
+                                    checked:bg-blue-600 checked:border-white checked:border-2
+                                    relative
+                                    after:content-['✔'] after:absolute after:left-[2px] after:top-[-2px] after:text-black after:text-xs
+                                    checked:after:opacity-100 after:opacity-0
+                                "
                             />
                             <label
                                 htmlFor="rememberMe"
-                                className="ml-2 text-white text-sm"
+                                className="ml-2 text-white text-xs"
                                 style={{ fontFamily: 'Noto Sans, sans-serif' }}
                             >
                                 Remember me
                             </label>
                         </div>
-                        <div>
+                        <div className="mt-5">
                             <LoginButton text="Login" onClick={handleLogin} width="w-72" height="h-10"/>
+                        </div>
+                        <div>
+                            <button 
+                                type="button"
+                                className="text-white text-xs mt-3"
+                                onClick={() => alert('Forgot password clicked')}
+                                >
+                                Forgot password ?
+                            </button>
                         </div>
                     </div>
                 </div>
