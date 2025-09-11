@@ -9,6 +9,7 @@ import { auth, googleProvider } from "../firebase";
 import { signInWithPopup } from "firebase/auth";
 import type { User } from "firebase/auth";
 import { signInWithEmailAndPassword } from "firebase/auth";
+import { setPersistence, browserLocalPersistence, browserSessionPersistence } from "firebase/auth";
 
 export default function Login() {
     const [email, setEmail] = useState('');
@@ -21,6 +22,10 @@ export default function Login() {
 
     const handleLogin = async () => {
        try{
+        await setPersistence(
+            auth,
+            rememberMe ? browserLocalPersistence : browserSessionPersistence
+        );
         const userCredential = await signInWithEmailAndPassword(auth, email, password);
         console.log("User Logged in:", userCredential.user);
         router.push('/home');
@@ -95,7 +100,7 @@ export default function Login() {
                         <div className="mt-3">
                             <FormInput 
                                 type="email"
-                                placeholder="Username"
+                                placeholder="Email"
                                 value={email}
                                 onChange={(e) => setEmail(e.target.value)}
                                 width="w-72"
