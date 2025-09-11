@@ -1,6 +1,6 @@
 "use client";
 import Image from "next/image";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 import FormInput from "@/components/formInput";
@@ -9,6 +9,7 @@ import { createUserWithEmailAndPassword, signInWithPopup } from "firebase/auth";
 import { auth, googleProvider } from "../firebase";
 import type { User } from "firebase/auth";
 import { updateProfile } from "firebase/auth";
+import useAuth from "@/components/authProvider";
 
 export default function RegisterPage() {
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -19,6 +20,13 @@ export default function RegisterPage() {
   const [showPassword, setShowPassword] = useState(false);
 
   const router = useRouter();
+  const user = useAuth();
+
+  useEffect(() => {
+    if(user){
+        router.push("/home");
+    }
+  },[user, router]);
 
   const handleSignUp = async () => {
     if (!agreeOurPolicy) {

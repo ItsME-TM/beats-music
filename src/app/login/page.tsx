@@ -1,5 +1,5 @@
 'use client';
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import LoginButton from "@/components/login-button";
 import FormInput from "@/components/formInput";
 import Image from "next/image";
@@ -10,6 +10,7 @@ import { signInWithPopup } from "firebase/auth";
 import type { User } from "firebase/auth";
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { setPersistence, browserLocalPersistence, browserSessionPersistence } from "firebase/auth";
+import useAuth from "@/components/authProvider";
 
 export default function Login() {
     const [email, setEmail] = useState('');
@@ -19,6 +20,13 @@ export default function Login() {
     const [googleUser, setGoogleUser] = useState<User | null>(null);
 
     const router = useRouter();
+    const user = useAuth();
+
+    useEffect(() => {
+        if (user){
+            router.push("/home");
+        }
+    },[user, router]);
 
     const handleLogin = async () => {
        try{
