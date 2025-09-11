@@ -18,7 +18,7 @@ export default function Header({ isLoggedIn,searchValue, onSearchChange }: Heade
                 <span className="ml-4 text-sm font-bold font-inika">BEATS MUSIC</span>
             </div>
             {loginStatus && (
-                <div className="bg-[#181818] w-150 h-10 flex items-center justify-between rounded-2xl pl-2 pr-2">
+                <div className="bg-[#181818] w-130 h-10 flex items-center justify-between rounded-2xl pl-2 pr-2">
                     <input
                         type="text"
                         placeholder="Search something..."

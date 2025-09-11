@@ -1,12 +1,17 @@
 @import "tailwindcss";
 @import url('https://fonts.googleapis.com/css2?family=Inika:wght@400;700&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=K2D:wght@400;700&display=swap');
 
 .font-inika {
   font-family: 'Inika', serif;
 }
 body {
   font-family: 'Inter', sans-serif;
+}
+
+.font-k2d {
+  font-family: 'K2D', sans-serif;
 }
 
 :root {
