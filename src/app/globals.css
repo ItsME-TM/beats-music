@@ -2,12 +2,17 @@
 @import url('https://fonts.googleapis.com/css2?family=Inika:wght@400;700&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=K2D:wght@400;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;700&display=swap');
 
 .font-inika {
   font-family: 'Inika', serif;
 }
-body {
+.font-inter {
   font-family: 'Inter', sans-serif;
+}
+
+.font-noto {
+  font-family: 'Noto Sans', sans-serif;
 }
 
 .font-k2d {

@@ -106,6 +106,18 @@ export default function Login() {
                                 Forgot password ?
                             </button>
                         </div>
+                        <div className="flex items-center my-5 w-full">
+                            <hr className="flex-grow border-t border-gray-600"/>
+                                <span className="mx-3 text-gray-400 text-xs font-noto">
+                                    or
+                                </span>
+                            <hr className="flex-grow border-t border-gray-600"/>
+                        </div>
+                        <div className="flex mx-20 gap-3">
+                            <Image src="/icons/google-logo.png" alt="google-logo" width={25} height={25}/>
+                            <Image src="/icons/facebook-logo.png" alt="google-logo" width={25} height={25}/>
+                            <Image src="/icons/github-logo.png" alt="google-logo" width={25} height={25}/>
+                        </div>
                     </div>
                 </div>
             </div>
