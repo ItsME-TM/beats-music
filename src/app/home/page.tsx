@@ -5,6 +5,7 @@ import useAuth from "@/components/authProvider";
 import { MdLibraryMusic } from "react-icons/md";
 import Popup from "@/components/PopUp";
 import { auth } from "@/app/firebase";
+import Image from "next/image";
 
 export default function HomePage(){
     const user = useAuth();
@@ -22,7 +23,7 @@ export default function HomePage(){
             <div className="flex flex-row h-75 mt-4">
                 <div className="flex flex-col w-[57%]">
                     <span className="text-5xl font-k2d font-bold">THE MUTIL-UNIVERSAL MUSIC PLAYLIST</span>
-                    <span className="text-md mt-3">Discover the magic of music with us. 
+                    <span className="text-md font-k2d mt-3">Discover the magic of music with us. 
                         Our platform is your gateway to a world of melodies, 
                         rhythms, and emotions. Whether you&apos;re a passionate listener, 
                         a budding artist, or an industry professional, 
@@ -39,8 +40,16 @@ export default function HomePage(){
                         <MdLibraryMusic size={20} color="white" className="ml-2 mr-4" />
                     </div>
                 </div>
-                <div className="flex flex-col w-[43%] bg-blue-400">
-                    b
+                <div className="flex flex-col w-[43%] items-center">
+                    <span className="text-lg font-bold font-k2d ">NEW SONG: ONE OF THE GIRLS</span>
+                    <span className="text-sm font-k2d">The Weeknd, JENNIE & Lily Rose Depp</span>
+                    <Image
+                        src="/images/music-player.png" 
+                        alt="Music player"
+                        width={280}
+                        height={280}
+                        className="mt-5" 
+                    />
                 </div>
             </div>
             <div>b</div>
