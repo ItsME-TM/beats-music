@@ -5,18 +5,33 @@ import FormInput from "@/components/formInput";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
+import { auth, googleProvider } from "../firebase";
+import { signInWithPopup } from "firebase/auth";
+import type { User } from "firebase/auth";
 
 export default function Login() {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [rememberMe, setRememberMe] = useState(false);
     const [showPassword, setShowPassword] = useState(false);
+    const [googleUser, setGoogleUser] = useState<User | null>(null);
 
     const router = useRouter();
 
     const handleLogin = () => {
         console.log('Login: ')
     }
+
+    const handleGoogleLogin = async () => {
+    try {
+        const result = await signInWithPopup(auth, googleProvider);
+        setGoogleUser(result.user);
+        console.log("Google user:", result.user);
+        router.push("/")
+    } catch (error) {
+        console.error("Google login error:", error);
+    }
+};
 
     return (
         <div className="flex"> 
@@ -55,7 +70,7 @@ export default function Login() {
                 >
                     <h2 className="text-white text-2xl font-bold">Welcome Back</h2>
                     <p className="text-gray-300 text-xs">Glad you’re back.!</p>
-                    <div className="flex flex-col  h-100 items-center">
+                    <div className="flex flex-col  h-97 items-center">
                         <div className="mt-3">
                             <FormInput 
                                 type="email"
@@ -124,15 +139,15 @@ export default function Login() {
                                 </span>
                             <hr className="flex-grow border-t border-gray-600"/>
                         </div>
-                        <div className="flex mx-20 gap-3">
-                            <Image src="/icons/google-logo.png" alt="google-logo" width={25} height={25}/>
-                            <Image src="/icons/facebook-logo.png" alt="google-logo" width={25} height={25}/>
-                            <Image src="/icons/github-logo.png" alt="google-logo" width={25} height={25}/>
+                        <div className="flex mx-20 gap-4">
+                            <Image src="/icons/google-logo.png" alt="google-logo" width={25} height={25} className="cursor-pointer" onClick={handleGoogleLogin}/>
+                            <Image src="/icons/facebook-logo.png" alt="google-logo" width={25} height={25} className="cursor-pointer"/>
+                            <Image src="/icons/github-logo.png" alt="google-logo" width={25} height={25} className="cursor-pointer"/>
                         </div>
                         <div>
                             <button
                                 type="button"
-                                className="text-white text-xs mt-15 font-noto cursor-pointer"
+                                className="text-white text-xs mt-10 font-noto cursor-pointer"
                                 onClick={() => router.push('/register')}
                                 >
                                 Don&#39;t have an account? Signup
