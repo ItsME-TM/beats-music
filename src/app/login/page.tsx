@@ -4,11 +4,13 @@ import LoginButton from "@/components/login-button";
 import FormInput from "@/components/formInput";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
+import { FaEye, FaEyeSlash } from "react-icons/fa";
 
 export default function Login() {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [rememberMe, setRememberMe] = useState(false);
+    const [showPassword, setShowPassword] = useState(false);
 
     const router = useRouter();
 
@@ -66,13 +68,19 @@ export default function Login() {
                         </div>
                         <div className="mt-3">
                             <FormInput 
-                                type="password"
+                                type={showPassword ? "text" : "password"}
                                 placeholder="Password"
                                 value={password}
                                 onChange={(e) => setPassword(e.target.value)}
                                 width="w-72"
                                 height="h-10"
                             />
+                            <span 
+                                className="relative left-65 bottom-7 cursor-pointer"
+                                onClick={() => setShowPassword(!showPassword)}
+                            >
+                                {showPassword ? <FaEyeSlash size={15}/> : <FaEye size={15}/>}
+                            </span>
                         </div>
                         <div className="flex items-center justify-start w-full mt-2 ml-3">
                             <input
