@@ -9,15 +9,13 @@ interface HeaderProps {
 }
 
 export default function Header({ isLoggedIn,searchValue, onSearchChange }: HeaderProps) {
-    const loginStatus = true;
-
     return (
         <header className="h-10 flex items-center justify-between mt-4 px-26">
             <div className="flex items-center">
                 <Image src="/icons/left-logo.png" alt="left Logo" width={32} height={32}/>
                 <span className="ml-4 text-sm font-bold font-inika">BEATS MUSIC</span>
             </div>
-            {loginStatus && (
+            {isLoggedIn && (
                 <div className="bg-[#181818] w-130 h-10 flex items-center justify-between rounded-2xl pl-2 pr-2">
                     <input
                         type="text"

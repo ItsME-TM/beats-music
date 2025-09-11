@@ -34,7 +34,7 @@ export default function Login() {
 };
 
     return (
-        <div className="flex overflow-x-hidden"> 
+        <div className="flex overflow-x-hidden w-screen"> 
             <div className="w-[60%] pl-25 pt-10 flex-clo">
                 {/* Left column content */}
                 <div>
