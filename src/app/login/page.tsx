@@ -27,14 +27,14 @@ export default function Login() {
         const result = await signInWithPopup(auth, googleProvider);
         setGoogleUser(result.user);
         console.log("Google user:", result.user);
-        router.push("/")
+        router.push("/home"); // Redirect to home or dashboard
     } catch (error) {
         console.error("Google login error:", error);
     }
 };
 
     return (
-        <div className="flex"> 
+        <div className="flex overflow-x-hidden"> 
             <div className="w-[60%] pl-25 pt-10 flex-clo">
                 {/* Left column content */}
                 <div>
