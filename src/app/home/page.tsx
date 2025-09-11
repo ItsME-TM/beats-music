@@ -1,8 +1,9 @@
 "use client";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import useAuth from "@/components/authProvider";
-import SideBar from "@/components/sideBar";
+import Popup from "@/components/PopUp";
+import { auth } from "@/app/firebase";
 
 export default function HomePage(){
     const user = useAuth();
@@ -12,12 +13,11 @@ export default function HomePage(){
         if (!user) {
             router.push("/login");
         }
-        }, [user, router]);
+    }, [user, router]);
 
     return(
         <div className="">
-            home
+            Home
         </div>
-        
     );
 }
