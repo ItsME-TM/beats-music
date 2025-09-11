@@ -6,11 +6,49 @@ import { MdLibraryMusic } from "react-icons/md";
 import Popup from "@/components/PopUp";
 import { auth } from "@/app/firebase";
 import Image from "next/image";
+import { IoPlayCircleOutline } from "react-icons/io5";
 
 export default function HomePage(){
     const user = useAuth();
     const router = useRouter();
     const [searchSongDetails, setSearchSongDetails] = useState("");
+    const songs = [
+        {
+            image: "/images/weeknd.png",
+            title: "Blinding Lights",
+            artist: "The Weeknd"
+        },
+        {
+            image: "/images/selena.jpg",
+            title: "Lose You To Love Me",
+            artist: "Selena Gomez"
+        },
+        {
+            image: "/images/coldplay.jpg",
+            title: "Viva La Vida",
+            artist: "Coldplay"
+        },
+        {
+            image: "/images/weeknd.png",
+            title: "Save Your Tears",
+            artist: "The Weeknd"
+        },
+        {
+            image: "/images/selena.jpg",
+            title: "Rare",
+            artist: "Selena Gomez"
+        },
+        {
+            image: "/images/coldplay.jpg",
+            title: "Paradise",
+            artist: "Coldplay"
+        },
+        {
+            image: "/images/weeknd.png",
+            title: "Starboy",
+            artist: "The Weeknd"
+        }
+    ];
 
     useEffect(() => {
         if (!user) {
@@ -20,7 +58,7 @@ export default function HomePage(){
 
     return(
         <div className="flex flex-col pt-10 pl-20 pr-25 pb-5">
-            <div className="flex flex-row h-75 mt-4">
+            <div className="flex flex-row h-75 mt-2">
                 <div className="flex flex-col w-[57%]">
                     <span className="text-5xl font-k2d font-bold">THE MUTIL-UNIVERSAL MUSIC PLAYLIST</span>
                     <span className="text-md font-k2d mt-3">Discover the magic of music with us. 
@@ -52,7 +90,27 @@ export default function HomePage(){
                     />
                 </div>
             </div>
-            <div>b</div>
+            <div>
+                <div className="flex flex-row items-center gap-1">
+                    <span className="font-inter text-sm font-bold ">New Releases</span>
+                    <IoPlayCircleOutline color="#17DCF5" size={18}/>
+                </div>
+                <div className="grid grid-cols-7 gap-2 mt-2">
+                    {songs.map((song, idx)=>(
+                        <div key={idx} >
+                            <Image
+                                src={song.image}
+                                alt={song.title}
+                                width={130}
+                                height={130}
+                            />
+                            <span className="font-bold text-sm text-white">{song.title}</span>
+                            <br/>
+                            <span className="text-xs text-gray-400">{song.artist}</span>
+                        </div>
+                    ))}
+                </div>
+            </div>
         </div>
     );
 }
