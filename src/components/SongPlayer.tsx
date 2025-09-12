@@ -11,6 +11,7 @@ import {
   IoShuffle,
   IoRepeat,
 } from "react-icons/io5";
+import { BsThreeDots } from "react-icons/bs";
 
 type LyricLine = {
   time: number;
@@ -202,6 +203,7 @@ export default function SongPlayer({
                 />
               )}
             </button>
+            <BsThreeDots size={18} className="cursor-pointer"/>
             <AddPlaylistButton
               text="Add Playlist"
               width="w-20"
