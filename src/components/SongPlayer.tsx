@@ -174,7 +174,7 @@ export default function SongPlayer({
       style={coverUrl ? { backgroundImage: `url(${coverUrl})` } : undefined}
     >
       {/* overlay */}
-      <div className="absolute inset-0 bg-black/50" />
+      <div className="absolute inset-0 bg-gradient-to-l from-[rgba(0,0,0,0.9)] to-[rgba(102,102,102,0.35)]" />
 
       {/* content */}
       <div className="relative flex gap-2 h-full p-6">
@@ -191,9 +191,15 @@ export default function SongPlayer({
               onClick={() => setLiked((l) => !l)}
             >
               {liked ? (
-                <AiFillHeart className="text-red-500 cursor-pointer" size={18} />
+                <AiFillHeart
+                  className="text-red-500 cursor-pointer"
+                  size={18}
+                />
               ) : (
-                <AiOutlineHeart className="opacity-80 cursor-pointer" size={18} />
+                <AiOutlineHeart
+                  className="opacity-80 cursor-pointer"
+                  size={18}
+                />
               )}
             </button>
             <AddPlaylistButton

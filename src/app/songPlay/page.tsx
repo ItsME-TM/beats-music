@@ -17,7 +17,7 @@ export default function SongPlayPage() {
 
   return (
     <div className="flex pt-6 pl-25 pr-20 pb-2 flex-row ">
-        <div className="flex-col bg-white w-[60%] flex-1">
+        <div className="flex-col w-[60%] flex-1">
             <SongPlayer
                 title="ONE OF THE GIRLS"
                 artists={["The Weeknd", "JENNIE", "Lily-Rose Depp"]}
