@@ -4,6 +4,7 @@ import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import useAuth from "@/components/authProvider";
 import SongPlayer from "@/components/SongPlayer";
+import RecentPlayed from "@/components/RecentPlyed";
 
 export default function SongPlayPage() {
   const user = useAuth();
@@ -42,6 +43,7 @@ export default function SongPlayPage() {
                 onPrev={() => console.log("Prev")}
                 onNext={() => console.log("Next")}
             />
+            <RecentPlayed />
         </div>
         <div className="flex flex-col w-[40%]">
 
