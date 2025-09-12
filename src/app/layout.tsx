@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import HeaderWrapper from "@/components/headerWrapper";
+import NextTopLoader from "nextjs-toploader";
 import { AuthProvider } from "@/components/authProvider";
 import SideBarWrapper from "@/components/SideBarWrapper";
 
@@ -38,6 +39,18 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <AuthProvider>
+          <NextTopLoader
+            color="#17DCF5"
+            initialPosition={0.2}
+            crawlSpeed={250}
+            height={3}
+            crawl={true}
+            showSpinner={false}
+            easing="ease"
+            speed={200}
+            shadow="0 0 10px #17DCF5,0 0 5px #17DCF5"
+            zIndex={2000}
+          />
           <HeaderWrapper />
           {children}
           <SideBarWrapper />
