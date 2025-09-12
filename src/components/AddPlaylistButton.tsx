@@ -23,7 +23,7 @@ export default function AddPlaylistButton({
       onClick={onClick}
       disabled={disabled}
       aria-label="Add to Playlist"
-      className={`bg-teal-500 font-inter text-xs px-1 hover:text-white cursor-pointer  font-bold color-[#17DCF5] text-black ${
+      className={`bg-teal-500 font-inter rounded-md text-xs px-1 hover:text-white cursor-pointer  font-bold color-[#17DCF5] text-black ${
         width ?? ""
       } ${height ?? ""}   `}
     >

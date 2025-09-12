@@ -55,7 +55,6 @@ export default function SongPlayer({
     (currentTime / Math.max(duration, 1)) * 100
   );
 
-
   useEffect(() => {
     if (!audioSrc) return;
     const audio = new Audio(audioSrc);
@@ -87,7 +86,6 @@ export default function SongPlayer({
     };
   }, [audioSrc, repeat]);
 
-
   useEffect(() => {
     if (audioSrc) return;
     if (!isPlaying) return;
@@ -112,7 +110,6 @@ export default function SongPlayer({
     return () => window.clearInterval(id);
   }, [isPlaying, duration, currentTime, repeat, audioSrc]);
 
-
   const currentLyricIndex = useMemo(() => {
     if (!lyrics.length) return -1;
     let idx = -1;
@@ -124,16 +121,25 @@ export default function SongPlayer({
   }, [lyrics, currentTime]);
 
   const visibleLyrics = useMemo(() => {
-    if (!lyrics.length) return [];
-    const start = Math.max(0, currentLyricIndex - 2);
-    const end = Math.min(lyrics.length, currentLyricIndex + 4);
+    const total = lyrics.length;
+    if (!total) return [];
+    const windowSize = Math.min(5, total);
+    let start: number;
+    if (currentLyricIndex < 0) {
+      // before first line, start from the top
+      start = 0;
+    } else {
+      start = currentLyricIndex - Math.floor(windowSize / 2);
+      // clamp window to valid range so we always show exactly `windowSize` lines when possible
+      start = Math.max(0, Math.min(start, total - windowSize));
+    }
+    const end = start + windowSize;
     return lyrics.slice(start, end).map((l, i) => ({
       ...l,
       isCurrent: l.time === lyrics[currentLyricIndex]?.time,
       key: `${l.time}-${i}`,
     }));
   }, [lyrics, currentLyricIndex]);
-
 
   function togglePlayPause() {
     if (audioRef.current) {
@@ -185,9 +191,9 @@ export default function SongPlayer({
               onClick={() => setLiked((l) => !l)}
             >
               {liked ? (
-                <AiFillHeart className="text-red-500" size={18} />
+                <AiFillHeart className="text-red-500 cursor-pointer" size={18} />
               ) : (
-                <AiOutlineHeart className="opacity-80" size={18} />
+                <AiOutlineHeart className="opacity-80 cursor-pointer" size={18} />
               )}
             </button>
             <AddPlaylistButton
@@ -202,11 +208,11 @@ export default function SongPlayer({
         {/* right: lyrics */}
         <div className="ml-5 mt-5 flex-1 self-center">
           {visibleLyrics.length ? (
-            <div className="flex flex-col ml-6 gap-2">
+            <div className="flex flex-col items-center gap-2">
               {visibleLyrics.map((l) => (
                 <div
                   key={l.key}
-                  className={`text-lg ${
+                  className={`text-lg text-center ${
                     l.isCurrent
                       ? "font-bold text-red-400"
                       : "opacity-80 text-white"
@@ -248,40 +254,42 @@ export default function SongPlayer({
             <div className="flex items-center justify-center gap-6">
               <button
                 onClick={() => setShuffle((s) => !s)}
-                className={`${controlBtnClass} ${shuffle ? "bg-white/20" : ""}`}
+                className={`${controlBtnClass} ${
+                  shuffle ? "opacity-100" : "opacity-70"
+                }`}
                 aria-label="Shuffle"
               >
-                <IoShuffle size={14} />
+                <IoShuffle size={16} />
               </button>
               <button
                 onClick={onPrev}
                 className={controlBtnClass}
                 aria-label="Previous"
               >
-                <IoPlaySkipBack size={14} />
+                <IoPlaySkipBack size={16} />
               </button>
               <button
                 onClick={togglePlayPause}
-                className="w-8 h-8 rounded-full bg-white text-black flex items-center justify-center"
+                className="p-1 text-white flex items-center justify-center cursor-pointer"
                 aria-label={isPlaying ? "Pause" : "Play"}
               >
-                {isPlaying ? <IoPause size={16} /> : <IoPlay size={16} />}
+                {isPlaying ? <IoPause size={18} /> : <IoPlay size={18} />}
               </button>
               <button
                 onClick={onNext}
                 className={controlBtnClass}
                 aria-label="Next"
               >
-                <IoPlaySkipForward size={14} />
+                <IoPlaySkipForward size={16} />
               </button>
               <button
                 onClick={() => setRepeat((r) => (r === "off" ? "one" : "off"))}
                 className={`${controlBtnClass} ${
-                  repeat === "one" ? "bg-white/20" : ""
+                  repeat === "one" ? "opacity-100" : "opacity-70"
                 }`}
                 aria-label="Repeat"
               >
-                <IoRepeat size={14} />
+                <IoRepeat size={16} />
               </button>
             </div>
           </div>
@@ -297,4 +305,4 @@ function inferDuration(lyrics: LyricLine[]) {
 }
 
 const controlBtnClass =
-  "w-6 h-6 rounded-full bg-white/10 border border-white/20 text-white flex items-center justify-center";
+  "p-1 text-white transition-colors cursor-pointer hover:text-white focus:outline-none";
