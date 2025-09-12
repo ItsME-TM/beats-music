@@ -65,13 +65,13 @@ export default function Popup({
           <div className="mt-8 flex items-center justify-center gap-4">
             <button
               onClick={onConfirm}
-              className=" cursor-pointer w-35 px-5 py-2.5 rounded-lg font-semibold text-white bg-black/40 hover:bg-black/60 border border-[#17DCF5] shadow-[0_0_8px_rgba(23,220,245,0.2)] transition focus:outline-none focus:ring-2 focus:ring-[#17DCF5]/50"
+              className="cursor-pointer w-35 px-5 py-2.5 rounded-lg font-semibold text-white bg-black/40 border border-[#17DCF5] shadow-[0_0_8px_rgba(23,220,245,0.2)] transition transition-transform duration-150 hover:bg-black/55 hover:shadow-[0_0_14px_rgba(23,220,245,0.45)] hover:-translate-y-0.5 active:translate-y-0 focus:outline-none focus:ring-2 focus:ring-[#17DCF5]/50"
             >
               Yes, I&apos;m sure
             </button>
             <button
               onClick={onCancel}
-              className="px-5 py-2.5 w-35 rounded-lg font-semibold text-white bg-black/30 hover:bg-black/50 border border-[#17DCF5] transition focus:outline-none focus:ring-2 focus:ring-[#17DCF5]/40 cursor-pointer"
+              className="px-5 py-2.5 w-35 rounded-lg font-semibold text-white bg-black/30 border border-[#17DCF5] transition transition-transform duration-150 hover:bg-black/55 hover:shadow-[0_0_14px_rgba(23,220,245,0.45)] hover:-translate-y-0.5 active:translate-y-0 focus:outline-none focus:ring-2 focus:ring-[#17DCF5]/40 cursor-pointer"
             >
               Cancel
             </button>
