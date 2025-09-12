@@ -2,6 +2,15 @@
 
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import AddPlaylistButton from "./AddPlaylistButton";
+import { AiOutlineHeart, AiFillHeart } from "react-icons/ai";
+import {
+  IoPlay,
+  IoPause,
+  IoPlaySkipBack,
+  IoPlaySkipForward,
+  IoShuffle,
+  IoRepeat,
+} from "react-icons/io5";
 
 type LyricLine = {
   time: number;
@@ -41,9 +50,12 @@ export default function SongPlayer({
     durationProp || inferDuration(lyrics) || 200
   );
 
-  const progressPct = Math.min(100, (currentTime / Math.max(duration, 1)) * 100);
+  const progressPct = Math.min(
+    100,
+    (currentTime / Math.max(duration, 1)) * 100
+  );
 
-  // --- audio setup ---
+
   useEffect(() => {
     if (!audioSrc) return;
     const audio = new Audio(audioSrc);
@@ -75,7 +87,7 @@ export default function SongPlayer({
     };
   }, [audioSrc, repeat]);
 
-  // --- simulation for when no audioSrc ---
+
   useEffect(() => {
     if (audioSrc) return;
     if (!isPlaying) return;
@@ -100,7 +112,7 @@ export default function SongPlayer({
     return () => window.clearInterval(id);
   }, [isPlaying, duration, currentTime, repeat, audioSrc]);
 
-  // --- lyrics highlighting ---
+
   const currentLyricIndex = useMemo(() => {
     if (!lyrics.length) return -1;
     let idx = -1;
@@ -122,7 +134,7 @@ export default function SongPlayer({
     }));
   }, [lyrics, currentLyricIndex]);
 
-  // --- handlers ---
+
   function togglePlayPause() {
     if (audioRef.current) {
       if (isPlaying) {
@@ -172,7 +184,11 @@ export default function SongPlayer({
               className="p-2"
               onClick={() => setLiked((l) => !l)}
             >
-              {liked ? "❤️" : "🤍"}
+              {liked ? (
+                <AiFillHeart className="text-red-500" size={18} />
+              ) : (
+                <AiOutlineHeart className="opacity-80" size={18} />
+              )}
             </button>
             <AddPlaylistButton
               text="Add Playlist"
@@ -232,27 +248,40 @@ export default function SongPlayer({
             <div className="flex items-center justify-center gap-6">
               <button
                 onClick={() => setShuffle((s) => !s)}
-                className={controlBtnClass}
+                className={`${controlBtnClass} ${shuffle ? "bg-white/20" : ""}`}
+                aria-label="Shuffle"
               >
-                🔀
+                <IoShuffle size={14} />
               </button>
-              <button onClick={onPrev} className={controlBtnClass}>
-                ⏮
+              <button
+                onClick={onPrev}
+                className={controlBtnClass}
+                aria-label="Previous"
+              >
+                <IoPlaySkipBack size={14} />
               </button>
               <button
                 onClick={togglePlayPause}
                 className="w-8 h-8 rounded-full bg-white text-black flex items-center justify-center"
+                aria-label={isPlaying ? "Pause" : "Play"}
               >
-                {isPlaying ? "⏸" : "▶"}
+                {isPlaying ? <IoPause size={16} /> : <IoPlay size={16} />}
               </button>
-              <button onClick={onNext} className={controlBtnClass}>
-                ⏭
+              <button
+                onClick={onNext}
+                className={controlBtnClass}
+                aria-label="Next"
+              >
+                <IoPlaySkipForward size={14} />
               </button>
               <button
                 onClick={() => setRepeat((r) => (r === "off" ? "one" : "off"))}
-                className={controlBtnClass}
+                className={`${controlBtnClass} ${
+                  repeat === "one" ? "bg-white/20" : ""
+                }`}
+                aria-label="Repeat"
               >
-                🔁
+                <IoRepeat size={14} />
               </button>
             </div>
           </div>
