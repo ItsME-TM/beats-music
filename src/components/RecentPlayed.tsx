@@ -47,7 +47,21 @@ export default function RecentPlayed({ songs }: RecentPlayedProps) {
               key={song.id}
               className={`flex items-center mb-1 rounded-lg transition-colors ${active}`}
             >
-              <span className="w-6 text-center text-xs">{idx + 1}</span>
+              <div className="relative w-6 h-6 flex items-center justify-center text-xs mr-0">
+                <span
+                  className={`transition-opacity duration-150 ${
+                    song.isPlaying ? "opacity-0" : "opacity-100"
+                  }`}
+                >
+                  {idx + 1}
+                </span>
+                {song.isPlaying && (
+                  <IoPause
+                    className="absolute inset-0 m-auto text-[#00eaff] text-sm"
+                    aria-label="Playing"
+                  />
+                )}
+              </div>
               <Image
                 src={song.image}
                 alt={song.title}
@@ -93,14 +107,7 @@ export default function RecentPlayed({ songs }: RecentPlayedProps) {
               >
                 <BsThreeDots />
               </button>
-              {song.isPlaying && (
-                <span
-                  className="ml-3 text-xl text-[#00eaff]"
-                  aria-label="Playing"
-                >
-                  <IoPause />
-                </span>
-              )}
+              {/* trailing playing icon removed; now overlaid on index */}
             </div>
           );
         })}
