@@ -9,7 +9,6 @@ export type Playlist = {
   id: number;
   name: string;
   description?: string;
-  icon?: "home" | "stats" | "none";
 };
 
 type YourPlayListsProps = {
@@ -40,9 +39,9 @@ export default function YourPlayLists({
     <section
       className={`bg-[#0b0b0b] rounded-xl px-4 py-1 text-white ${className}`}
     >
-      <div className="flex items-center mb-1">
-         <IoHome />
-        <h2 className="ml-2 text-base font-semibold flex-1 leading-tight">
+      <div className="flex items-center mb-1 gap-2">
+        <IoHome className="text-lg" />
+        <h2 className="text-base font-semibold flex-1 leading-tight">
           {title}
         </h2>
         <button
@@ -62,18 +61,19 @@ export default function YourPlayLists({
               key={pl.id}
               type="button"
               onClick={() => handleSelect(pl)}
-              className={`group flex items-center gap-2 text-left rounded-md px-2 py-1 transition-colors focus:outline-none focus:ring-1 focus:ring-[#00eaff] ${
+              className={`group flex items-center text-left rounded-md px-2 py-1 transition-colors focus:outline-none focus:ring-1 focus:ring-[#00eaff] ${
                 active
                   ? "bg-[#181818] text-[#ff4d4d] font-medium"
                   : "text-gray-300 hover:text-white hover:bg-[#141414]"
               }`}
               aria-pressed={active}
             >
-              <span className="text-lg w-5 flex justify-center">
-                {pl.icon === "home"}
-                {pl.icon === "stats" && <BsGraphUp />}
+              <span className="flex items-center gap-3 flex-1 min-w-0">
+                <span className="truncate">{pl.name}</span>
+                {active && (
+                  <BsGraphUp className="text-[#ff4d4d] text-sm shrink-0" />
+                )}
               </span>
-              <span className="truncate flex-1">{pl.name}</span>
             </button>
           );
         })}

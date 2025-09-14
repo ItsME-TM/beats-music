@@ -1,7 +1,6 @@
 "use client";
 
 import Image from "next/image";
-import { IoChevronForward, IoChevronBack } from "react-icons/io5";
 import { AiFillPlayCircle } from "react-icons/ai";
 import React from "react";
 
@@ -59,7 +58,7 @@ export default function SongReleases({
                     aria-label={`Play ${r.title}`}
                     className="absolute inset-0 opacity-0 group-hover:opacity-100 flex items-center justify-center bg-black/40 transition-opacity"
                   >
-                    <AiFillPlayCircle className="text-white/90 drop-shadow" size={34} />
+                    <AiFillPlayCircle className="text-white/90 drop-shadow cursor-pointer" size={34} />
                   </button>
                 </div>
               </div>
