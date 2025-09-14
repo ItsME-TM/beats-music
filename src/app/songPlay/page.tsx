@@ -6,6 +6,7 @@ import useAuth from "@/components/authProvider";
 import SongPlayer from "@/components/SongPlayer";
 import RecentPlayed from "@/components/RecentPlayed";
 import SongReleases, { Release } from "@/components/songReleases";
+import TopGlobalSongs from "@/components/TopGlobalSongs";
 
 export default function SongPlayPage() {
   const user = useAuth();
@@ -130,8 +131,23 @@ export default function SongPlayPage() {
           />
         </div>
       </div>
-
-      <div className="flex flex-col w-[40%]"></div>
+      <div className="flex flex-col w-[40%]">
+        <div className="mt-2">
+          <TopGlobalSongs
+            songs={[
+              { id: 1, title: "Mistletoe", artist: "Justin Bieber", duration: "3:54", image: "/images/maria.png" },
+              { id: 2, title: "Easy On Me", artist: "Adele", duration: "3:54", image: "/images/selena.jpg" },
+              { id: 3, title: "Moonlight", artist: "Public Library Commun...", duration: "3:54", image: "/images/donda.png" },
+              { id: 4, title: "SICKO MODE", artist: "Travis Scott ft. Drake", duration: "3:54", image: "/images/weeknd.png" },
+              { id: 5, title: "Get Lost", artist: "Vincent Fable", duration: "3:54", image: "/images/kanye.png" },
+              { id: 6, title: "I Feel Good", artist: "Pink Sweat$", duration: "3:54", image: "/images/pink_sweat.jpg" },
+              { id: 7, title: "Midsummer Madness", artist: "88rising", duration: "3:54", image: "/images/zedd.jpg" },
+            ]}
+            onSelect={(song) => console.log("Selected top song", song)}
+            onToggleFavorite={(song, fav) => console.log("Fav toggled", song.title, fav)}
+          />
+        </div>
+      </div>
     </div>
   );
 }
