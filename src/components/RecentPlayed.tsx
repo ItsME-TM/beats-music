@@ -85,10 +85,10 @@ export default function RecentPlayed({ songs }: RecentPlayedProps) {
                   {song.artist}
                 </div>
               </div>
-              <div className="w-[120px] text-left text-sm truncate">
+              <div className="w-[120px] text-left text-xs truncate">
                 {song.album || "Album"}
               </div>
-              <div className="w-[60px] text-center text-sm">
+              <div className="w-[60px] text-center text-xs">
                 {song.duration}
               </div>
               <button
