@@ -167,7 +167,7 @@ export default function SongPlayer({
 
   return (
     <div
-      className={`w-160 h-70 relative rounded-2xl text-white shadow-lg overflow-hidden ${
+      className={`w-160 h-68 relative rounded-2xl text-white shadow-lg overflow-hidden ${
         coverUrl
           ? "bg-center bg-cover"
           : "bg-gradient-to-br from-[#0b0f14] to-[#131a21]"

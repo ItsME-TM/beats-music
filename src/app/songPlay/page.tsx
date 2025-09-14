@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import useAuth from "@/components/authProvider";
 import SongPlayer from "@/components/SongPlayer";
 import RecentPlayed from "@/components/RecentPlayed";
+import SongReleases, { Release } from "@/components/songReleases";
 
 export default function SongPlayPage() {
   const user = useAuth();
@@ -45,43 +46,92 @@ export default function SongPlayPage() {
         />
         <div className="pt-2">
           <RecentPlayed
-              songs={[
+            songs={[
+              {
+                id: 1,
+                title: "All I Want For Christmas Is You",
+                artist: "Maria Carey",
+                album: "Album",
+                duration: "3:54",
+                image: "/images/maria.png",
+                isFavorite: false,
+              },
+              {
+                id: 2,
+                title: "One of the girls",
+                artist: "The Weekn & JENNIE...",
+                album: "-R-",
+                duration: "3:54",
+                image: "/images/jennie.png",
+                isPlaying: true,
+                isFavorite: true,
+              },
+              {
+                id: 3,
+                title: "Donda",
+                artist: "Kanye West",
+                album: "Donda",
+                duration: "3:54",
+                image: "/images/donda.png",
+                isFavorite: false,
+              },
+            ]}
+          />
+        </div>
+        <div>
+          <SongReleases
+            releases={
+              [
                 {
                   id: 1,
-                  title: "All I Want For Christmas Is You",
-                  artist: "Maria Carey",
-                  album: "Album",
-                  duration: "3:54",
-                  image: "/images/maria.png",
-                  isFavorite: false,
+                  title: "Way Back Home",
+                  artist: "SHAUN",
+                  image: "/images/weeknd.png",
                 },
                 {
                   id: 2,
-                  title: "One of the girls",
-                  artist: "The Weekn & JENNIE...",
-                  album: "-R-",
-                  duration: "3:54",
-                  image: "/images/jennie.png",
-                  isPlaying: true,
-                  isFavorite: true,
+                  title: "Rockabye",
+                  artist: "The Clean Bandit",
+                  image: "/images/selena.jpg",
                 },
                 {
                   id: 3,
-                  title: "Donda",
+                  title: "Graduation",
                   artist: "Kanye West",
-                  album: "Donda",
-                  duration: "3:54",
                   image: "/images/donda.png",
-                  isFavorite: false,
                 },
-              ]}
-            />
+                {
+                  id: 4,
+                  title: "Stay",
+                  artist: "Zedd",
+                  image: "/images/weeknd.png",
+                },
+                {
+                  id: 5,
+                  title: "abcdefu",
+                  artist: "GAYLE",
+                  image: "/images/selena.jpg",
+                },
+                {
+                  id: 6,
+                  title: "Bad Habits",
+                  artist: "Ed Sheeran",
+                  image: "/images/weeknd.png",
+                },
+                {
+                  id: 7,
+                  title: "At My Worst",
+                  artist: "Pink Sweat$",
+                  image: "/images/jennie.png",
+                },
+              ] as Release[]
+            }
+            onSelect={(r) => console.log("Selected release", r)}
+          />
         </div>
       </div>
-          
-      <div className="flex flex-col w-[40%]">
-        
-      </div>
+
+      <div className="flex flex-col w-[40%]"></div>
     </div>
   );
 }
