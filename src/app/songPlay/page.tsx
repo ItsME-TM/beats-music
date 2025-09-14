@@ -195,7 +195,7 @@ export default function SongPlayPage() {
         <div className="mt-2">
           <YourPlayLists
             playlists={[
-              { id: 1, name: "For workplace", icon: "home" },
+              { id: 1, name: "For workplace" },
               { id: 2, name: "Rich Brian's collections" },
               { id: 3, name: "deep focus" },
             ]}
