@@ -5,10 +5,12 @@ import { useRouter } from "next/navigation";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 import FormInput from "@/components/formInput";
 import LoginButton from "@/components/login-button";
-import { createUserWithEmailAndPassword, signInWithPopup } from "firebase/auth";
+import {
+  createUserWithEmailAndPassword,
+  signInWithPopup,
+  updateProfile,
+} from "firebase/auth";
 import { auth, googleProvider } from "../firebase";
-import type { User } from "firebase/auth";
-import { updateProfile } from "firebase/auth";
 import useAuth from "@/components/authProvider";
 
 export default function RegisterPage() {
@@ -23,10 +25,10 @@ export default function RegisterPage() {
   const user = useAuth();
 
   useEffect(() => {
-    if(user){
-        router.push("/home");
+    if (user) {
+      router.push("/home");
     }
-  },[user, router]);
+  }, [user, router]);
 
   const handleSignUp = async () => {
     if (!agreeOurPolicy) {
@@ -48,8 +50,12 @@ export default function RegisterPage() {
       router.push("/home");
     } catch (error: unknown) {
       console.error("Error signing up:", error);
-      if (typeof error === "object" && error !== null && "code" in error && 
-        (error as {code: string}).code === "auth/email-already-in-use") {
+      if (
+        typeof error === "object" &&
+        error !== null &&
+        "code" in error &&
+        (error as { code: string }).code === "auth/email-already-in-use"
+      ) {
         alert(
           "This email is already registered. Please log in or use a different email."
         );
@@ -73,19 +79,15 @@ export default function RegisterPage() {
   };
 
   return (
-    <div className="w-screen flex items-center justify-center pr-20 pt-5 pl-15">
+    <div className="w-screen flex items-center justify-center px-4 sm:px-6 md:px-10 lg:px-16 pt-6 sm:pt-8">
       <div
-        className="w-90 rounded-xl pt-3 p-8 backdrop-blur-[53px] shadow-[-8px_4px_5px_0px_#0000003D]"
+        className="w-full sm:w-[420px] md:w-90 rounded-xl pt-3 p-6 sm:p-8 backdrop-blur-[53px] shadow-[-8px_4px_5px_0px_#0000003D]"
         style={{
-          background: `
-                    linear-gradient(0deg, rgba(0, 0, 0, 0.14), rgba(0, 0, 0, 0.14)),
-                    linear-gradient(321.23deg, rgba(191, 191, 191, 0.062) 5.98%, rgba(0, 0, 0, 0) 66.28%)
-                    `,
+          background:
+            "linear-gradient(0deg, rgba(0, 0, 0, 0.14), rgba(0, 0, 0, 0.14)),\n                    linear-gradient(321.23deg, rgba(191, 191, 191, 0.062) 5.98%, rgba(0, 0, 0, 0) 66.28%)",
           border: "1px solid",
-          borderImageSource: `
-                    linear-gradient(166.93deg, #AFAFAF 3.24%, rgba(96, 96, 96, 0) 96.43%),
-                    linear-gradient(317.92deg, rgba(255, 255, 255, 0.6) 1.48%, rgba(0, 0, 0, 0) 67.95%)
-                    `,
+          borderImageSource:
+            "linear-gradient(166.93deg, #AFAFAF 3.24%, rgba(96, 96, 96, 0) 96.43%),\n                    linear-gradient(317.92deg, rgba(255, 255, 255, 0.6) 1.48%, rgba(0, 0, 0, 0) 67.95%)",
         }}
       >
         <h2 className="text-white text-2xl font-bold font-noto">
@@ -94,50 +96,50 @@ export default function RegisterPage() {
         <p className="text-gray-300 text-xs font-noto">
           Enjoy your new spirit world
         </p>
-        <div className="flex flex-col  h-97 items-center">
-          <div className="mt-4">
+        <div className="flex flex-col h-97 items-center">
+          <div className="mt-4 w-full flex justify-center">
             <FormInput
               type="text"
               placeholder="Username"
               value={username}
               onChange={(e) => setUsername(e.target.value)}
-              width="w-72"
+              width="w-[85%] sm:w-72"
               height="h-10"
             />
           </div>
-          <div className="mt-2">
+          <div className="mt-2 w-full flex justify-center">
             <FormInput
               type="email"
               placeholder="Email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              width="w-72"
+              width="w-[85%] sm:w-72"
               height="h-10"
             />
           </div>
-          <div className="mt-2">
+          <div className="mt-2 w-full flex justify-center">
             <FormInput
               type={showPassword ? "text" : "password"}
               placeholder="Password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              width="w-72"
+              width="w-[85%] sm:w-72"
               height="h-10"
             />
             <span
-              className="relative left-65 bottom-7 cursor-pointer"
+              className="relative left-[70%] sm:left-65 bottom-7 cursor-pointer"
               onClick={() => setShowPassword(!showPassword)}
             >
               {showPassword ? <FaEyeSlash size={15} /> : <FaEye size={15} />}
             </span>
           </div>
-          <div className="mt-0">
+          <div className="mt-0 w-full flex justify-center">
             <FormInput
               type="password"
               placeholder="Confirm Password"
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
-              width="w-72"
+              width="w-[85%] sm:w-72"
               height="h-10"
             />
           </div>
@@ -164,11 +166,11 @@ export default function RegisterPage() {
               Agree Our Policy
             </label>
           </div>
-          <div className="mt-5">
+          <div className="mt-5 w-full flex justify-center">
             <LoginButton
               text="Creat New Account"
               onClick={handleSignUp}
-              width="w-72"
+              width="w-[85%] sm:w-72"
               height="h-10"
             />
           </div>
@@ -186,7 +188,7 @@ export default function RegisterPage() {
             <span className="mx-3 text-gray-400 text-xs font-noto">or</span>
             <hr className="flex-grow border-t border-gray-600" />
           </div>
-          <div className="flex mx-20 gap-4">
+          <div className="flex mx-10 sm:mx-20 gap-4">
             <Image
               src="/icons/google-logo.png"
               alt="google-logo"

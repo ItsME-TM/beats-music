@@ -22,7 +22,7 @@ type RecentPlayedProps = {
 
 export default function RecentPlayed({ songs }: RecentPlayedProps) {
   return (
-    <div className="bg-[#111] rounded-xl py-1 px-6 text-white w-160">
+    <div className="bg-[#111] rounded-xl py-1 px-4 sm:px-6 text-white w-full max-w-[640px]">
       {/* Header */}
       <div className="flex items-center mb-1">
         <span className="text-md font-semibold">Recently Played</span>

@@ -85,7 +85,7 @@ export default function SongPlayer({
       audio.removeEventListener("ended", onEnd);
       audioRef.current = null;
     };
-  }, [audioSrc, repeat]);
+  }, [audioSrc, repeat, durationProp, onNext]);
 
   useEffect(() => {
     if (audioSrc) return;
@@ -167,25 +167,31 @@ export default function SongPlayer({
 
   return (
     <div
-      className={`w-160 h-68 relative rounded-2xl text-white shadow-lg overflow-hidden ${
+      className={`relative rounded-2xl text-white shadow-lg overflow-hidden ${
         coverUrl
           ? "bg-center bg-cover"
           : "bg-gradient-to-br from-[#0b0f14] to-[#131a21]"
-      }`}
+      } w-full max-w-[860px] md:max-w-[960px] lg:max-w-[1024px] h-[320px] sm:h-[360px] md:h-[420px]`}
       style={coverUrl ? { backgroundImage: `url(${coverUrl})` } : undefined}
     >
       {/* overlay */}
       <div className="absolute inset-0 bg-gradient-to-l from-[rgba(0,0,0,0.9)] to-[rgba(102,102,102,0.35)]" />
 
       {/* content */}
-      <div className="relative flex gap-2 h-full p-6">
+      <div className="relative flex flex-col md:flex-row gap-4 md:gap-2 h-full p-4 md:p-6">
         {/* left: song info */}
-        <div className="w-60 self-center">
-          <p className="text-xs font-bold opacity-80 mb-2">FEATURED SONG</p>
-          <h1 className="text-xl font-extrabold leading-tight">{title}</h1>
-          <p className="mt-2 text-xs opacity-90">{artists.join(" & ")}</p>
+        <div className="md:w-60 self-start md:self-center">
+          <p className="text-[10px] sm:text-xs font-bold opacity-80 mb-1 sm:mb-2">
+            FEATURED SONG
+          </p>
+          <h1 className="text-lg sm:text-xl font-extrabold leading-tight">
+            {title}
+          </h1>
+          <p className="mt-1 sm:mt-2 text-[10px] sm:text-xs opacity-90">
+            {artists.join(" & ")}
+          </p>
 
-          <div className="flex items-center gap-4 mt-4">
+          <div className="flex items-center gap-3 sm:gap-4 mt-3 sm:mt-4">
             <button
               aria-label="Like"
               className="p-2"
@@ -203,24 +209,24 @@ export default function SongPlayer({
                 />
               )}
             </button>
-            <BsThreeDots size={18} className="cursor-pointer"/>
+            <BsThreeDots size={18} className="cursor-pointer" />
             <AddPlaylistButton
               text="Add Playlist"
-              width="w-20"
-              height="h-5"
+              width="w-22 sm:w-24"
+              height="h-6 sm:h-7"
               onClick={onAddToPlaylist}
             />
           </div>
         </div>
 
         {/* right: lyrics */}
-        <div className="ml-5 mt-5 flex-1 self-center">
+        <div className="md:ml-5 mt-2 md:mt-5 flex-1 self-start md:self-center">
           {visibleLyrics.length ? (
             <div className="flex flex-col items-center gap-2">
               {visibleLyrics.map((l) => (
                 <div
                   key={l.key}
-                  className={`text-lg text-center ${
+                  className={`text-base sm:text-lg text-center ${
                     l.isCurrent
                       ? "font-bold text-red-400"
                       : "opacity-80 text-white"
@@ -231,14 +237,16 @@ export default function SongPlayer({
               ))}
             </div>
           ) : (
-            <p className="opacity-70 text-sm">No lyrics available.</p>
+            <p className="opacity-70 text-xs sm:text-sm">
+              No lyrics available.
+            </p>
           )}
 
           {/* controls under lyrics */}
           <div className="mt-5 flex flex-col gap-3">
             {/* progress */}
             <div className="flex items-center gap-2.5">
-              <div className="w-10 text-xs opacity-80">
+              <div className="w-10 text-[10px] sm:text-xs opacity-80">
                 {formatTime(currentTime)}
               </div>
               <input
@@ -253,13 +261,13 @@ export default function SongPlayer({
                   background: `linear-gradient(to right, #ff4b4b ${progressPct}%, rgba(255,255,255,0.35) ${progressPct}%)`,
                 }}
               />
-              <div className="w-10 text-right text-xs opacity-80">
+              <div className="w-10 text-right text-[10px] sm:text-xs opacity-80">
                 {formatTime(duration)}
               </div>
             </div>
 
             {/* play controls */}
-            <div className="flex items-center justify-center gap-6">
+            <div className="flex items-center justify-center gap-4 sm:gap-6">
               <button
                 onClick={() => setShuffle((s) => !s)}
                 className={`${controlBtnClass} ${
