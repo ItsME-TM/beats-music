@@ -7,6 +7,10 @@
 	Modern music experience built with Next.js 15, React 19, Firebase Auth, and TailwindCSS 4.
 </div>
 
+<div align="center">
+  <a href="https://beats-music-nu.vercel.app/"><strong>➥ 🌐Live Demo</strong></a>
+</div>
+
 ---
 
 ## ✨ Overview
