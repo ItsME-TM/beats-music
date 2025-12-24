@@ -11,7 +11,7 @@
   "dependencies": {
     "autoprefixer": "^10.4.21",
     "firebase": "^12.2.1",
-    "next": "15.5.2",
+    "next": "15.5.9",
     "nextjs-toploader": "^3.9.17",
     "postcss": "^8.5.6",
     "react": "19.1.0",
