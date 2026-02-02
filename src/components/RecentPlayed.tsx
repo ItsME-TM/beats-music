@@ -22,12 +22,12 @@ type RecentPlayedProps = {
 
 export default function RecentPlayed({ songs }: RecentPlayedProps) {
   return (
-    <div className="bg-[#111] rounded-xl py-1 px-4 sm:px-6 text-white w-full max-w-[640px]">
+    <div className="bg-[#111] rounded-xl py-2 px-3 sm:px-4 md:px-6 text-white w-full">
       {/* Header */}
-      <div className="flex items-center mb-1">
-        <span className="text-md font-semibold">Recently Played</span>
+      <div className="flex items-center mb-2">
+        <span className="text-sm sm:text-md font-semibold">Recently Played</span>
         <button
-          className="ml-3 cursor-pointer text-[#00eaff] text-xl hover:opacity-80 focus:outline-none"
+          className="ml-3 cursor-pointer text-[#00eaff] text-lg sm:text-xl hover:opacity-80 focus:outline-none"
           aria-label="Pause"
           type="button"
         >
@@ -36,7 +36,7 @@ export default function RecentPlayed({ songs }: RecentPlayedProps) {
       </div>
 
       {/* Songs list */}
-      <div>
+      <div className="space-y-1">
         {songs.map((song, idx) => {
           const active = song.isPlaying
             ? "bg-[#181818] py-2 text-[#00eaff]"
@@ -45,9 +45,9 @@ export default function RecentPlayed({ songs }: RecentPlayedProps) {
           return (
             <div
               key={song.id}
-              className={`flex items-center mb-1 rounded-lg transition-colors ${active}`}
+              className={`flex items-center gap-2 sm:gap-3 rounded-lg transition-colors ${active} py-1.5 sm:py-2`}
             >
-              <div className="relative w-6 h-6 flex items-center justify-center text-xs mr-0">
+              <div className="relative w-5 sm:w-6 h-5 sm:h-6 flex items-center justify-center text-[10px] sm:text-xs shrink-0">
                 <span
                   className={`transition-opacity duration-150 ${
                     song.isPlaying ? "opacity-0" : "opacity-100"
@@ -57,7 +57,7 @@ export default function RecentPlayed({ songs }: RecentPlayedProps) {
                 </span>
                 {song.isPlaying && (
                   <IoPause
-                    className="absolute inset-0 m-auto text-[#00eaff] text-sm"
+                    className="absolute inset-0 m-auto text-[#00eaff] text-xs sm:text-sm"
                     aria-label="Playing"
                   />
                 )}
@@ -67,32 +67,33 @@ export default function RecentPlayed({ songs }: RecentPlayedProps) {
                 alt={song.title}
                 width={30}
                 height={30}
-                className="rounded-lg mr-4 object-cover bg-white"
+                className="w-7 h-7 sm:w-8 sm:h-8 rounded-md sm:rounded-lg object-cover bg-white shrink-0"
               />
-              <div className="flex-1">
+              <div className="flex-1 min-w-0">
                 <div
                   className={`${
                     song.isPlaying ? "font-semibold" : "font-normal"
-                  } text-base text-xs`}
+                  } text-[11px] sm:text-xs truncate`}
                 >
                   {song.title}
                 </div>
                 <div
-                  className={`text-xs ${
+                  className={`text-[10px] sm:text-xs truncate ${
                     song.isPlaying ? "text-[#00eaff]" : "text-gray-400"
                   }`}
                 >
                   {song.artist}
                 </div>
               </div>
-              <div className="w-[120px] text-left text-xs truncate">
+              {/* Album - hidden on mobile */}
+              <div className="hidden sm:block w-[100px] md:w-[120px] text-left text-[10px] sm:text-xs truncate text-gray-400">
                 {song.album || "Album"}
               </div>
-              <div className="w-[60px] text-center text-xs">
+              <div className="w-10 sm:w-[60px] text-center text-[10px] sm:text-xs text-gray-400">
                 {song.duration}
               </div>
               <button
-                className={`ml-3 text-xl hover:scale-110 transition-transform focus:outline-none ${
+                className={`p-1 sm:p-2 text-base sm:text-xl hover:scale-110 transition-transform focus:outline-none ${
                   song.isFavorite ? "text-[#00eaff]" : "text-white"
                 }`}
                 aria-label={song.isFavorite ? "Unfavorite" : "Favorite"}
@@ -101,13 +102,12 @@ export default function RecentPlayed({ songs }: RecentPlayedProps) {
                 {song.isFavorite ? <AiFillHeart /> : <AiOutlineHeart />}
               </button>
               <button
-                className="ml-3 text-xl text-white hover:scale-110 transition-transform focus:outline-none"
+                className="p-1 sm:p-2 text-base sm:text-xl text-white hover:scale-110 transition-transform focus:outline-none"
                 aria-label="Menu"
                 type="button"
               >
                 <BsThreeDots />
               </button>
-              {/* trailing playing icon removed; now overlaid on index */}
             </div>
           );
         })}

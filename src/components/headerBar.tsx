@@ -1,7 +1,7 @@
 "use client";
-import Image from "next/image";
-import { MdLibraryMusic } from "react-icons/md";
+import { LogoIcon } from "@/components/Icons";
 import { ChangeEvent } from "react";
+
 interface HeaderProps {
   isLoggedIn?: boolean;
   searchValue: string;
@@ -14,47 +14,25 @@ export default function Header({
   onSearchChange,
 }: HeaderProps) {
   return (
-    <header className="h-12 sm:h-14 flex items-center justify-between mt-3 sm:mt-4 px-4 sm:px-6 md:px-10 lg:px-20">
-      <div className="flex items-center">
-        <Image
-          src="/icons/left-logo.png"
-          alt="left Logo"
-          width={32}
-          height={32}
-        />
-        <span className="ml-4 text-sm font-bold font-inika">BEATS MUSIC</span>
+    <header className="h-12 sm:h-14 flex items-center justify-between mt-2 sm:mt-3 md:mt-4 px-3 sm:px-4 md:pl-6 lg:pl-10 md:pr-[70px] lg:pr-[100px] w-full">
+      <div className="flex items-center shrink-0">
+        <LogoIcon className="w-8 h-8 sm:w-9 sm:h-9" />
+        <span className="ml-2 sm:ml-4 text-xs sm:text-sm font-bold font-inika tracking-wider">BEATS MUSIC</span>
       </div>
       {isLoggedIn && (
-        <div className="hidden sm:flex bg-[#181818] h-9 sm:h-10 items-center justify-between rounded-2xl pl-2 pr-2 w-[48vw] md:w-[38vw] lg:w-[520px]">
+        <div className="hidden sm:flex bg-[#181818] h-8 sm:h-9 md:h-10 items-center justify-between rounded-2xl pl-4 pr-3 flex-1 mx-3 sm:mx-6 md:mx-10 max-w-[600px] border border-white/5 focus-within:border-cyan-400/50 transition-colors">
           <input
             type="text"
             placeholder="Search something..."
             value={searchValue}
             onChange={onSearchChange}
-            className="bg-transparent text-white text-xs pl-3 outline-none placeholder-white flex-1"
+            className="bg-transparent text-white text-[10px] sm:text-xs outline-none placeholder-gray-400 flex-1 min-w-0"
           />
-          <MdLibraryMusic size={20} color="white" className="ml-2 mr-4" />
+          <svg className="w-4 h-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+          </svg>
         </div>
       )}
-      <div className="relative hidden sm:flex items-center">
-        <div className="absolute -top-2 right-20 sm:static sm:mr-2 z-10">
-          <span className="text-xs sm:text-sm font-Inter">after</span>
-          <span className="text-xs sm:text-sm font-bold font-Inter">pay</span>
-        </div>
-        <Image
-          src="/icons/right-1-logo.png"
-          alt="left Logo"
-          width={40}
-          height={40}
-        />
-        <Image
-          src="/icons/right-2-logo.png"
-          alt="left Logo"
-          width={60}
-          height={60}
-          className="ml-4"
-        />
-      </div>
     </header>
   );
 }

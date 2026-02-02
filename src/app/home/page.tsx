@@ -55,66 +55,97 @@ export default function HomePage() {
   }, [user, router]);
 
   return (
-    <div className="flex flex-col pt-6 sm:pt-8 md:pt-10 px-4 sm:px-6 md:pl-10 md:pr-16 lg:px-20 pb-5 md:pr-[84px]">
-      <div className="flex flex-col md:flex-row md:h-75 mt-2 gap-6">
-        <div className="flex flex-col md:w-[57%]">
-          <span className="text-3xl sm:text-4xl md:text-5xl font-k2d font-bold">
-            THE MUTIL-UNIVERSAL MUSIC PLAYLIST
-          </span>
-          <span className="text-sm sm:text-base md:text-md font-k2d mt-3">
+    <div className="flex flex-col pt-4 sm:pt-6 md:pt-8 lg:pt-10 px-4 md:pl-8 lg:pl-12 md:pr-[70px] lg:pr-[100px] pb-24 md:pb-8 w-full max-w-[100vw]">
+      <div className="flex flex-col lg:flex-row mt-2 gap-8 lg:gap-12">
+        <div className="flex flex-col lg:w-3/5 xl:w-[60%]">
+          <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-k2d font-bold leading-tight tracking-tight">
+            THE MULTI-UNIVERSAL <br className="hidden sm:block" /> MUSIC PLAYLIST
+          </h1>
+          <p className="text-xs sm:text-sm md:text-base font-k2d mt-3 sm:mt-5 text-gray-300 leading-relaxed max-w-2xl">
             Discover the magic of music with us. Our platform is your gateway to
             a world of melodies, rhythms, and emotions. Whether you&apos;re a
             passionate listener, a budding artist, or an industry professional,
             we have something special for you.
-          </span>
-          <div className="bg-[#181818] h-10 flex items-center justify-between rounded-2xl mt-6 sm:mt-8 md:mt-10 pl-2 pr-2 w-full md:w-[560px]">
+          </p>
+          {/* Mobile search - visible only on small screens */}
+          <div className="sm:hidden bg-[#181818] h-11 flex items-center justify-between rounded-full mt-6 pl-4 pr-3 w-full border border-white/5 focus-within:border-cyan-400/50 transition-colors">
             <input
               type="text"
               placeholder="Search something..."
               value={searchSongDetails}
               onChange={(e) => setSearchSongDetails(e.target.value)}
-              className="bg-transparent text-white text-xs pl-3 outline-none placeholder-white flex-1"
+              className="bg-transparent text-white text-sm pl-1 outline-none placeholder-gray-400 flex-1"
             />
-            <MdLibraryMusic size={20} color="white" className="ml-2 mr-4" />
+            <svg className="w-5 h-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+            </svg>
+          </div>
+          {/* Desktop search suggestion/input placeholder (if distinct from header, otherwise maybe remove or style differently) */}
+          <div className="hidden sm:flex bg-[#181818] h-12 items-center justify-between rounded-full mt-8 md:mt-10 pl-5 pr-4 w-full max-w-[560px] border border-white/5 focus-within:border-cyan-400/50 transition-colors shadow-lg shadow-black/20">
+            <input
+              type="text"
+              placeholder="Search something..."
+              value={searchSongDetails}
+              onChange={(e) => setSearchSongDetails(e.target.value)}
+              className="bg-transparent text-white text-sm outline-none placeholder-gray-400 flex-1"
+            />
+            <svg className="w-5 h-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+            </svg>
           </div>
         </div>
-        <div className="flex flex-col md:w-[43%] items-center text-center md:text-left">
-          <span className="text-base sm:text-lg font-bold font-k2d ">
-            NEW SONG: ONE OF THE GIRLS
-          </span>
-          <span className="text-xs sm:text-sm font-k2d">
-            The Weeknd, JENNIE & Lily Rose Depp
-          </span>
-          <Image
-            src="/images/music-player.png"
-            alt="Music player"
-            width={240}
-            height={240}
-            className="mt-4 sm:mt-5 md:w-[280px] md:h-[280px]"
-          />
+        
+        <div className="flex flex-col lg:w-2/5 xl:w-[40%] items-center lg:items-start text-center lg:text-left mt-6 lg:mt-0 relative">
+          <div className="relative z-10">
+            <span className="text-sm sm:text-base lg:text-lg font-bold font-k2d block text-cyan-400 mb-1">
+              NEW SONG: ONE OF THE GIRLS
+            </span>
+            <span className="text-xs sm:text-sm font-k2d text-gray-400 block mb-4">
+              The Weeknd, JENNIE & Lily Rose Depp
+            </span>
+          </div>
+           {/* Decorative blurred background for image */}
+          <div className="relative group">
+            <div className="absolute -inset-1 bg-gradient-to-r from-cyan-400 to-blue-600 rounded-full blur opacity-25 group-hover:opacity-50 transition duration-1000 group-hover:duration-200"></div>
+            <Image
+                src="/images/music-player.png"
+                alt="Music player"
+                width={320}
+                height={320}
+                className="relative mt-2 w-[200px] h-[200px] sm:w-[240px] sm:h-[240px] md:w-[280px] md:h-[280px] lg:w-[320px] lg:h-[320px] object-contain drop-shadow-2xl hover:scale-105 transition-transform duration-500 ease-out"
+            />
+          </div>
         </div>
       </div>
-      <div>
-        <div className="flex flex-row items-center gap-1 mt-4">
-          <span className="font-inter text-xs sm:text-sm font-bold ">
+
+      <div className="mt-10 sm:mt-12">
+        <div className="flex flex-row items-center gap-2 mb-4 sm:mb-6">
+          <span className="font-inter text-base sm:text-lg font-bold tracking-wide">
             New Releases
           </span>
-          <IoPlayCircleOutline color="#17DCF5" size={18} />
+          <IoPlayCircleOutline className="text-cyan-400 w-6 h-6 sm:w-7 sm:h-7 hover:scale-110 transition-transform cursor-pointer" />
         </div>
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-7 gap-3 sm:gap-4 mt-2">
+        
+        <div className="grid grid-cols-2 xs:grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 xl:grid-cols-7 gap-4 sm:gap-5">
           {songs.map((song, idx) => (
-            <div key={idx}>
-              <Image
-                src={song.image}
-                alt={song.title}
-                width={120}
-                height={120}
-              />
-              <span className="block font-bold text-xs sm:text-sm text-white">
+            <div key={idx} className="group cursor-pointer flex flex-col">
+              <div className="relative overflow-hidden rounded-xl aspect-square shadow-lg shadow-black/40">
+                 <div className="absolute inset-0 bg-black/20 group-hover:bg-black/0 transition-colors z-10" />
+                 <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity z-20 flex items-end p-2">
+                    <IoPlayCircleOutline className="text-white w-8 h-8 drop-shadow-md translate-y-4 group-hover:translate-y-0 transition-transform duration-300" />
+                 </div>
+                <Image
+                  src={song.image}
+                  alt={song.title}
+                  width={160}
+                  height={160}
+                  className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500 ease-in-out"
+                />
+              </div>
+              <span className="block font-bold text-xs sm:text-sm text-white mt-3 truncate group-hover:text-cyan-400 transition-colors">
                 {song.title}
               </span>
-              <br />
-              <span className="text-[10px] sm:text-xs text-gray-400">
+              <span className="block text-[10px] sm:text-xs text-gray-400 truncate mt-1">
                 {song.artist}
               </span>
             </div>
@@ -124,3 +155,4 @@ export default function HomePage() {
     </div>
   );
 }
+

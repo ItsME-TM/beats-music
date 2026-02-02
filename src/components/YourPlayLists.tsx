@@ -37,18 +37,18 @@ export default function YourPlayLists({
 
   return (
     <section
-      className={`bg-[#0b0b0b] rounded-xl px-4 py-1 text-white ${className}`}
+      className={`bg-[#0b0b0b] rounded-xl px-3 sm:px-4 py-2 text-white ${className}`}
     >
-      <div className="flex items-center mb-1 gap-2">
-        <IoHome className="text-lg" />
-        <h2 className="text-base font-semibold flex-1 leading-tight">
+      <div className="flex items-center mb-2 gap-2">
+        <IoHome className="text-base sm:text-lg" />
+        <h2 className="text-sm sm:text-base font-semibold flex-1 leading-tight">
           {title}
         </h2>
         <button
           type="button"
           onClick={() => onAdd?.()}
           aria-label="Add playlist"
-          className="p-1 text-xl text-gray-300 hover:text-[#00eaff] transition-colors"
+          className="p-1.5 sm:p-1 text-lg sm:text-xl text-gray-300 hover:text-[#00eaff] transition-colors"
         >
           <AiOutlinePlus />
         </button>

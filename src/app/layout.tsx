@@ -5,6 +5,7 @@ import HeaderWrapper from "@/components/headerWrapper";
 import NextTopLoader from "nextjs-toploader";
 import { AuthProvider } from "@/components/authProvider";
 import SideBarWrapper from "@/components/SideBarWrapper";
+import MobileNavWrapper from "@/components/MobileNavWrapper";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -52,8 +53,11 @@ export default function RootLayout({
             zIndex={2000}
           />
           <HeaderWrapper />
-          {children}
+          <main className="pb-mobile-nav md:pb-0">
+            {children}
+          </main>
           <SideBarWrapper />
+          <MobileNavWrapper />
         </AuthProvider>
       </body>
     </html>
