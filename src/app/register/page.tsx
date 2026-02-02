@@ -56,13 +56,9 @@ export default function RegisterPage() {
         "code" in error &&
         (error as { code: string }).code === "auth/email-already-in-use"
       ) {
-        alert(
-          "This email is already registered. Please log in or use a different email."
-        );
+        alert("This email is already registered. Please log in or use a different email.");
       } else {
-        alert(
-          "Failed to create account. Please check your credentials and try again."
-        );
+        alert("Failed to create account. Please check your credentials and try again.");
       }
     }
   };
@@ -79,139 +75,121 @@ export default function RegisterPage() {
   };
 
   return (
-    <div className="w-screen flex items-center justify-center px-4 sm:px-6 md:px-10 lg:px-16 pt-6 sm:pt-8">
-      <div
-        className="w-full sm:w-[420px] md:w-90 rounded-xl pt-3 p-6 sm:p-8 backdrop-blur-[53px] shadow-[-8px_4px_5px_0px_#0000003D]"
-        style={{
-          background:
-            "linear-gradient(0deg, rgba(0, 0, 0, 0.14), rgba(0, 0, 0, 0.14)),\n                    linear-gradient(321.23deg, rgba(191, 191, 191, 0.062) 5.98%, rgba(0, 0, 0, 0) 66.28%)",
-          border: "1px solid",
-          borderImageSource:
-            "linear-gradient(166.93deg, #AFAFAF 3.24%, rgba(96, 96, 96, 0) 96.43%),\n                    linear-gradient(317.92deg, rgba(255, 255, 255, 0.6) 1.48%, rgba(0, 0, 0, 0) 67.95%)",
-        }}
-      >
-        <h2 className="text-white text-2xl font-bold font-noto">
-          Open New Account
-        </h2>
-        <p className="text-gray-300 text-xs font-noto">
-          Enjoy your new spirit world
-        </p>
-        <div className="flex flex-col h-97 items-center">
-          <div className="mt-4 w-full flex justify-center">
-            <FormInput
-              type="text"
-              placeholder="Username"
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
-              width="w-[85%] sm:w-72"
-              height="h-10"
-            />
-          </div>
-          <div className="mt-2 w-full flex justify-center">
-            <FormInput
-              type="email"
-              placeholder="Email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              width="w-[85%] sm:w-72"
-              height="h-10"
-            />
-          </div>
-          <div className="mt-2 w-full flex justify-center">
-            <FormInput
-              type={showPassword ? "text" : "password"}
-              placeholder="Password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              width="w-[85%] sm:w-72"
-              height="h-10"
-            />
-            <span
-              className="relative left-[70%] sm:left-65 bottom-7 cursor-pointer"
-              onClick={() => setShowPassword(!showPassword)}
-            >
-              {showPassword ? <FaEyeSlash size={15} /> : <FaEye size={15} />}
-            </span>
-          </div>
-          <div className="mt-0 w-full flex justify-center">
-            <FormInput
-              type="password"
-              placeholder="Confirm Password"
-              value={confirmPassword}
-              onChange={(e) => setConfirmPassword(e.target.value)}
-              width="w-[85%] sm:w-72"
-              height="h-10"
-            />
-          </div>
-          <div className="flex items-center justify-start w-full mt-2 ml-3">
-            <input
-              type="checkbox"
-              id="agreeOurPolicy"
-              checked={agreeOurPolicy}
-              onChange={() => setAgreeOurPolicy(!agreeOurPolicy)}
-              className="
-                                appearance-none bg-gradient-to-b from-blue-500 via-blue-300 to-purple-500 w-4 h-4
-                                rounded-sm border border-gray-400
-                                checked:bg-blue-600 checked:border-white checked:border-2
-                                relative
-                                after:content-['✔'] after:absolute after:left-[2px] after:top-[-2px] after:text-black after:text-xs
-                                checked:after:opacity-100 after:opacity-0 cursor-pointer
-                            "
-            />
-            <label
-              htmlFor="agreeOurPolicy"
-              className="ml-2 text-white text-xs"
-              style={{ fontFamily: "Noto Sans, sans-serif" }}
-            >
-              Agree Our Policy
-            </label>
-          </div>
-          <div className="mt-5 w-full flex justify-center">
-            <LoginButton
-              text="Creat New Account"
-              onClick={handleSignUp}
-              width="w-[85%] sm:w-72"
-              height="h-10"
-            />
-          </div>
-          <div>
-            <button
-              type="button"
-              className="text-white text-xs mt-3 font-noto cursor-pointer"
-              onClick={() => router.push("/login")}
-            >
-              Do you have account? Login
-            </button>
-          </div>
-          <div className="flex items-center my-5 w-full">
-            <hr className="flex-grow border-t border-gray-600" />
-            <span className="mx-3 text-gray-400 text-xs font-noto">or</span>
-            <hr className="flex-grow border-t border-gray-600" />
-          </div>
-          <div className="flex mx-10 sm:mx-20 gap-4">
-            <Image
-              src="/icons/google-logo.png"
-              alt="google-logo"
-              width={25}
-              height={25}
-              className="cursor-pointer"
-              onClick={handleGoogleLogin}
-            />
-            <Image
-              src="/icons/facebook-logo.png"
-              alt="google-logo"
-              width={25}
-              height={25}
-              className="cursor-pointer"
-            />
-            <Image
-              src="/icons/github-logo.png"
-              alt="google-logo"
-              width={25}
-              height={25}
-              className="cursor-pointer"
-            />
-          </div>
+    <div className="w-screen h-screen overflow-hidden bg-[#0a0a0a] relative flex items-center justify-center px-4 sm:px-6 z-0 selection:bg-cyan-500/30">
+      {/* Background Decorative Elements */}
+      <div className="absolute top-[-20%] left-[-10%] w-[60%] h-[60%] bg-cyan-500/10 rounded-full blur-[120px] pointer-events-none" />
+      <div className="absolute bottom-[-20%] right-[-10%] w-[60%] h-[60%] bg-blue-600/10 rounded-full blur-[120px] pointer-events-none" />
+
+      <div className="w-full max-w-[450px] flex flex-col items-center z-10">
+        
+        {/* Header */}
+        <div className="text-center mb-6">
+           <h2 className="text-3xl font-bold font-k2d text-white tracking-widest">BEATS MUSIC</h2>
+           <p className="text-cyan-400 text-sm tracking-widest uppercase mt-1">Join the Revolution</p>
+        </div>
+
+        <div className="w-full backdrop-blur-xl bg-black/40 border border-white/10 rounded-2xl p-6 sm:p-8 shadow-2xl relative overflow-hidden">
+           {/* Subtle internal gradient */}
+           <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-cyan-500 to-transparent opacity-50" />
+
+           <div className="text-center mb-5">
+             <h3 className="text-xl font-bold text-white">Create Account</h3>
+             <p className="text-gray-400 text-xs mt-1">Start your journey with us today</p>
+           </div>
+           
+           <div className="space-y-3">
+             <FormInput
+               type="text"
+               placeholder="Username"
+               value={username}
+               onChange={(e) => setUsername(e.target.value)}
+               width="w-full"
+               height="h-10"
+             />
+             <FormInput
+               type="email"
+               placeholder="Email Address"
+               value={email}
+               onChange={(e) => setEmail(e.target.value)}
+               width="w-full"
+               height="h-10"
+             />
+             <div className="relative">
+                <FormInput
+                  type={showPassword ? "text" : "password"}
+                  placeholder="Password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  width="w-full"
+                  height="h-10"
+                />
+                <button
+                  type="button"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-white transition-colors"
+                  onClick={() => setShowPassword(!showPassword)}
+                >
+                  {showPassword ? <FaEyeSlash size={16} /> : <FaEye size={16} />}
+                </button>
+             </div>
+             <FormInput
+               type="password"
+               placeholder="Confirm Password"
+               value={confirmPassword}
+               onChange={(e) => setConfirmPassword(e.target.value)}
+               width="w-full"
+               height="h-10"
+             />
+
+             {/* Terms Checkbox */}
+             <div className="flex items-center gap-2 pt-1 cursor-pointer group" onClick={() => setAgreeOurPolicy(!agreeOurPolicy)}>
+                <div className={`w-4 h-4 shrink-0 rounded border flex items-center justify-center transition-all duration-200 ${agreeOurPolicy ? 'bg-cyan-500 border-cyan-500' : 'border-gray-500 bg-transparent group-hover:border-cyan-400'}`}>
+                   {agreeOurPolicy && <svg className="w-3 h-3 text-black font-bold" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" /></svg>}
+                </div>
+                <span className="text-xs text-gray-400 group-hover:text-white transition-colors select-none">
+                  I agree to the <span className="text-cyan-400 hover:underline">Terms & Policy</span>
+                </span>
+             </div>
+
+             <div className="pt-2">
+                 <LoginButton
+                   text="Sign Up"
+                   onClick={handleSignUp}
+                   width="w-full"
+                   height="h-11"
+                 />
+             </div>
+           </div>
+
+           <div className="relative my-5">
+              <div className="absolute inset-0 flex items-center"><div className="w-full border-t border-white/10"></div></div>
+              <div className="relative flex justify-center text-[10px] uppercase"><span className="bg-black/40 px-2 text-gray-500 backdrop-blur-xl">Or register with</span></div>
+           </div>
+
+           <div className="flex justify-center gap-5">
+               {[
+                 { src: "/icons/google-logo.png", alt: "Google", action: handleGoogleLogin },
+                 { src: "/icons/facebook-logo.png", alt: "Facebook", action: () => {} },
+                 { src: "/icons/github-logo.png", alt: "Github", action: () => {} }
+               ].map((social, idx) => (
+                 <button 
+                  key={idx}
+                  onClick={social.action}
+                  className="w-10 h-10 rounded-full bg-white/5 border border-white/10 flex items-center justify-center hover:bg-white/10 hover:border-cyan-500/50 hover:scale-110 transition-all duration-300"
+                 >
+                   <Image src={social.src} alt={social.alt} width={20} height={20} className="opacity-80 hover:opacity-100" />
+                 </button>
+               ))}
+           </div>
+
+           <div className="mt-6 text-center">
+              <button
+                 type="button"
+                 onClick={() => router.push("/login")}
+                 className="text-xs text-gray-400 hover:text-white transition-colors"
+              >
+                 Already have an account? <span className="text-cyan-400 font-semibold ml-1">Login</span>
+              </button>
+           </div>
         </div>
       </div>
     </div>

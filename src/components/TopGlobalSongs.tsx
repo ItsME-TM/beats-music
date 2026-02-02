@@ -57,17 +57,17 @@ export default function TopGlobalSongs({
 
   return (
     <section
-      className={`z-50 bg-[#0b0b0b] rounded-xl px-4 pt-0 pb-3 text-white ${className}`}
+      className={`z-50 bg-[#0b0b0b] rounded-xl px-3 sm:px-4 pt-2 pb-3 text-white ${className}`}
     >
-      <div className="flex items-start gap-3">
-        <h2 className="text-base font-semibold flex-1 leading-tight">
+      <div className="flex items-start gap-2 sm:gap-3">
+        <h2 className="text-sm sm:text-base font-semibold flex-1 leading-tight">
           {title}
         </h2>
-        <div className="flex items-center gap-2 text-[11px] font-medium">
+        <div className="flex items-center gap-1.5 sm:gap-2 text-[10px] sm:text-[11px] font-medium">
           <button
             type="button"
             onClick={() => setTab("new")}
-            className={`px-2 py-1 rounded-md border text-xs transition-colors ${
+            className={`px-2 py-1 rounded-md border text-[10px] sm:text-xs transition-colors ${
               tab === "new"
                 ? "bg-[#00eaff] text-black border-transparent"
                 : "bg-transparent border-[#222] text-gray-300 hover:text-white"
@@ -78,7 +78,7 @@ export default function TopGlobalSongs({
           <button
             type="button"
             onClick={() => setTab("global")}
-            className={`px-2 py-1 rounded-md border text-xs transition-colors ${
+            className={`px-2 py-1 rounded-md border text-[10px] sm:text-xs transition-colors ${
               tab === "global"
                 ? "bg-[#222] text-white border-transparent"
                 : "bg-transparent border-[#222] text-gray-300 hover:text-white"

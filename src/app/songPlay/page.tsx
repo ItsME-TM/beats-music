@@ -20,8 +20,8 @@ export default function SongPlayPage() {
   }, [user, router]);
 
   return (
-    <div className="flex flex-col md:flex-row gap-4 md:gap-6 pt-3 sm:pt-4 md:pt-6 px-4 sm:px-6 md:pl-10 md:pr-16 lg:px-20 pb-4 md:pr-[84px] ">
-      <div className="flex-col md:w-[60%] flex-1 min-w-0">
+    <div className="flex flex-col lg:flex-row gap-4 md:gap-6 pt-2 sm:pt-3 md:pt-4 lg:pt-6 px-3 sm:px-4 md:pl-6 lg:pl-10 md:pr-[70px] lg:pr-[100px] pb-4">
+      <div className="flex-col lg:w-[60%] flex-1 min-w-0">
         <SongPlayer
           title="ONE OF THE GIRLS"
           artists={["The Weeknd", "JENNIE", "Lily-Rose Depp"]}
@@ -132,7 +132,7 @@ export default function SongPlayPage() {
           />
         </div>
       </div>
-      <div className="flex flex-col md:w-[40%] min-w-0">
+      <div className="flex flex-col lg:w-[40%] min-w-0 mt-4 lg:mt-0">
         <div className="mt-2">
           <TopGlobalSongs
             songs={[
