@@ -1,5 +1,5 @@
 "use client";
-import { LogoIcon } from "@/components/Icons";
+import { LogoIcon } from "@/components/ui/Icons";
 import { ChangeEvent } from "react";
 
 interface HeaderProps {

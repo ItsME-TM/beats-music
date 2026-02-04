@@ -7,7 +7,7 @@ import {
   SearchIcon, 
   LibraryIcon, 
   UserIcon 
-} from "@/components/Icons";
+} from "@/components/ui/Icons";
 
 export default function MobileNavBar() {
   const router = useRouter();

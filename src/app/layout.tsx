@@ -1,11 +1,11 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-import HeaderWrapper from "@/components/headerWrapper";
+import HeaderWrapper from "@/components/layout/HeaderWrapper";
 import NextTopLoader from "nextjs-toploader";
-import { AuthProvider } from "@/components/authProvider";
-import SideBarWrapper from "@/components/SideBarWrapper";
-import MobileNavWrapper from "@/components/MobileNavWrapper";
+import { AuthProvider } from "@/providers/AuthProvider";
+import SideBarWrapper from "@/components/layout/SideBarWrapper";
+import MobileNavWrapper from "@/components/layout/MobileNavWrapper";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",

@@ -3,15 +3,15 @@ import Image from "next/image";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
-import FormInput from "@/components/formInput";
-import LoginButton from "@/components/login-button";
+import FormInput from "@/components/ui/FormInput";
+import LoginButton from "@/components/ui/LoginButton";
 import {
   createUserWithEmailAndPassword,
   signInWithPopup,
   updateProfile,
 } from "firebase/auth";
 import { auth, googleProvider } from "../firebase";
-import useAuth from "@/components/authProvider";
+import useAuth from "@/hooks/useAuth";
 
 export default function RegisterPage() {
   const [confirmPassword, setConfirmPassword] = useState("");

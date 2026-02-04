@@ -1,8 +1,8 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import LoginButton from "@/components/login-button";
-import FormInput from "@/components/formInput";
+import LoginButton from "@/components/ui/LoginButton";
+import FormInput from "@/components/ui/FormInput";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
@@ -14,8 +14,8 @@ import {
   browserLocalPersistence,
   browserSessionPersistence,
 } from "firebase/auth";
-import useAuth from "@/components/authProvider";
-import InteractiveWave from "@/components/InteractiveWave";
+import useAuth from "@/hooks/useAuth";
+import InteractiveWave from "@/components/ui/InteractiveWave";
 
 export default function Login() {
   const [email, setEmail] = useState("");

@@ -1,6 +1,7 @@
 "use client";
 
-import React, { useEffect, useMemo, useRef, useState } from "react";
+import React, { useMemo, useState } from "react";
+import useAudioPlayer from "@/hooks/useAudioPlayer";
 import AddPlaylistButton from "./AddPlaylistButton";
 import { AiOutlineHeart, AiFillHeart } from "react-icons/ai";
 import {
@@ -41,75 +42,22 @@ export default function SongPlayer({
   onPrev,
   onNext,
 }: SongPlayerProps) {
-  const audioRef = useRef<HTMLAudioElement | null>(null);
-  const [isPlaying, setIsPlaying] = useState(false);
+  const defaultDuration = durationProp || inferDuration(lyrics) || 200;
+
+  const {
+    isPlaying,
+    currentTime,
+    duration,
+    repeat,
+    shuffle,
+    progressPct,
+    togglePlayPause,
+    seekTo,
+    setRepeat,
+    setShuffle,
+  } = useAudioPlayer({ audioSrc, durationProp: defaultDuration, onNext });
+
   const [liked, setLiked] = useState(false);
-  const [shuffle, setShuffle] = useState(false);
-  const [repeat, setRepeat] = useState<"off" | "one">("off");
-  const [currentTime, setCurrentTime] = useState(0);
-  const [duration, setDuration] = useState<number>(
-    durationProp || inferDuration(lyrics) || 200
-  );
-
-  const progressPct = Math.min(
-    100,
-    (currentTime / Math.max(duration, 1)) * 100
-  );
-
-  useEffect(() => {
-    if (!audioSrc) return;
-    const audio = new Audio(audioSrc);
-    audioRef.current = audio;
-
-    const onLoaded = () =>
-      setDuration(Math.max(durationProp || audio.duration || 0, 1));
-    const onTime = () => setCurrentTime(audio.currentTime || 0);
-    const onEnd = () => {
-      if (repeat === "one") {
-        audio.currentTime = 0;
-        audio.play();
-      } else {
-        setIsPlaying(false);
-        onNext?.();
-      }
-    };
-
-    audio.addEventListener("loadedmetadata", onLoaded);
-    audio.addEventListener("timeupdate", onTime);
-    audio.addEventListener("ended", onEnd);
-
-    return () => {
-      audio.pause();
-      audio.removeEventListener("loadedmetadata", onLoaded);
-      audio.removeEventListener("timeupdate", onTime);
-      audio.removeEventListener("ended", onEnd);
-      audioRef.current = null;
-    };
-  }, [audioSrc, repeat, durationProp, onNext]);
-
-  useEffect(() => {
-    if (audioSrc) return;
-    if (!isPlaying) return;
-
-    const start = Date.now();
-    const startTime = currentTime;
-    const id = window.setInterval(() => {
-      const elapsed = (Date.now() - start) / 1000;
-      const t = startTime + elapsed;
-      if (t >= duration) {
-        if (repeat === "one") {
-          setCurrentTime(0);
-        } else {
-          setIsPlaying(false);
-        }
-        window.clearInterval(id);
-      } else {
-        setCurrentTime(t);
-      }
-    }, 250);
-
-    return () => window.clearInterval(id);
-  }, [isPlaying, duration, currentTime, repeat, audioSrc]);
 
   const currentLyricIndex = useMemo(() => {
     if (!lyrics.length) return -1;
@@ -141,23 +89,6 @@ export default function SongPlayer({
       key: `${l.time}-${i}`,
     }));
   }, [lyrics, currentLyricIndex]);
-
-  function togglePlayPause() {
-    if (audioRef.current) {
-      if (isPlaying) {
-        audioRef.current.pause();
-      } else {
-        audioRef.current.play().catch(() => {});
-      }
-    }
-    setIsPlaying((p) => !p);
-  }
-
-  function seekTo(t: number) {
-    const clamped = Math.max(0, Math.min(duration, t));
-    setCurrentTime(clamped);
-    if (audioRef.current) audioRef.current.currentTime = clamped;
-  }
 
   function formatTime(s: number) {
     const m = Math.floor(s / 60);

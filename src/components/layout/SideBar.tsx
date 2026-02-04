@@ -11,8 +11,8 @@ import {
   MicIcon, 
   RadioIcon, 
   LogoutIcon 
-} from "@/components/Icons";
-import Popup from "@/components/PopUp";
+} from "@/components/ui/Icons";
+import Popup from "@/components/ui/PopUp";
 import { auth } from "@/app/firebase";
 
 export default function SideBar() {

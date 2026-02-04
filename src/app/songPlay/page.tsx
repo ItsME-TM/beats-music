@@ -2,7 +2,7 @@
 
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
-import useAuth from "@/components/authProvider";
+import useAuth from "@/hooks/useAuth";
 import SongPlayer from "@/components/SongPlayer";
 import RecentPlayed from "@/components/RecentPlayed";
 import SongReleases, { Release } from "@/components/songReleases";
