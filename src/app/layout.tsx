@@ -53,7 +53,7 @@ export default function RootLayout({
             zIndex={2000}
           />
           <HeaderWrapper />
-          <main className="pb-mobile-nav md:pb-0">
+          <main className=" md:pb-0">
             {children}
           </main>
           <SideBarWrapper />
