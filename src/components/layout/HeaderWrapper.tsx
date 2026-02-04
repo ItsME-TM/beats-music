@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { usePathname } from "next/navigation";
-import Header from "./headerBar";
+import Header from "./HeaderBar";
 
 export default function HeaderWrapper() {
   const pathname = usePathname();

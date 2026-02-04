@@ -60,6 +60,15 @@ body {
   scrollbar-width: none;
 }
 
+/* Global scrollbar hide */
+*::-webkit-scrollbar {
+  display: none;
+}
+* {
+  -ms-overflow-style: none; /* IE and Edge */
+  scrollbar-width: none; /* Firefox */
+}
+
 /* Mobile navigation bottom bar */
 .mobile-nav {
   position: fixed;

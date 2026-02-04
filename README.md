@@ -1,14 +1,19 @@
 <div align="center">
-	<img src="public/icons/left-logo.png" alt="Beats Music Logo" width="90" />
-  
-	# Beats Music
-	**The Multi‑Universal Music Playlist**
-	<br/>
-	Modern music experience built with Next.js 15, React 19, Firebase Auth, and TailwindCSS 4.
-</div>
+  <a href="https://beats-music-nu.vercel.app/">
+    <img src="public/icons/right-logo1-name.png" alt="Beats Music Logo" width="250" />
+  </a>
 
-<div align="center">
-  <a href="https://beats-music-nu.vercel.app/"><strong>➥ 🌐Live Demo</strong></a>
+  # Beats Music
+
+  **The Multi‑Universal Music Playlist**
+
+  <p>
+    Modern music experience built with <strong>Next.js 15</strong>, <strong>React 19</strong>, <strong>Firebase Auth</strong>, and <strong>TailwindCSS 4</strong>.
+  </p>
+
+  <br />
+
+  <a href="https://beats-music-nu.vercel.app/"><strong>➥ 🌐 Live Demo</strong></a>
 </div>
 
 ---
@@ -56,10 +61,15 @@ src/
 		songPlay/            # Song playback UI page
 		searchSong/          # (Planned search UI)
 	components/
-		authProvider.tsx     # Context wrapper for Firebase user
+		layout/              # Header, Sidebar, MobileNav wrappers & components
+		ui/                  # Generic UI components (Buttons, Inputs, Icons, Popups)
 		SongPlayer.tsx       # Lyric aware custom player component
-		AddPlaylistButton.tsx
-		headerWrapper.tsx / sideBar.tsx etc.
+		...
+	providers/
+		AuthProvider.tsx     # Context wrapper for Firebase user
+	hooks/
+		useAuth.ts           # Authentication hook
+		useAudioPlayer.ts    # Audio player logic hook
 	assets/ (svg art)
 public/
 	audio/                 # Sample audio assets

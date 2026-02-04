@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import useAuth from "@/components/authProvider";
+import useAuth from "@/hooks/useAuth";
 import { MdLibraryMusic } from "react-icons/md";
 import Image from "next/image";
 import { IoPlayCircleOutline } from "react-icons/io5";
