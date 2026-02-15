@@ -69,8 +69,9 @@ export default function Login() {
 
   const handleGoogleLogin = async () => {
     try {
+      await setPersistence(auth, browserLocalPersistence);
       const result = await signInWithPopup(auth, googleProvider);
-      console.log("Google user:", result.user);
+      //console.log("Google user:", result.user);
       router.push("/home");
     } catch (error) {
       console.error("Google login error:", error);
@@ -112,7 +113,7 @@ export default function Login() {
                 <p className="text-cyan-400 text-[10px] tracking-widest uppercase mt-1">Your Music, Your Way</p>
              </div>
 
-             <div className="w-full max-w-[420px] backdrop-blur-xl bg-black/40 border border-white/10 rounded-2xl px-6 py-2 sm:px-8 sm:py-2 shadow-2xl relative overflow-hidden shrink-0 my-auto">
+             <div className="w-full max-w-[420px] backdrop-blur-xl bg-black/40 border border-white/10 rounded-2xl px-6 py-2 sm:px-8 sm:py-5 shadow-2xl relative overflow-hidden shrink-0 my-auto">
                 {/* Subtle internal gradient */}
                 <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-cyan-500 to-transparent opacity-50" />
                 
@@ -181,8 +182,8 @@ export default function Login() {
                 <div className="flex justify-center gap-6">
                    {[
                      { src: "/icons/google-logo.png", alt: "Google", action: handleGoogleLogin },
-                     { src: "/icons/facebook-logo.png", alt: "Facebook", action: () => {} },
-                     { src: "/icons/github-logo.png", alt: "Github", action: () => {} }
+                    //  { src: "/icons/facebook-logo.png", alt: "Facebook", action: () => {} },
+                    //  { src: "/icons/github-logo.png", alt: "Github", action: () => {} }
                    ].map((social, idx) => (
                      <button 
                       key={idx}
@@ -207,13 +208,13 @@ export default function Login() {
          </div>
          
          {/* Footer Links */}
-         <div className="w-full py-4 text-center z-20 shrink-0 bg-transparent">
+         {/* <div className="w-full py-4 text-center z-20 shrink-0 bg-transparent">
              <div className="flex justify-center gap-6 text-xs text-gray-600">
                 <button className="hover:text-cyan-400 transition-colors">Terms & Conditions</button>
                 <button className="hover:text-cyan-400 transition-colors">Privacy Policy</button>
                 <button className="hover:text-cyan-400 transition-colors">Support</button>
              </div>
-         </div>
+         </div> */}
       </div>
     </div>
   );

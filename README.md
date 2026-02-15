@@ -1,6 +1,6 @@
 <div align="center">
   <a href="https://beats-music-nu.vercel.app/">
-    <img src="public/icons/right-logo1-name.png" alt="Beats Music Logo" width="250" />
+    <img src="public/icons/beats-logo.svg" alt="Beats Music Logo" width="100" />
   </a>
 
   # Beats Music

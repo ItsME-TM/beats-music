@@ -15,9 +15,9 @@ export default function Header({
 }: HeaderProps) {
   return (
     <header className="h-12 sm:h-14 flex items-center justify-between mt-2 sm:mt-3 md:mt-4 px-3 sm:px-4 md:pl-6 lg:pl-10 md:pr-[70px] lg:pr-[100px] w-full">
-      <div className="flex items-center shrink-0">
-        <LogoIcon className="w-8 h-8 sm:w-9 sm:h-9" />
-        <span className="ml-2 sm:ml-4 text-xs sm:text-sm font-bold font-inika tracking-wider">BEATS MUSIC</span>
+      <div className="flex items-center justify-center shrink-0">
+        <LogoIcon className="w-6 h-6 sm:w-6 sm:h-6" />
+        <span className="ml-2 sm:ml-2 mt-2 sm:mt-3 text-md sm:text-lg font-bold font-inika tracking-wider">BEATS MUSIC</span>
       </div>
       {isLoggedIn && (
         <div className="hidden sm:flex bg-[#181818] h-8 sm:h-9 md:h-10 items-center justify-between rounded-2xl pl-4 pr-3 flex-1 mx-3 sm:mx-6 md:mx-10 max-w-[600px] border border-white/5 focus-within:border-cyan-400/50 transition-colors">

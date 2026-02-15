@@ -47,7 +47,7 @@ export default function RegisterPage() {
         password
       );
       await updateProfile(userCredential.user, { displayName: username });
-      console.log("User signed up:", userCredential.user);
+      //console.log("User signed up:", userCredential.user);
       router.push("/home");
     } catch (error: unknown) {
       console.error("Error signing up:", error);
@@ -67,7 +67,7 @@ export default function RegisterPage() {
   const handleGoogleLogin = async () => {
     try {
       const result = await signInWithPopup(auth, googleProvider);
-      console.log("Google user:", result.user);
+      //console.log("Google user:", result.user);
       router.push("/home");
     } catch (error) {
       console.error("Google login error:", error);
@@ -76,23 +76,41 @@ export default function RegisterPage() {
   };
 
   return (
-    <div className="w-full h-[calc(100dvh-56px)] md:h-[calc(100dvh-72px)] relative flex flex-col items-center justify-center z-0 overflow-hidden bg-transparent selection:bg-cyan-500/30">
+    <div className="w-full h-[calc(100dvh-56px)] md:h-[calc(100dvh-72px)] relative flex flex-col lg:flex-row overflow-hidden bg-transparent selection:bg-cyan-500/30">
       <InteractiveBackground />
       {/* Background Decorative Elements */}
-      <div className="fixed top-[-20%] left-[-10%] w-[60%] h-[60%] bg-cyan-500/10 rounded-full blur-[120px] pointer-events-none z-0" />
-      <div className="fixed bottom-[-20%] right-[-10%] w-[60%] h-[60%] bg-blue-600/10 rounded-full blur-[120px] pointer-events-none z-0" />
+      <div className="fixed top-[-20%] left-[-10%] w-[50%] h-[50%] bg-cyan-500/10 rounded-full blur-[120px] pointer-events-none z-0" />
+      <div className="fixed bottom-[-20%] right-[-10%] w-[50%] h-[50%] bg-blue-600/10 rounded-full blur-[120px] pointer-events-none z-0" />
 
-      {/* Main Content Area - Form */}
-      <div className="flex-1 w-full flex flex-col items-center justify-center px-4 sm:px-6 overflow-y-auto overflow-x-hidden z-10 custom-scrollbar">
-        <div className="w-full max-w-[450px] flex flex-col items-center py-6 my-auto shrink-0">
+      {/* Left Column - Hero/Intro (Hidden on mobile/tablet vertical, visible on lg) */}
+      <div className="hidden lg:flex w-[55%] h-full flex-col justify-center px-16 xl:px-24 z-10 pointer-events-none">
+        <div className="relative">
+          <h2 className="text-4xl xl:text-5xl font-bold font-k2d text-white leading-tight">
+            JOIN THE <br />
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-500">
+            REVOLUTION
+          </span>
+        </h2>
+        <p className="font-k2d mt-6 text-gray-400 text-lg leading-relaxed max-w-xl">
+          Create your account today and unlock a world of endless music. Connect with artists, 
+          curate your playlists, and experience sound like never before.
+        </p>
+        </div>
+      </div>
+
+      {/* Right Column - Form */}
+      <div className="w-full lg:w-[45%] h-full flex flex-col items-center z-10 relative">
+        
+        {/* Main Form Area */}
+        <div className="flex-1 w-full flex flex-col items-center justify-center px-6 sm:px-12 overflow-y-auto overflow-x-hidden custom-scrollbar">
           
-          {/* Header text */}
-          <div className="text-center mb-6">
-             <h2 className="text-3xl font-bold font-k2d text-white tracking-widest">BEATS MUSIC</h2>
-             <p className="text-cyan-400 text-sm tracking-widest uppercase mt-1">Join the Revolution</p>
+          {/* Mobile Logo Header */}
+          <div className="lg:hidden mb-4 mt-4 text-center shrink-0">
+             <h2 className="text-xl font-bold font-k2d text-white tracking-widest">BEATS MUSIC</h2>
+             <p className="text-cyan-400 text-[10px] tracking-widest uppercase mt-1">Join the Revolution</p>
           </div>
 
-          <div className="w-full backdrop-blur-xl bg-black/40 border border-white/10 rounded-2xl p-6 sm:p-8 shadow-2xl relative overflow-hidden">
+          <div className="w-full max-w-[450px] backdrop-blur-xl bg-black/40 border border-white/10 rounded-2xl px-6 py-2 sm:px-8 sm:py-5 shadow-2xl relative overflow-hidden shrink-0 my-auto">
              {/* Subtle internal gradient */}
              <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-cyan-500 to-transparent opacity-50" />
 
@@ -172,8 +190,8 @@ export default function RegisterPage() {
              <div className="flex justify-center gap-5">
                  {[
                    { src: "/icons/google-logo.png", alt: "Google", action: handleGoogleLogin },
-                   { src: "/icons/facebook-logo.png", alt: "Facebook", action: () => {} },
-                   { src: "/icons/github-logo.png", alt: "Github", action: () => {} }
+                  //  { src: "/icons/facebook-logo.png", alt: "Facebook", action: () => {} },
+                  //  { src: "/icons/github-logo.png", alt: "Github", action: () => {} }
                  ].map((social, idx) => (
                    <button 
                     key={idx}
@@ -185,7 +203,7 @@ export default function RegisterPage() {
                  ))}
              </div>
 
-             <div className="mt-6 text-center">
+             <div className="mt-2 text-center">
                 <button
                    type="button"
                    onClick={() => router.push("/login")}
@@ -196,16 +214,16 @@ export default function RegisterPage() {
              </div>
           </div>
         </div>
-      </div>
 
-       {/* Footer Links */}
-       <div className="w-full py-4 text-center z-20 shrink-0 bg-transparent">
-           <div className="flex justify-center gap-6 text-xs text-gray-600">
-              <button className="hover:text-cyan-400 transition-colors">Terms & Conditions</button>
-              <button className="hover:text-cyan-400 transition-colors">Privacy Policy</button>
-              <button className="hover:text-cyan-400 transition-colors">Support</button>
-           </div>
-       </div>
+         {/* Footer Links - Commented out as per previous user edit */}
+         {/* <div className="w-full py-4 text-center z-20 shrink-0 bg-transparent">
+             <div className="flex justify-center gap-6 text-xs text-gray-600">
+                <button className="hover:text-cyan-400 transition-colors">Terms & Conditions</button>
+                <button className="hover:text-cyan-400 transition-colors">Privacy Policy</button>
+                <button className="hover:text-cyan-400 transition-colors">Support</button>
+             </div>
+         </div> */}
+      </div>
     </div>
   );
 }
