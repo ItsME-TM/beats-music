@@ -25,7 +25,7 @@ export const metadata: Metadata = {
   description: "Beats Music — The Multi-Universal Music Playlist",
   applicationName: "Beats Music",
   icons: {
-    icon: [{ url: "/icons/left-logo.png", type: "image/png" }],
+    icon: [{ url: "/icons/beats-logo.svg", type: "image/svg+xml" }],
   },
 };
 
