@@ -22,7 +22,7 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 let analytics: ReturnType<typeof getAnalytics> | undefined;
 if (typeof window !== "undefined") {
-  analytics = getAnalytics(app);
+  // analytics = getAnalytics(app);
 }
 
 export const auth = getAuth(app);

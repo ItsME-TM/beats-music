@@ -66,7 +66,7 @@ export default function RegisterPage() {
 
   const handleGoogleLogin = async () => {
     try {
-      const result = await signInWithPopup(auth, googleProvider);
+      await signInWithPopup(auth, googleProvider);
       //console.log("Google user:", result.user);
       router.push("/home");
     } catch (error) {

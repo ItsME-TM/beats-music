@@ -1,52 +1,24 @@
 "use client";
+import { getSongImage } from "@/utils/imageUtils";
+
+// ... existing imports ...
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import useAuth from "@/hooks/useAuth";
-import { MdLibraryMusic } from "react-icons/md";
+// import { MdLibraryMusic } from "react-icons/md";
 import Image from "next/image";
 import { IoPlayCircleOutline } from "react-icons/io5";
+import { searchSongs } from "@/services/jioSaavnApi";
+import HomeSkeleton from "@/components/skeleton/HomeSkeleton";
 
 export default function HomePage() {
   const user = useAuth();
   const router = useRouter();
   const [searchSongDetails, setSearchSongDetails] = useState("");
-  const songs = [
-    {
-      image: "/images/weeknd.png",
-      title: "Blinding Lights",
-      artist: "The Weeknd",
-    },
-    {
-      image: "/images/selena.jpg",
-      title: "Lose You To Love Me",
-      artist: "Selena Gomez",
-    },
-    {
-      image: "/images/coldplay.jpg",
-      title: "Viva La Vida",
-      artist: "Coldplay",
-    },
-    {
-      image: "/images/weeknd.png",
-      title: "Save Your Tears",
-      artist: "The Weeknd",
-    },
-    {
-      image: "/images/selena.jpg",
-      title: "Rare",
-      artist: "Selena Gomez",
-    },
-    {
-      image: "/images/coldplay.jpg",
-      title: "Paradise",
-      artist: "Coldplay",
-    },
-    {
-      image: "/images/weeknd.png",
-      title: "Starboy",
-      artist: "The Weeknd",
-    },
-  ];
+  // Using 'any' for now to quickly map the API response, ideally should use the interface
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const [songs, setSongs] = useState<any[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     if (!user) {
@@ -54,8 +26,37 @@ export default function HomePage() {
     }
   }, [user, router]);
 
+  useEffect(() => {
+    const fetchNewReleases = async () => {
+      setIsLoading(true);
+      try {
+        // Fetching 10 songs to show 7/8 in grid and use 10th for featured
+        const results = await searchSongs("English Top Hits", 10);
+        if (results && results.length > 0) {
+          setSongs(results);
+        }
+      } catch (error) {
+        console.error("Failed to fetch songs", error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    fetchNewReleases();
+  }, []);
+
+  const handleSongClick = (songId: string) => {
+    router.push(`/songPlay?id=${songId}`);
+  };
+
+  const featuredSong = songs[9];
+
+  if (isLoading) {
+    return <HomeSkeleton />;
+  }
+
   return (
     <div className="flex flex-col pt-4 sm:pt-6 md:pt-8 lg:pt-10 px-4 md:pl-8 lg:pl-12 md:pr-[70px] lg:pr-[100px] pb-24 md:pb-8 w-full max-w-[100vw]">
+      {/* ... keeping header content same ... */}
       <div className="flex flex-col lg:flex-row mt-2 gap-8 lg:gap-12">
         <div className="flex flex-col lg:w-3/5 xl:w-[60%]">
           <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-k2d font-bold leading-tight tracking-tight">
@@ -96,23 +97,27 @@ export default function HomePage() {
         </div>
         
         <div className="flex flex-col lg:w-2/5 xl:w-[40%] items-center lg:items-start text-center lg:text-left mt-6 lg:mt-0 relative">
-          <div className="relative z-10">
-            <span className="text-sm sm:text-base lg:text-lg font-bold font-k2d block text-cyan-400 mb-1">
-              NEW SONG: ONE OF THE GIRLS
+          <div 
+            className="relative z-10 cursor-pointer group/header"
+            onClick={() => featuredSong && handleSongClick(featuredSong.id)}
+          >
+            <span className="text-sm sm:text-base lg:text-lg font-bold font-k2d block text-cyan-400 mb-1 uppercase group-hover/header:text-white transition-colors">
+              NEW SONG: {featuredSong ? featuredSong.name.replace(/&quot;/g, '"').replace(/&#039;/g, "'").replace(/&amp;/g, "&") : "ONE OF THE GIRLS"}
             </span>
             <span className="text-xs sm:text-sm font-k2d text-gray-400 block mb-4">
-              The Weeknd, JENNIE & Lily Rose Depp
+              {featuredSong ? (featuredSong.primaryArtists || featuredSong.artist) : "The Weeknd, JENNIE & Lily Rose Depp"}
             </span>
           </div>
            {/* Decorative blurred background for image */}
-          <div className="relative group">
+          <div className="relative group cursor-pointer" onClick={() => featuredSong && handleSongClick(featuredSong.id)}>
             <div className="absolute -inset-1 bg-gradient-to-r from-cyan-400 to-blue-600 rounded-full blur opacity-25 group-hover:opacity-50 transition duration-1000 group-hover:duration-200"></div>
             <Image
-                src="/images/music-player.png"
-                alt="Music player"
+                src={getSongImage(featuredSong)}
+                alt={featuredSong?.name || "Music player"}
                 width={320}
                 height={320}
-                className="relative mt-2 w-[200px] h-[200px] sm:w-[240px] sm:h-[240px] md:w-[280px] md:h-[280px] lg:w-[320px] lg:h-[320px] object-contain drop-shadow-2xl hover:scale-105 transition-transform duration-500 ease-out"
+                className="relative mt-2 w-[200px] h-[200px] sm:w-[240px] sm:h-[240px] md:w-[280px] md:h-[280px] lg:w-[320px] lg:h-[320px] object-cover rounded-full drop-shadow-2xl hover:scale-105 transition-transform duration-500 ease-out"
+                unoptimized
             />
           </div>
         </div>
@@ -127,26 +132,34 @@ export default function HomePage() {
         </div>
         
         <div className="grid grid-cols-2 xs:grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 xl:grid-cols-7 gap-4 sm:gap-5">
-          {songs.map((song, idx) => (
-            <div key={idx} className="group cursor-pointer flex flex-col">
+          {songs.slice(0, 8).map((song, index) => (
+            <div 
+              key={song.id} 
+              className={`group cursor-pointer flex flex-col ${index === 7 ? 'lg:hidden' : ''}`}
+              onClick={() => handleSongClick(song.id)}
+            >
               <div className="relative overflow-hidden rounded-xl aspect-square shadow-lg shadow-black/40">
                  <div className="absolute inset-0 bg-black/20 group-hover:bg-black/0 transition-colors z-10" />
                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity z-20 flex items-end p-2">
                     <IoPlayCircleOutline className="text-white w-8 h-8 drop-shadow-md translate-y-4 group-hover:translate-y-0 transition-transform duration-300" />
                  </div>
                 <Image
-                  src={song.image}
-                  alt={song.title}
+                  src={getSongImage(song)}
+                  alt={song.name}
                   width={160}
                   height={160}
                   className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500 ease-in-out"
+                  unoptimized // Add unoptimized if domains are not configured in next.config.ts
                 />
               </div>
               <span className="block font-bold text-xs sm:text-sm text-white mt-3 truncate group-hover:text-cyan-400 transition-colors">
-                {song.title}
+                {song.name
+                  .replace(/&quot;/g, '"')
+                  .replace(/&#039;/g, "'")
+                  .replace(/&amp;/g, "&")}
               </span>
               <span className="block text-[10px] sm:text-xs text-gray-400 truncate mt-1">
-                {song.artist}
+                {song.primaryArtists || song.artist}
               </span>
             </div>
           ))}
