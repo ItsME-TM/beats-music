@@ -1,3 +1,4 @@
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const getSongImage = (song: any, fallbackUrl: string = "/images/music-player.png"): string => {
   if (!song) return fallbackUrl;
 
@@ -22,6 +23,7 @@ export const getSongImage = (song: any, fallbackUrl: string = "/images/music-pla
   return fallbackUrl;
 };
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const getDownloadUrl = (song: any): string => {
     if (!song) return "";
     

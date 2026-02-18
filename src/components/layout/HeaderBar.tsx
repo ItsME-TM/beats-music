@@ -9,9 +9,9 @@ interface HeaderProps {
 }
 
 export default function Header({
-  isLoggedIn,
-  searchValue,
-  onSearchChange,
+// isLoggedIn,
+  // searchValue,
+  // onSearchChange,
 }: HeaderProps) {
   return (
     <header className="h-12 sm:h-14 flex items-center justify-between mt-2 sm:mt-3 md:mt-4 px-3 sm:px-4 md:pl-6 lg:pl-10 md:pr-[70px] lg:pr-[100px] w-full">
