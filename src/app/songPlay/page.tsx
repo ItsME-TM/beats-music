@@ -1,17 +1,24 @@
 "use client";
 
-import { useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { useEffect, useState, Suspense } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import useAuth from "@/hooks/useAuth";
 import SongPlayer from "@/components/SongPlayer";
 import RecentPlayed from "@/components/RecentPlayed";
 import SongReleases, { Release } from "@/components/songReleases";
-import TopGlobalSongs from "@/components/TopGlobalSongs";
+import TopGlobalSongs, { TopSong } from "@/components/TopGlobalSongs";
 import YourPlayLists from "@/components/YourPlayLists";
+import { searchSongs, getSongDetails, SaavnSong } from "@/services/jioSaavnApi";
+import { getSongImage, getDownloadUrl } from "@/utils/imageUtils";
 
-export default function SongPlayPage() {
+function SongPlayContent() {
   const user = useAuth();
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const songId = searchParams.get("id");
+
+  const [currentSong, setCurrentSong] = useState<SaavnSong | null>(null);
+  const [topSongs, setTopSongs] = useState<TopSong[]>([]);
 
   useEffect(() => {
     if (!user) {
@@ -19,29 +26,57 @@ export default function SongPlayPage() {
     }
   }, [user, router]);
 
+  useEffect(() => {
+    const fetchTopSongs = async () => {
+      const results = await searchSongs("Global Top 100", 20); // Fetch top 20 for the list
+      if (results) {
+        const mappedSongs: TopSong[] = results.map((s) => ({
+          id: s.id,
+          title: s.name
+            .replace(/&quot;/g, '"')
+            .replace(/&#039;/g, "'")
+            .replace(/&amp;/g, "&"),
+          artist: s.primaryArtists || "",
+          duration: formatDuration(s.duration),
+          image: getSongImage(s),
+          isFavorite: false,
+        }));
+        setTopSongs(mappedSongs);
+      }
+    };
+    fetchTopSongs();
+  }, []);
+
+  useEffect(() => {
+    const fetchCurrentSong = async () => {
+      if (songId) {
+        const songWrapper = await getSongDetails(songId);
+        if (songWrapper) {
+             setCurrentSong(songWrapper);
+        }
+      }
+    };
+    fetchCurrentSong();
+  }, [songId]);
+
+  const handleSongSelect = async (song: TopSong) => {
+      const details = await getSongDetails(String(song.id));
+      if(details) setCurrentSong(details);
+  };
+
+  const currentAudioSrc = getDownloadUrl(currentSong);
+  const currentImage = getSongImage(currentSong, "/images/one-of-the-girl-banner.png");
+
   return (
     <div className="flex flex-col lg:flex-row gap-4 md:gap-6 pt-2 sm:pt-3 md:pt-4 lg:pt-6 px-3 sm:px-4 md:pl-6 lg:pl-10 md:pr-[70px] lg:pr-[100px] pb-4">
       <div className="flex-col lg:w-[60%] flex-1 min-w-0">
         <SongPlayer
-          title="ONE OF THE GIRLS"
-          artists={["The Weeknd", "JENNIE", "Lily-Rose Depp"]}
-          audioSrc="/audio/one-of-the-girls.m4a"
-          coverUrl="/images/one-of-the-girl-banner.png"
-          duration={244}
-          lyrics={[
-            { time: 0, text: "Instrumental intro..." },
-            { time: 12, text: "Verse line about the night sky" },
-            { time: 24, text: "Echoes drift across the city" },
-            { time: 36, text: "Heartbeat syncs to faded lights" },
-            { time: 48, text: "Chorus lifts like rising fire" },
-            { time: 60, text: "We move as one through the wire" },
-            { time: 75, text: "Second verse, a softer tone" },
-            { time: 90, text: "Promises carved in chrome" },
-            { time: 105, text: "Chorus returns, brighter than before" },
-            { time: 135, text: "Bridge holds the moment" },
-            { time: 165, text: "Final chorus, crowd in bloom" },
-            { time: 195, text: "Outro fades into the room" },
-          ]}
+          title={currentSong?.name ? currentSong.name.replace(/&quot;/g, '"').replace(/&#039;/g, "'").replace(/&amp;/g, "&") : "Select a Song"}
+          artists={currentSong?.primaryArtists ? currentSong.primaryArtists.split(", ") : ["Unknown Artist"]}
+          audioSrc={currentAudioSrc}
+          coverUrl={currentImage}
+          duration={currentSong?.duration ? Number(currentSong.duration) : 0}
+          lyrics={[]} // Lyrics API not integrated yet
           onAddToPlaylist={() => console.log("Add to playlist clicked")}
           onPrev={() => console.log("Prev")}
           onNext={() => console.log("Next")}
@@ -135,58 +170,8 @@ export default function SongPlayPage() {
       <div className="flex flex-col lg:w-[40%] min-w-0 mt-4 lg:mt-0">
         <div className="mt-2">
           <TopGlobalSongs
-            songs={[
-              {
-                id: 1,
-                title: "Mistletoe",
-                artist: "Justin Bieber",
-                duration: "3:54",
-                image: "/images/maria.png",
-              },
-              {
-                id: 2,
-                title: "Easy On Me",
-                artist: "Adele",
-                duration: "3:54",
-                image: "/images/selena.jpg",
-              },
-              {
-                id: 3,
-                title: "Moonlight",
-                artist: "Public Library Commun...",
-                duration: "3:54",
-                image: "/images/donda.png",
-              },
-              {
-                id: 4,
-                title: "SICKO MODE",
-                artist: "Travis Scott ft. Drake",
-                duration: "3:54",
-                image: "/images/weeknd.png",
-              },
-              {
-                id: 5,
-                title: "Get Lost",
-                artist: "Vincent Fable",
-                duration: "3:54",
-                image: "/images/kanye.png",
-              },
-              {
-                id: 6,
-                title: "I Feel Good",
-                artist: "Pink Sweat$",
-                duration: "3:54",
-                image: "/images/pink_sweat.jpg",
-              },
-              {
-                id: 7,
-                title: "Midsummer Madness",
-                artist: "88rising",
-                duration: "3:54",
-                image: "/images/zedd.jpg",
-              },
-            ]}
-            onSelect={(song) => console.log("Selected top song", song)}
+            songs={topSongs}
+            onSelect={handleSongSelect}
             onToggleFavorite={(song, fav) =>
               console.log("Fav toggled", song.title, fav)
             }
@@ -206,5 +191,21 @@ export default function SongPlayPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+// Helper to format duration from seconds to mm:ss
+function formatDuration(seconds: number): string {
+  if (!seconds) return "0:00";
+  const m = Math.floor(seconds / 60);
+  const s = Math.floor(seconds % 60);
+  return `${m}:${s.toString().padStart(2, "0")}`;
+}
+
+export default function SongPlayPage() {
+  return (
+    <Suspense fallback={<div className="text-white p-10">Loading...</div>}>
+      <SongPlayContent />
+    </Suspense>
   );
 }

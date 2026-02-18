@@ -7,7 +7,7 @@ import { BsThreeDots } from "react-icons/bs";
 import { IoChevronDown, IoChevronUp } from "react-icons/io5";
 
 export type TopSong = {
-  id: number;
+  id: string | number;
   title: string;
   artist: string;
   duration: string;
@@ -34,8 +34,8 @@ export default function TopGlobalSongs({
 }: TopGlobalSongsProps) {
   const [tab, setTab] = useState<"new" | "global">("new");
   const [expanded, setExpanded] = useState(false);
-  const [favorites, setFavorites] = useState<Record<number, boolean>>(() => {
-    const map: Record<number, boolean> = {};
+  const [favorites, setFavorites] = useState<Record<string | number, boolean>>(() => {
+    const map: Record<string | number, boolean> = {};
     songs.forEach((s) => {
       if (s.isFavorite) map[s.id] = true;
     });
