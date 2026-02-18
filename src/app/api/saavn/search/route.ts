@@ -87,6 +87,7 @@ async function fetchITunesData(query: string, limit: number) {
     
     if (!data.results) return [];
 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     return data.results.map((item: any) => ({
       id: String(item.trackId),
       name: item.trackName,

@@ -5,7 +5,7 @@ import { getSongImage } from "@/utils/imageUtils";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import useAuth from "@/hooks/useAuth";
-import { MdLibraryMusic } from "react-icons/md";
+// import { MdLibraryMusic } from "react-icons/md";
 import Image from "next/image";
 import { IoPlayCircleOutline } from "react-icons/io5";
 import { searchSongs } from "@/services/jioSaavnApi";
@@ -16,6 +16,7 @@ export default function HomePage() {
   const router = useRouter();
   const [searchSongDetails, setSearchSongDetails] = useState("");
   // Using 'any' for now to quickly map the API response, ideally should use the interface
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [songs, setSongs] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 

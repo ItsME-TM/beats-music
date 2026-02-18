@@ -70,7 +70,7 @@ export default function Login() {
   const handleGoogleLogin = async () => {
     try {
       await setPersistence(auth, browserLocalPersistence);
-      const result = await signInWithPopup(auth, googleProvider);
+      await signInWithPopup(auth, googleProvider);
       //console.log("Google user:", result.user);
       router.push("/home");
     } catch (error) {
