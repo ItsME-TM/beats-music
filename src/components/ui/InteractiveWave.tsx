@@ -71,7 +71,7 @@ const InteractiveWave = () => {
 
       for (let i = 0; i < waveCount; i++) {
         ctx.beginPath();
-        // const hue = (time * 10 + i * 20) % 360; // Cycling colors (unused)
+
         // Adjust alpha based on user interaction activity or just steady pulsing
         ctx.strokeStyle = `hsla(${180 + (normalizedX * 100) + (i * 10)}, 80%, 60%, 0.5)`; 
         ctx.lineWidth = 3;
