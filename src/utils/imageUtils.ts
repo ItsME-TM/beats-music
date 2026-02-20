@@ -1,5 +1,14 @@
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export const getSongImage = (song: any, fallbackUrl: string = "/images/music-player.png"): string => {
+interface MediaUrl {
+  link?: string;
+  url?: string;
+}
+
+interface SongData {
+  image?: string | (string | MediaUrl)[];
+  downloadUrl?: string | (string | MediaUrl)[];
+}
+
+export const getSongImage = (song: SongData | null, fallbackUrl: string = "/images/music-player.png"): string => {
   if (!song) return fallbackUrl;
 
   // Handle if image is an array
@@ -23,8 +32,7 @@ export const getSongImage = (song: any, fallbackUrl: string = "/images/music-pla
   return fallbackUrl;
 };
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export const getDownloadUrl = (song: any): string => {
+export const getDownloadUrl = (song: SongData | null): string => {
     if (!song) return "";
     
     if (Array.isArray(song.downloadUrl)) {

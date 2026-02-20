@@ -8,11 +8,7 @@ interface HeaderProps {
   onSearchChange: (e: ChangeEvent<HTMLInputElement>) => void;
 }
 
-export default function Header({
-// isLoggedIn,
-  // searchValue,
-  // onSearchChange,
-}: HeaderProps) {
+export default function Header({}: HeaderProps) {
   return (
     <header className="h-12 sm:h-14 flex items-center justify-between mt-2 sm:mt-3 md:mt-4 px-3 sm:px-4 md:pl-6 lg:pl-10 md:pr-[70px] lg:pr-[100px] w-full">
       <div className="flex items-center justify-center shrink-0">
