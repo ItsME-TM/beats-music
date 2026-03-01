@@ -2,6 +2,7 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   /* config options here */
+  output: "standalone",
   images: {
     remotePatterns: [
       {
@@ -11,7 +12,7 @@ const nextConfig: NextConfig = {
       {
         protocol: "https",
         hostname: "www.jiosaavn.com",
-      }
+      },
     ],
   },
   webpack(config) {

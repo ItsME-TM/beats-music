@@ -96,7 +96,7 @@ export default function HomePage() {
           </div>
         </div>
         
-        <div className="flex flex-col lg:w-2/5 xl:w-[40%] items-center lg:items-start text-center lg:text-left mt-6 lg:mt-0 relative">
+        <div className="flex flex-col lg:w-2/5 xl:w-[40%] items-center lg:ml-28 lg:items-start text-center lg:text-left mt-6 lg:mt-0 relative">
           <div 
             className="relative z-10 cursor-pointer group/header"
             onClick={() => featuredSong && handleSongClick(featuredSong.id)}
