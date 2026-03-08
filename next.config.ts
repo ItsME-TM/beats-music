@@ -13,6 +13,10 @@ const nextConfig: NextConfig = {
         protocol: "https",
         hostname: "www.jiosaavn.com",
       },
+      {
+        protocol: "https",
+        hostname: "*.mzstatic.com",
+      },
     ],
   },
   webpack(config) {
