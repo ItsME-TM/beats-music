@@ -1,10 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
 
-const API_MIRRORS = [
-  "https://saavn.dev/api",
-  "https://jiosaavn-api-privatecv.vercel.app",
-];
-
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
   const id = searchParams.get("id") || "";
@@ -12,36 +7,88 @@ export async function GET(request: NextRequest) {
   if (!id) {
     return NextResponse.json(
       { status: "ERROR", message: "Song ID is required", data: null },
-      { status: 400 }
+      { status: 400 },
     );
   }
 
-  for (const baseUrl of API_MIRRORS) {
-    try {
-      const url = `${baseUrl}/songs?id=${encodeURIComponent(id)}`;
-      console.log(`[API Proxy] Trying song details: ${url}`);
+  // Use iTunes lookup
+  try {
+    console.log(`[API Proxy] Trying iTunes lookup for ID: ${id}`);
+    const url = `https://itunes.apple.com/lookup?id=${id}`;
+    const response = await fetch(url);
+    const data = await response.json();
 
-      const response = await fetch(url, {
-        headers: { "Accept": "application/json" },
-        signal: AbortSignal.timeout(8000),
+    if (data.results && data.results.length > 0) {
+      const item = data.results[0];
+      const songInfo = mapITunesItem(item);
+
+      return NextResponse.json({
+        status: "SUCCESS",
+        message: null,
+        data: [songInfo],
       });
-
-      if (!response.ok) {
-        console.log(`[API Proxy] Mirror ${baseUrl} returned ${response.status}`);
-        continue;
-      }
-
-      const data = await response.json();
-      console.log(`[API Proxy] Song details success from ${baseUrl}`);
-      return NextResponse.json(data);
-    } catch (error) {
-      console.error(`[API Proxy] Mirror ${baseUrl} failed:`, error);
-      continue;
     }
+  } catch (error) {
+    console.error(`[API Proxy] iTunes lookup fallback failed:`, error);
   }
 
   return NextResponse.json(
-    { status: "ERROR", message: "All API mirrors are unavailable", data: null },
-    { status: 503 }
+    {
+      status: "ERROR",
+      message: "All API mirrors and fallback are unavailable",
+      data: null,
+    },
+    { status: 503 },
   );
+}
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function mapITunesItem(item: any) {
+  return {
+    id: String(item.trackId),
+    name: (item.trackName || item.collectionName || "Unknown Track")
+      .replace(/&quot;/g, '"')
+      .replace(/&#039;/g, "'")
+      .replace(/&amp;/g, "&"),
+    album: {
+      id: String(item.collectionId || ""),
+      name: (item.collectionName || item.trackName || "Unknown Album")
+        .replace(/&quot;/g, '"')
+        .replace(/&#039;/g, "'")
+        .replace(/&amp;/g, "&"),
+      url: item.collectionViewUrl || "",
+    },
+    year: item.releaseDate ? item.releaseDate.substring(0, 4) : "",
+    releaseDate: item.releaseDate || "",
+    duration: Math.floor((item.trackTimeMillis || 0) / 1000),
+    label: item.copyright || "",
+    primaryArtists: (item.artistName || "Unknown Artist")
+      .replace(/&quot;/g, '"')
+      .replace(/&#039;/g, "'")
+      .replace(/&amp;/g, "&"),
+    artists: [
+      {
+        id: String(item.artistId || ""),
+        name: item.artistName || "Unknown Artist",
+        role: "singer",
+        image: [],
+      },
+    ],
+    image: [
+      { quality: "100x100", link: item.artworkUrl100 || "" },
+      { quality: "60x60", link: item.artworkUrl60 || "" },
+      {
+        quality: "600x600",
+        link: (item.artworkUrl100 || "").replace(
+          /\/(?:100|150|200)x(?:100|150|200)bb/,
+          "/600x600bb",
+        ),
+      },
+    ],
+    downloadUrl: [
+      { quality: "96kbps", link: item.previewUrl || "" },
+      { quality: "160kbps", link: item.previewUrl || "" },
+      { quality: "320kbps", link: item.previewUrl || "" },
+    ],
+  };
 }

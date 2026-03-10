@@ -12,24 +12,47 @@ export default function useAudioPlayer({
   onNext,
 }: UseAudioPlayerProps) {
   const audioRef = useRef<HTMLAudioElement | null>(null);
+  const durationPropRef = useRef(durationProp);
+  const volumeRef = useRef(0.8);
+
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState<number>(durationProp || 0);
   const [repeat, setRepeat] = useState<"off" | "one">("off");
   const [shuffle, setShuffle] = useState(false);
+  const [volume, setVolume] = useState(0.8);
+
+  useEffect(() => {
+    durationPropRef.current = durationProp;
+  }, [durationProp]);
+
+  useEffect(() => {
+    volumeRef.current = volume;
+    if (audioRef.current) {
+      audioRef.current.volume = volume;
+    }
+  }, [volume]);
 
   const progressPct = Math.min(
     100,
-    (currentTime / Math.max(duration, 1)) * 100
+    (currentTime / Math.max(duration, 1)) * 100,
   );
 
   useEffect(() => {
     if (!audioSrc) return;
+
+    // Clean up previous audio if it exists
+    if (audioRef.current) {
+      audioRef.current.pause();
+      audioRef.current = null;
+    }
+
     const audio = new Audio(audioSrc);
+    audio.volume = volumeRef.current;
     audioRef.current = audio;
 
     const onLoaded = () =>
-      setDuration(Math.max(durationProp || audio.duration || 0, 1));
+      setDuration(Math.max(durationPropRef.current || audio.duration || 0, 1));
     const onTime = () => setCurrentTime(audio.currentTime || 0);
     const onEnd = () => {
       if (repeat === "one") {
@@ -45,6 +68,15 @@ export default function useAudioPlayer({
     audio.addEventListener("timeupdate", onTime);
     audio.addEventListener("ended", onEnd);
 
+    // Auto-play when audioSrc changes
+    audio
+      .play()
+      .then(() => setIsPlaying(true))
+      .catch((err) => {
+        console.warn("Auto-play blocked or failed:", err);
+        setIsPlaying(false);
+      });
+
     return () => {
       audio.pause();
       audio.removeEventListener("loadedmetadata", onLoaded);
@@ -52,8 +84,9 @@ export default function useAudioPlayer({
       audio.removeEventListener("ended", onEnd);
       audioRef.current = null;
     };
-  }, [audioSrc, repeat, durationProp, onNext]);
+  }, [audioSrc, repeat, onNext]);
 
+  // Internal timer fallback if audioSrc is missing (redundant if we always have src, but kept for safety)
   useEffect(() => {
     if (audioSrc) return;
     if (!isPlaying) return;
@@ -82,11 +115,16 @@ export default function useAudioPlayer({
     if (audioRef.current) {
       if (isPlaying) {
         audioRef.current.pause();
+        setIsPlaying(false);
       } else {
-        audioRef.current.play().catch(() => {});
+        audioRef.current
+          .play()
+          .then(() => setIsPlaying(true))
+          .catch(() => setIsPlaying(false));
       }
+    } else {
+      setIsPlaying((p) => !p);
     }
-    setIsPlaying((p) => !p);
   }
 
   function seekTo(t: number) {
@@ -95,16 +133,23 @@ export default function useAudioPlayer({
     if (audioRef.current) audioRef.current.currentTime = clamped;
   }
 
+  function changeVolume(val: number) {
+    const v = Math.max(0, Math.min(1, val));
+    setVolume(v);
+  }
+
   return {
     isPlaying,
     currentTime,
     duration,
     repeat,
     shuffle,
+    volume,
     progressPct,
     togglePlayPause,
     seekTo,
     setRepeat,
     setShuffle,
+    changeVolume,
   };
 }

@@ -1,57 +1,27 @@
 import { NextRequest, NextResponse } from "next/server";
 
-// List of JioSaavn API mirrors to try in order
-const API_MIRRORS = [
-  "https://saavn.dev/api",
-  "https://jiosaavn-api-privatecv.vercel.app",
-];
-
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
   const query = searchParams.get("query") || "";
-  const page = searchParams.get("page") || "1";
   const limit = searchParams.get("limit") || "10";
 
   if (!query) {
     return NextResponse.json(
       { status: "ERROR", message: "Query parameter is required", data: null },
-      { status: 400 }
+      { status: 400 },
     );
   }
 
-  // Try each mirror until one works
-  for (const baseUrl of API_MIRRORS) {
-    try {
-      const url = `${baseUrl}/search/songs?query=${encodeURIComponent(query)}&page=${page}&limit=${limit}`;
-      console.log(`[API Proxy] Trying: ${url}`);
-
-      const response = await fetch(url, {
-        headers: {
-          "Accept": "application/json",
-        },
-        signal: AbortSignal.timeout(8000), // 8 second timeout per mirror
-      });
-
-      if (!response.ok) {
-        console.log(`[API Proxy] Mirror ${baseUrl} returned ${response.status}, trying next...`);
-        continue;
-      }
-
-      const data = await response.json();
-      console.log(`[API Proxy] Success from ${baseUrl}`);
-
-      return NextResponse.json(data);
-    } catch (error) {
-      console.error(`[API Proxy] Mirror ${baseUrl} failed:`, error);
-      continue;
-    }
-  }
-
-  // All mirrors failed — try iTunes API as a reliable fallback
+  // Use iTunes API as the primary data source
   try {
     const iTunesData = await fetchITunesData(query, Number(limit));
     if (iTunesData.length > 0) {
-      console.log(`[API Proxy] Success from iTunes fallback`);
+      console.log(
+        `[API Proxy] Success from iTunes. Sample track:`,
+        iTunesData[0].name,
+        "by",
+        iTunesData[0].primaryArtists,
+      );
       return NextResponse.json({
         status: "SUCCESS",
         message: null,
@@ -67,7 +37,9 @@ export async function GET(request: NextRequest) {
   }
 
   // Absolute last resort - static mock data
-  console.log("[API Proxy] All mirrors and iTunes failed, returning static mock data");
+  console.log(
+    "[API Proxy] All mirrors and iTunes failed, returning static mock data",
+  );
   return NextResponse.json({
     status: "SUCCESS",
     message: null,
@@ -84,39 +56,66 @@ async function fetchITunesData(query: string, limit: number) {
     const url = `https://itunes.apple.com/search?term=${encodeURIComponent(query)}&media=music&limit=${limit}`;
     const response = await fetch(url);
     const data = await response.json();
-    
+
     if (!data.results) return [];
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    return data.results.map((item: any) => ({
-      id: String(item.trackId),
-      name: item.trackName,
-      album: {
-        id: String(item.collectionId),
-        name: item.collectionName,
-        url: item.collectionViewUrl,
-      },
-      year: item.releaseDate ? item.releaseDate.substring(0, 4) : "",
-      releaseDate: item.releaseDate,
-      duration: Math.floor(item.trackTimeMillis / 1000),
-      label: "",
-      primaryArtists: item.artistName,
-      artists: [{ id: String(item.artistId), name: item.artistName, role: "singer", image: [] }],
-      image: [
-        { quality: "100x100", link: item.artworkUrl100 },
-        { quality: "60x60", link: item.artworkUrl60 },
-        { quality: "600x600", link: item.artworkUrl100?.replace("100x100bb", "600x600bb") },
-      ],
-      downloadUrl: [
-        { quality: "96kbps", link: item.previewUrl },
-        { quality: "160kbps", link: item.previewUrl },
-        { quality: "320kbps", link: item.previewUrl }, // It's just a 30s preview but better than nothing
-      ],
-    }));
+    return data.results.map((item: any) => mapITunesItem(item));
   } catch (e) {
     console.error("iTunes fetch error:", e);
     return [];
   }
+}
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function mapITunesItem(item: any) {
+  return {
+    id: String(item.trackId),
+    name: (item.trackName || item.collectionName || "Unknown Track")
+      .replace(/&quot;/g, '"')
+      .replace(/&#039;/g, "'")
+      .replace(/&amp;/g, "&"),
+    album: {
+      id: String(item.collectionId || ""),
+      name: (item.collectionName || item.trackName || "Unknown Album")
+        .replace(/&quot;/g, '"')
+        .replace(/&#039;/g, "'")
+        .replace(/&amp;/g, "&"),
+      url: item.collectionViewUrl || "",
+    },
+    year: item.releaseDate ? item.releaseDate.substring(0, 4) : "",
+    releaseDate: item.releaseDate || "",
+    duration: Math.floor((item.trackTimeMillis || 0) / 1000),
+    label: item.copyright || "",
+    primaryArtists: (item.artistName || "Unknown Artist")
+      .replace(/&quot;/g, '"')
+      .replace(/&#039;/g, "'")
+      .replace(/&amp;/g, "&"),
+    artists: [
+      {
+        id: String(item.artistId || ""),
+        name: item.artistName || "Unknown Artist",
+        role: "singer",
+        image: [],
+      },
+    ],
+    image: [
+      { quality: "100x100", link: item.artworkUrl100 || "" },
+      { quality: "60x60", link: item.artworkUrl60 || "" },
+      {
+        quality: "600x600",
+        link: (item.artworkUrl100 || "").replace(
+          /\/(?:100|150|200)x(?:100|150|200)bb/,
+          "/600x600bb",
+        ),
+      },
+    ],
+    downloadUrl: [
+      { quality: "96kbps", link: item.previewUrl || "" },
+      { quality: "160kbps", link: item.previewUrl || "" },
+      { quality: "320kbps", link: item.previewUrl || "" },
+    ],
+  };
 }
 
 function getMockSongs() {
@@ -211,7 +210,9 @@ function getMockSongs() {
       duration: 239,
       label: "Wolf Tone",
       primaryArtists: "Glass Animals",
-      artists: [{ id: "ar8", name: "Glass Animals", role: "singer", image: [] }],
+      artists: [
+        { id: "ar8", name: "Glass Animals", role: "singer", image: [] },
+      ],
       image: [],
       downloadUrl: [],
     },
