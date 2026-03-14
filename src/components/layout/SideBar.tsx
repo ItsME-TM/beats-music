@@ -2,15 +2,15 @@
 
 import { useState } from "react";
 import { useRouter, usePathname } from "next/navigation";
-import { 
-  HomeIcon, 
-  PlayIcon, 
-  SearchIcon, 
-  MusicNoteIcon, 
-  UserIcon, 
-  MicIcon, 
-  RadioIcon, 
-  LogoutIcon 
+import {
+  HomeIcon,
+  PlayIcon,
+  SearchIcon,
+  MusicNoteIcon,
+  UserIcon,
+  MicIcon,
+  RadioIcon,
+  LogoutIcon,
 } from "@/components/ui/Icons";
 import Popup from "@/components/ui/PopUp";
 import { auth } from "@/app/firebase";
@@ -43,32 +43,54 @@ export default function SideBar() {
           onClick={() => go("/home")}
           aria-current={isActive("/home") ? "page" : undefined}
           className={`${baseIcon} ${
-            isActive("/home") ? "text-cyan-400" : "text-gray-400 hover:text-white"
+            isActive("/home")
+              ? "text-cyan-400"
+              : "text-gray-400 hover:text-white"
           } cursor-pointer`}
         />
         <PlayIcon
           className={`${baseIcon} ${
-            isActive("/songPlay") ? "text-cyan-400" : "text-gray-400 hover:text-white"
+            isActive("/songPlay")
+              ? "text-cyan-400"
+              : "text-gray-400 hover:text-white"
           } cursor-pointer`}
           onClick={() => go("/songPlay")}
           aria-current={isActive("/songPlay") ? "page" : undefined}
         />
         <SearchIcon
           className={`${baseIcon} ${
-            isActive("/searchSong") ? "text-cyan-400" : "text-gray-400 hover:text-white"
+            isActive("/searchSong")
+              ? "text-cyan-400"
+              : "text-gray-400 hover:text-white"
           } cursor-pointer`}
           onClick={() => go("/searchSong")}
           aria-current={isActive("/searchSong") ? "page" : undefined}
         />
-        <MusicNoteIcon className="h-6 w-6 text-gray-500 cursor-pointer hover:text-white transition-colors" />
-        <UserIcon className="h-6 w-6 text-gray-500 cursor-pointer hover:text-white transition-colors" />
+        <MusicNoteIcon
+          onClick={() => go("/library")}
+          aria-current={isActive("/library") ? "page" : undefined}
+          className={`${baseIcon} ${
+            isActive("/library")
+              ? "text-cyan-400"
+              : "text-gray-400 hover:text-white"
+          } cursor-pointer`}
+        />
+        <UserIcon
+          onClick={() => go("/profile")}
+          aria-current={isActive("/profile") ? "page" : undefined}
+          className={`${baseIcon} ${
+            isActive("/profile")
+              ? "text-cyan-400"
+              : "text-gray-400 hover:text-white"
+          } cursor-pointer`}
+        />
         <MicIcon className="h-6 w-6 text-gray-500 cursor-pointer hover:text-white transition-colors" />
         <RadioIcon className="h-6 w-6 text-gray-500 cursor-pointer hover:text-white transition-colors" />
         <div className="mt-auto">
-             <LogoutIcon
+          <LogoutIcon
             className="h-6 w-6 text-gray-400 hover:text-red-500 cursor-pointer transition-colors"
             onClick={() => setShowPopup(true)}
-            />
+          />
         </div>
       </div>
       <Popup

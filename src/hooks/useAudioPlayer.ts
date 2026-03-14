@@ -18,7 +18,7 @@ export default function useAudioPlayer({
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState<number>(durationProp || 0);
-  const [repeat, setRepeat] = useState<"off" | "one">("off");
+  const [repeat, setRepeat] = useState<"off" | "all" | "one">("off");
   const [shuffle, setShuffle] = useState(false);
   const [volume, setVolume] = useState(0.8);
 
@@ -58,9 +58,15 @@ export default function useAudioPlayer({
       if (repeat === "one") {
         audio.currentTime = 0;
         audio.play().catch(() => {});
-      } else {
-        setIsPlaying(false);
+      } else if (repeat === "all") {
         onNext?.();
+      } else {
+        // repeat === "off": call onNext only if provided (page guards last song); else stop
+        if (onNext) {
+          onNext();
+        } else {
+          setIsPlaying(false);
+        }
       }
     };
 
@@ -99,10 +105,13 @@ export default function useAudioPlayer({
       if (t >= duration) {
         if (repeat === "one") {
           setCurrentTime(0);
+        } else if (repeat === "all") {
+          onNext?.();
+          window.clearInterval(id);
         } else {
           setIsPlaying(false);
+          window.clearInterval(id);
         }
-        window.clearInterval(id);
       } else {
         setCurrentTime(t);
       }

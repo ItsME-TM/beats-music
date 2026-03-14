@@ -35,6 +35,7 @@ type SongPlayerProps = {
   onAddToPlaylist?: () => void;
   onPrev?: () => void;
   onNext?: () => void;
+  onShuffleChange?: (shuffle: boolean) => void;
 };
 
 export default function SongPlayer({
@@ -48,6 +49,7 @@ export default function SongPlayer({
   onAddToPlaylist,
   onPrev,
   onNext,
+  onShuffleChange,
 }: SongPlayerProps) {
   console.log("[SongPlayer] init props:", {
     title,
@@ -60,7 +62,7 @@ export default function SongPlayer({
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState<number>(durationProp || 0);
-  const [repeat, setRepeat] = useState<"off" | "one">("off");
+  const [repeat, setRepeat] = useState<"off" | "all" | "one">("off");
   const [shuffle, setShuffle] = useState(false);
   const [volume, setVolume] = useState(0.8);
   const [isSeeking, setIsSeeking] = useState(false);
@@ -213,7 +215,16 @@ export default function SongPlayer({
   }, [volume]);
 
   const [liked, setLiked] = useState(false);
-  const [showVolume, setShowVolume] = useState(false);
+  const prevVolumeRef = useRef(0.8);
+
+  function toggleMute() {
+    if (volume > 0) {
+      prevVolumeRef.current = volume;
+      setVolume(0);
+    } else {
+      setVolume(prevVolumeRef.current);
+    }
+  }
 
   const currentLyricIndex = useMemo(() => {
     if (!lyrics.length) return -1;
@@ -325,8 +336,12 @@ export default function SongPlayer({
                   typeof playerRef.current.seekTo === "function"
                 ) {
                   playerRef.current.seekTo(0);
+                  setIsPlaying(true);
                 }
+              } else if (repeat === "all") {
+                if (onNext) onNext();
               } else {
+                // repeat === "off": call onNext only if provided; else stop
                 if (onNext) onNext();
                 else setIsPlaying(false);
               }
@@ -480,7 +495,13 @@ export default function SongPlayer({
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-4 sm:gap-6">
                 <button
-                  onClick={() => setShuffle((s) => !s)}
+                  onClick={() =>
+                    setShuffle((s) => {
+                      const next = !s;
+                      onShuffleChange?.(next);
+                      return next;
+                    })
+                  }
                   className={`transition-all ${shuffle ? "text-cyan-400 scale-110 drop-shadow-[0_0_8px_rgba(34,211,238,0.8)]" : "text-white/60 hover:text-white"}`}
                   aria-label="Shuffle"
                 >
@@ -513,35 +534,39 @@ export default function SongPlayer({
                 </button>
                 <button
                   onClick={() =>
-                    setRepeat((r) => (r === "off" ? "one" : "off"))
+                    setRepeat((r) =>
+                      r === "off" ? "all" : r === "all" ? "one" : "off",
+                    )
                   }
-                  className={`transition-all ${repeat === "one" ? "text-cyan-400 scale-110 drop-shadow-[0_0_8px_rgba(34,211,238,0.8)]" : "text-white/60 hover:text-white"}`}
+                  className={`relative transition-all ${repeat !== "off" ? "text-cyan-400 scale-110 drop-shadow-[0_0_8px_rgba(34,211,238,0.8)]" : "text-white/60 hover:text-white"}`}
                   aria-label="Repeat"
                 >
                   <IoRepeat size={20} />
+                  {repeat === "one" && (
+                    <span className="absolute -top-1.5 -right-1.5 text-[9px] font-bold bg-cyan-400 text-black rounded-full w-3.5 h-3.5 flex items-center justify-center leading-none">
+                      1
+                    </span>
+                  )}
                 </button>
               </div>
 
-              <div className="flex items-center gap-3 group/volume relative">
+              <div className="flex items-center gap-2 group/volume">
                 <button
-                  onClick={() => setShowVolume(!showVolume)}
+                  onClick={toggleMute}
                   className="text-white/60 hover:text-white transition-colors"
+                  aria-label={volume === 0 ? "Unmute" : "Mute"}
                 >
                   <VolumeIcon />
                 </button>
-                <div
-                  className={`flex items-center transition-all duration-300 ${showVolume ? "w-20 sm:w-24 opacity-100" : "w-0 opacity-0 pointer-events-none"} overflow-hidden`}
-                >
-                  <input
-                    type="range"
-                    min={0}
-                    max={1}
-                    step={0.01}
-                    value={volume}
-                    onChange={(e) => changeVolume(Number(e.target.value))}
-                    className="w-full accent-cyan-400 h-1 cursor-pointer"
-                  />
-                </div>
+                <input
+                  type="range"
+                  min={0}
+                  max={1}
+                  step={0.01}
+                  value={volume}
+                  onChange={(e) => changeVolume(Number(e.target.value))}
+                  className="w-20 sm:w-24 accent-cyan-400 h-1 cursor-pointer"
+                />
               </div>
             </div>
           </div>
