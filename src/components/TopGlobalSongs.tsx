@@ -34,17 +34,19 @@ export default function TopGlobalSongs({
 }: TopGlobalSongsProps) {
   const [tab, setTab] = useState<"new" | "global">("new");
   const [expanded, setExpanded] = useState(false);
-  const [favorites, setFavorites] = useState<Record<string | number, boolean>>(() => {
-    const map: Record<string | number, boolean> = {};
-    songs.forEach((s) => {
-      if (s.isFavorite) map[s.id] = true;
-    });
-    return map;
-  });
+  const [favorites, setFavorites] = useState<Record<string | number, boolean>>(
+    () => {
+      const map: Record<string | number, boolean> = {};
+      songs.forEach((s) => {
+        if (s.isFavorite) map[s.id] = true;
+      });
+      return map;
+    },
+  );
 
   const visibleSongs = useMemo(
     () => (expanded ? songs : songs.slice(0, initialVisible)),
-    [expanded, songs, initialVisible]
+    [expanded, songs, initialVisible],
   );
 
   function toggleFavorite(song: TopSong) {
@@ -109,6 +111,7 @@ export default function TopGlobalSongs({
                   fill
                   sizes="40px"
                   className="object-cover group-hover:scale-105 transition-transform duration-300"
+                  unoptimized
                 />
               </div>
               <div className="flex-1 min-w-0">
