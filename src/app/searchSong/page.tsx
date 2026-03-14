@@ -7,21 +7,160 @@ import { searchSongs, SaavnSong } from "@/services/jioSaavnApi";
 import { getSongImage } from "@/utils/imageUtils";
 import Skeleton from "@/components/skeleton/Skeleton";
 
-const GENRES = [
-  "Pop",
-  "Hip-Hop",
-  "Rock",
-  "Electronic",
-  "Chill",
-  "Workout",
-  "Jazz",
-  "R&B",
-];
+const GENRE_GRADIENTS: Record<string, string> = {
+  Pop: "from-pink-500 to-rose-400",
+  "Hip-Hop": "from-orange-500 to-yellow-400",
+  Rock: "from-gray-600 to-slate-800",
+  Electronic: "from-cyan-500 to-blue-600",
+  Chill: "from-teal-500 to-emerald-400",
+  Workout: "from-red-600 to-orange-500",
+  Jazz: "from-amber-600 to-yellow-700",
+  "R&B": "from-purple-600 to-violet-500",
+};
+
+const GENRES = Object.keys(GENRE_GRADIENTS);
+
+function decodeEntities(str: string): string {
+  return str
+    .replace(/&quot;/g, '"')
+    .replace(/&#039;/g, "'")
+    .replace(/&amp;/g, "&");
+}
 
 function formatDuration(seconds: number): string {
   const m = Math.floor(seconds / 60);
   const s = seconds % 60;
   return `${m}:${s.toString().padStart(2, "0")}`;
+}
+
+interface CategoryCardProps {
+  genre: string;
+  gradient: string; // Tailwind gradient class, e.g. "from-purple-600 to-blue-500"
+  onClick: (genre: string) => void;
+}
+
+function CategoryCard({ genre, gradient, onClick }: CategoryCardProps) {
+  return (
+    <div
+      className={`bg-gradient-to-br ${gradient} rounded-xl min-h-[100px] flex items-end p-4 cursor-pointer hover:scale-105 hover:brightness-110 transition-transform`}
+      onClick={() => onClick(genre)}
+    >
+      <span className="font-bold text-white text-base">{genre}</span>
+    </div>
+  );
+}
+
+interface BrowseSectionProps {
+  onGenreClick: (genre: string) => void;
+}
+
+function BrowseSection({ onGenreClick }: BrowseSectionProps) {
+  return (
+    <div>
+      <h2 className="text-xl font-bold text-white mb-4">Browse all</h2>
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+        {Object.entries(GENRE_GRADIENTS).map(([genre, gradient]) => (
+          <CategoryCard
+            key={genre}
+            genre={genre}
+            gradient={gradient}
+            onClick={onGenreClick}
+          />
+        ))}
+      </div>
+    </div>
+  );
+}
+
+interface TopResultCardProps {
+  song: SaavnSong;
+  onClick: (id: string) => void;
+}
+
+function TopResultCard({ song, onClick }: TopResultCardProps) {
+  return (
+    <div
+      className="bg-neutral-900 rounded-2xl p-6 cursor-pointer hover:bg-neutral-800 transition-colors"
+      onClick={() => onClick(song.id)}
+    >
+      <img
+        src={getSongImage(song)}
+        alt={song.name}
+        className="w-20 h-20 rounded-xl object-cover mb-4"
+      />
+      <p className="text-white text-xl font-bold truncate mb-1">
+        {decodeEntities(song.name)}
+      </p>
+      <p className="text-gray-400 text-sm truncate mb-3">
+        {song.primaryArtists}
+      </p>
+      <span className="inline-block bg-neutral-700 text-white text-xs font-semibold px-2 py-1 rounded-full">
+        Song
+      </span>
+    </div>
+  );
+}
+
+interface SongRowProps {
+  song: SaavnSong;
+  onClick: (id: string) => void;
+}
+
+function SongRow({ song, onClick }: SongRowProps) {
+  return (
+    <div
+      className="flex items-center gap-4 p-3 rounded-xl hover:bg-neutral-800 transition-colors cursor-pointer w-full text-left"
+      onClick={() => onClick(song.id)}
+    >
+      <img
+        src={getSongImage(song)}
+        alt={song.name}
+        className="w-[50px] h-[50px] rounded-lg object-cover flex-shrink-0"
+      />
+      <div className="flex-1 min-w-0">
+        <p className="text-white text-sm font-semibold truncate">
+          {decodeEntities(song.name)}
+        </p>
+        <p className="text-gray-400 text-xs truncate mt-0.5">
+          {song.primaryArtists}
+        </p>
+      </div>
+      <span className="text-gray-500 text-xs flex-shrink-0">
+        {formatDuration(song.duration)}
+      </span>
+    </div>
+  );
+}
+
+function SplitLayoutSkeleton() {
+  return (
+    <div className="grid grid-cols-1 md:grid-cols-[1fr_2fr] gap-6 mt-4">
+      {/* Left: large block */}
+      <div className="bg-neutral-900 rounded-2xl p-6">
+        <Skeleton className="w-full h-48 rounded-2xl mb-4" />
+        <Skeleton className="h-5 w-3/4 mb-2" />
+        <Skeleton className="h-4 w-1/2 mb-3" />
+        <Skeleton className="h-6 w-16 rounded-full" />
+      </div>
+      {/* Right: row skeletons */}
+      <div className="flex flex-col gap-2">
+        <Skeleton className="h-5 w-24 mb-2" />
+        {[...Array(5)].map((_, i) => (
+          <div
+            key={i}
+            className="flex items-center gap-4 p-3 rounded-xl bg-neutral-900"
+          >
+            <Skeleton className="w-[50px] h-[50px] rounded-lg flex-shrink-0" />
+            <div className="flex-1 min-w-0">
+              <Skeleton className="h-4 w-3/4 mb-2" />
+              <Skeleton className="h-3 w-1/2" />
+            </div>
+            <Skeleton className="h-3 w-10 flex-shrink-0" />
+          </div>
+        ))}
+      </div>
+    </div>
+  );
 }
 
 function SearchSkeleton() {
@@ -96,7 +235,7 @@ export default function SearchSongPage() {
     setQuery(genre);
   };
 
-  const showGenreChips = query === "";
+  const showGenreChips = query.trim() === "";
   const showNoResults =
     hasSearched &&
     !isLoading &&
@@ -158,47 +297,15 @@ export default function SearchSongPage() {
         </div>
       </div>
 
-      {/* Genre chips — shown when query is empty */}
+      {/* Browse all — shown when query is empty */}
       {showGenreChips && (
         <div className="mb-6">
-          <h2 className="text-sm font-semibold text-gray-400 uppercase tracking-wider mb-3">
-            Browse by genre
-          </h2>
-          <div className="flex flex-wrap gap-2">
-            {GENRES.map((genre) => (
-              <button
-                key={genre}
-                onClick={() => handleGenreClick(genre)}
-                className="px-4 py-2 rounded-xl text-sm font-medium border border-white/10 bg-neutral-900 text-gray-300 hover:border-cyan-400/60 hover:text-cyan-400 transition-colors"
-              >
-                {genre}
-              </button>
-            ))}
-          </div>
-        </div>
-      )}
-
-      {/* Active genre chips — shown when query matches a genre */}
-      {!showGenreChips && GENRES.includes(query) && (
-        <div className="mb-4 flex flex-wrap gap-2">
-          {GENRES.map((genre) => (
-            <button
-              key={genre}
-              onClick={() => handleGenreClick(genre)}
-              className={`px-4 py-2 rounded-xl text-sm font-medium border transition-colors ${
-                genre === query
-                  ? "border-cyan-400 text-cyan-400 bg-cyan-400/10"
-                  : "border-white/10 bg-neutral-900 text-gray-300 hover:border-cyan-400/60 hover:text-cyan-400"
-              }`}
-            >
-              {genre}
-            </button>
-          ))}
+          <BrowseSection onGenreClick={handleGenreClick} />
         </div>
       )}
 
       {/* Loading skeleton */}
-      {isLoading && <SearchSkeleton />}
+      {isLoading && <SplitLayoutSkeleton />}
 
       {/* Error state */}
       {!isLoading && error && (
@@ -208,45 +315,29 @@ export default function SearchSongPage() {
       {/* No results */}
       {showNoResults && (
         <div className="mt-10 text-center">
-          <p className="text-gray-400 text-base">
+          <p className="text-gray-400 text-sm">
             No results found for &ldquo;{debouncedQuery.trim()}&rdquo;
           </p>
         </div>
       )}
 
-      {/* Results list */}
+      {/* Split results layout */}
       {!isLoading && !error && results.length > 0 && (
-        <div className="flex flex-col gap-2">
-          {results.map((song) => (
-            <button
-              key={song.id}
-              onClick={() => handleSongClick(song.id)}
-              className="flex items-center gap-4 p-3 rounded-xl bg-neutral-900 hover:bg-neutral-800 transition-colors text-left w-full group"
-            >
-              {/* Cover image */}
-              <img
-                src={getSongImage(song)}
-                alt={song.name}
-                className="w-14 h-14 rounded-xl object-cover flex-shrink-0"
-              />
-              {/* Title + artist */}
-              <div className="flex-1 min-w-0">
-                <p className="text-white text-sm font-semibold truncate group-hover:text-cyan-400 transition-colors">
-                  {song.name
-                    .replace(/&quot;/g, '"')
-                    .replace(/&#039;/g, "'")
-                    .replace(/&amp;/g, "&")}
-                </p>
-                <p className="text-gray-400 text-xs truncate mt-0.5">
-                  {song.primaryArtists}
-                </p>
-              </div>
-              {/* Duration */}
-              <span className="text-gray-500 text-xs flex-shrink-0">
-                {formatDuration(song.duration)}
-              </span>
-            </button>
-          ))}
+        <div className="grid grid-cols-1 md:grid-cols-[1fr_2fr] gap-6">
+          {/* Left: Top result */}
+          <div>
+            <p className="text-lg font-bold text-white mb-3">Top result</p>
+            <TopResultCard song={results[0]} onClick={handleSongClick} />
+          </div>
+          {/* Right: Songs list */}
+          <div>
+            <p className="text-lg font-bold text-white mb-3">Songs</p>
+            <div className="flex flex-col">
+              {results.slice(1).map((song) => (
+                <SongRow key={song.id} song={song} onClick={handleSongClick} />
+              ))}
+            </div>
+          </div>
         </div>
       )}
     </div>

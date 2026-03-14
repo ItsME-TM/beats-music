@@ -1,8 +1,8 @@
-// Feature: music-player-ui-overhaul, Property 1: Debounce delays search
+// Feature: search-page-spotify-redesign, Property 7: Debounce delays search
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import * as fc from "fast-check";
 
-// Validates: Requirements 1.2
+// Validates: Requirements 7.1, 7.2
 
 /**
  * Simulates the debounce mechanism used by useDebounce(query, 400).
@@ -41,7 +41,7 @@ function simulateDebounce(
   return callCount;
 }
 
-describe("Debounce delays search (Property 1)", () => {
+describe("Debounce delays search (Property 7)", () => {
   beforeEach(() => {
     vi.useFakeTimers();
   });

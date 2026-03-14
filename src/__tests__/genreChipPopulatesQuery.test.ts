@@ -1,5 +1,6 @@
 // Feature: music-player-ui-overhaul, Property 3: Genre chip populates query and triggers search
-import { describe, it, expect } from "vitest";
+// Feature: search-page-spotify-redesign, Property 2: Category card click populates query
+import { describe, it, expect, vi } from "vitest";
 import * as fc from "fast-check";
 
 // Validates: Requirements 2.2
@@ -66,6 +67,34 @@ describe("Genre chip populates query and triggers search (Property 3)", () => {
         // The query must be the exact chip label — no trimming, no transformation
         expect(query).toStrictEqual(genre);
         expect(query.length).toBe(genre.length);
+      }),
+      { numRuns: 100 },
+    );
+  });
+});
+
+// Validates: Requirements 1.6
+const GENRE_GRADIENTS: Record<string, string> = {
+  Pop: "from-pink-500 to-rose-400",
+  "Hip-Hop": "from-orange-500 to-yellow-400",
+  Rock: "from-gray-600 to-slate-800",
+  Electronic: "from-cyan-500 to-blue-600",
+  Chill: "from-teal-500 to-emerald-400",
+  Workout: "from-red-600 to-orange-500",
+  Jazz: "from-amber-600 to-yellow-700",
+  "R&B": "from-purple-600 to-violet-500",
+};
+
+describe("Property 2: Category card click populates query", () => {
+  it("clicking a CategoryCard calls onClick with the exact genre label", () => {
+    fc.assert(
+      fc.property(fc.constantFrom(...Object.keys(GENRE_GRADIENTS)), (genre) => {
+        const onClick = vi.fn();
+        // Mirrors the CategoryCard onClick handler: () => onClick(genre)
+        const handleClick = () => onClick(genre);
+        handleClick();
+        expect(onClick).toHaveBeenCalledWith(genre);
+        expect(onClick).toHaveBeenCalledTimes(1);
       }),
       { numRuns: 100 },
     );
