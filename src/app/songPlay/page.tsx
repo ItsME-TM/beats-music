@@ -154,7 +154,7 @@ function SongPlayContent() {
     : "Select a Song";
 
   return (
-    <div className="flex flex-col lg:flex-row gap-4 md:gap-6 pt-2 sm:pt-3 md:pt-4 lg:pt-6 px-3 sm:px-4 md:pl-6 lg:pl-10 md:pr-[70px] lg:pr-[100px] pb-4">
+    <div className="flex flex-col lg:flex-row gap-4 md:gap-6 pt-2 sm:pt-3 md:pt-4 lg:pt-6 px-3 sm:px-4 md:pl-6 lg:pl-10 md:pr-[70px] lg:pr-[100px] pb-24 md:pb-4">
       <div className="flex-col lg:w-[62%] flex-1 min-w-0">
         <SongPlayer
           title={isAudioLoading ? "Finding HD Stream..." : cleanTitle}

@@ -279,13 +279,13 @@ export default function SongPlayer({
         coverUrl
           ? "bg-center bg-cover"
           : "bg-gradient-to-br from-[#0b0f14] to-[#131a21]"
-      } w-full h-[340px] sm:h-[380px] md:h-[440px] transition-all duration-700 ease-in-out border border-white/10`}
+      } w-full h-auto min-h-[320px] sm:min-h-[360px] md:min-h-[75vh] transition-all duration-700 ease-in-out border border-white/10`}
       style={coverUrl ? { backgroundImage: `url(${coverUrl})` } : undefined}
     >
       {/* Hidden media player: keeps playback running while UI shows thumbnail/artwork */}
       {mediaSrc && (
         <div
-          className="absolute left-0 top-0 w-[1px] h-[1px] overflow-hidden"
+          className="absolute left-0 top-0 w-px h-px overflow-hidden"
           style={{ opacity: 0.01, pointerEvents: "none" }}
         >
           {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
@@ -375,8 +375,8 @@ export default function SongPlayer({
       {/* content */}
       <div className="relative flex flex-col md:flex-row gap-6 h-full p-6 md:p-8">
         {/* left: song info + thumbnail/video */}
-        <div className="md:w-64 self-start md:self-center">
-          <div className="w-40 h-40 rounded-2xl overflow-hidden mb-4 shadow-lg">
+        <div className="w-full md:w-64 self-start md:self-center shrink-0">
+          <div className="w-32 h-32 sm:w-40 sm:h-40 md:w-48 md:h-48 rounded-2xl overflow-hidden mb-4 shadow-lg">
             {coverUrl ? (
               <img
                 src={coverUrl}

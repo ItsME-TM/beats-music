@@ -84,8 +84,7 @@ export default function SideBar() {
               : "text-gray-400 hover:text-white"
           } cursor-pointer`}
         />
-        <MicIcon className="h-6 w-6 text-gray-500 cursor-pointer hover:text-white transition-colors" />
-        <RadioIcon className="h-6 w-6 text-gray-500 cursor-pointer hover:text-white transition-colors" />
+      
         <div className="mt-auto">
           <LogoutIcon
             className="h-6 w-6 text-gray-400 hover:text-red-500 cursor-pointer transition-colors"

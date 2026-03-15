@@ -27,7 +27,7 @@ export default function QueuePanel({
   onSelect,
 }: QueuePanelProps) {
   return (
-    <div className="flex flex-col h-full bg-[#0b0b0b] rounded-xl px-3 pt-3 pb-3 text-white">
+    <div className="flex flex-col max-h-[50vh] sm:max-h-[60vh] lg:max-h-[75vh] bg-[#0b0b0b] rounded-xl border border-cyan-400/50 px-3 pt-3 pb-3 text-white">
       <h2 className="text-sm font-semibold mb-3 text-white/90">Up Next</h2>
       <div className="overflow-y-auto flex-1 divide-y divide-[#151515]">
         {songs.map((song) => {
@@ -41,7 +41,7 @@ export default function QueuePanel({
                 isPlaying ? "border-l-2 border-cyan-400 pl-2" : "pl-0"
               }`}
             >
-              <div className="relative w-8 h-8 rounded-md overflow-hidden bg-[#222] flex-shrink-0">
+              <div className="relative w-8 h-8 rounded-md overflow-hidden bg-[#222] shrink-0">
                 <Image
                   src={song.image}
                   alt={song.title}
@@ -63,11 +63,11 @@ export default function QueuePanel({
                   {song.artist}
                 </p>
               </div>
-              <span className="text-[11px] text-gray-400 w-10 text-right flex-shrink-0">
+              <span className="text-[11px] text-gray-400 w-10 text-right shrink-0">
                 {song.duration}
               </span>
               {isLoading && (
-                <span className="flex-shrink-0">
+                <span className="shrink-0">
                   <Spinner />
                 </span>
               )}
