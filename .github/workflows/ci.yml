@@ -84,8 +84,6 @@ jobs:
           context: .
           push: true
           tags: ${{ secrets.DOCKER_USERNAME }}/beat-music:latest
-          cache-from: type=registry,ref=${{ secrets.DOCKER_USERNAME }}/beat-music:buildcache
-          cache-to: type=registry,ref=${{ secrets.DOCKER_USERNAME }}/beat-music:buildcache,mode=max
 
   deploy:
     name: Trigger Render Deployment
