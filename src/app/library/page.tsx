@@ -9,7 +9,6 @@ import Image from "next/image";
 import { MdFavorite, MdMusicNote } from "react-icons/md";
 import { sortPlaylists, SortOrder } from "@/utils/sortPlaylists";
 import Skeleton from "@/components/skeleton/Skeleton";
-export { sortPlaylists } from "@/utils/sortPlaylists";
 
 const PLAYLIST_GRADIENTS = [
   "from-purple-600 to-blue-500",
@@ -44,7 +43,7 @@ interface PlaylistCardProps {
   onSelect: (pl: Playlist) => void;
 }
 
-export function LikedSongsCard({ count }: { count: number }) {
+function LikedSongsCard({ count }: { count: number }) {
   return (
     <div
       className="bg-linear-to-br from-cyan-400 via-blue-500 to-purple-600 rounded-2xl p-8 w-full flex flex-col justify-end gap-2"
@@ -57,7 +56,7 @@ export function LikedSongsCard({ count }: { count: number }) {
   );
 }
 
-export function SongRow({ song, onClick }: SongRowProps) {
+function SongRow({ song, onClick }: SongRowProps) {
   return (
     <button
       type="button"
@@ -122,7 +121,7 @@ function FilterBar({ sortOrder, onSortChange }: FilterBarProps) {
   );
 }
 
-export function PlaylistCard({
+function PlaylistCard({
   playlist,
   gradientClass,
   onSelect,

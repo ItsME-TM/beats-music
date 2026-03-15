@@ -301,8 +301,7 @@ export default function SongPlayer({
             onReady={() => {
               setPlayerReady(true);
             }}
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            onError={(e: any) => {
+            onError={(e: unknown) => {
               console.error("[SongPlayer] hidden Playback error:", e);
               setIsPlaying(false);
             }}
@@ -311,16 +310,14 @@ export default function SongPlayer({
               setHasUserInteracted(true);
             }}
             onPause={() => {}}
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            onProgress={(prog: any) => {
+            onProgress={(prog: { playedSeconds?: number; played?: number }) => {
               const secondsRaw = prog?.playedSeconds ?? prog?.played ?? 0;
               const seconds = Number(secondsRaw);
               if (!isSeeking && Number.isFinite(seconds)) {
                 setCurrentTime(seconds);
               }
             }}
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            onDuration={(dur: any) => {
+            onDuration={(dur: number) => {
               const parsed = Number(dur);
               if (Number.isFinite(parsed) && parsed > 0) {
                 setDuration(parsed);
@@ -344,7 +341,6 @@ export default function SongPlayer({
             }}
             width="100%"
             height="100%"
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             config={
               {
                 youtube: {
@@ -364,7 +360,7 @@ export default function SongPlayer({
                   forceAudio: true,
                   attributes: { crossOrigin: "anonymous" },
                 },
-              } as any
+              } as unknown as Record<string, unknown>
             }
           />
         </div>
