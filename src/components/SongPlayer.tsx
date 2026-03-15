@@ -1,8 +1,11 @@
 "use client";
 
 import React, { useMemo, useState, useRef, useEffect } from "react";
+import Image from "next/image";
 
 import ReactPlayer from "react-player";
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const ReactPlayerAny: any = ReactPlayer;
 import AddPlaylistButton from "./AddPlaylistButton";
 import { AiOutlineHeart, AiFillHeart } from "react-icons/ai";
 import {
@@ -35,6 +38,7 @@ type SongPlayerProps = {
   onAddToPlaylist?: () => void;
   onPrev?: () => void;
   onNext?: () => void;
+  onShuffleChange?: (shuffle: boolean) => void;
 };
 
 export default function SongPlayer({
@@ -48,6 +52,7 @@ export default function SongPlayer({
   onAddToPlaylist,
   onPrev,
   onNext,
+  onShuffleChange,
 }: SongPlayerProps) {
   console.log("[SongPlayer] init props:", {
     title,
@@ -60,7 +65,7 @@ export default function SongPlayer({
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState<number>(durationProp || 0);
-  const [repeat, setRepeat] = useState<"off" | "one">("off");
+  const [repeat, setRepeat] = useState<"off" | "all" | "one">("off");
   const [shuffle, setShuffle] = useState(false);
   const [volume, setVolume] = useState(0.8);
   const [isSeeking, setIsSeeking] = useState(false);
@@ -206,14 +211,23 @@ export default function SongPlayer({
     ) {
       try {
         playerRef.current.setVolume(volume);
-      } catch (e) {
+      } catch {
         // ignore
       }
     }
   }, [volume]);
 
   const [liked, setLiked] = useState(false);
-  const [showVolume, setShowVolume] = useState(false);
+  const prevVolumeRef = useRef(0.8);
+
+  function toggleMute() {
+    if (volume > 0) {
+      prevVolumeRef.current = volume;
+      setVolume(0);
+    } else {
+      setVolume(prevVolumeRef.current);
+    }
+  }
 
   const currentLyricIndex = useMemo(() => {
     if (!lyrics.length) return -1;
@@ -267,52 +281,43 @@ export default function SongPlayer({
       className={`relative rounded-3xl text-white shadow-2xl overflow-hidden ${
         coverUrl
           ? "bg-center bg-cover"
-          : "bg-gradient-to-br from-[#0b0f14] to-[#131a21]"
-      } w-full h-[340px] sm:h-[380px] md:h-[440px] transition-all duration-700 ease-in-out border border-white/10`}
+          : "bg-linear-to-br from-[#0b0f14] to-[#131a21]"
+      } w-full h-auto min-h-80 sm:min-h-90 md:min-h-[75vh] transition-all duration-700 ease-in-out border border-white/10`}
       style={coverUrl ? { backgroundImage: `url(${coverUrl})` } : undefined}
     >
       {/* Hidden media player: keeps playback running while UI shows thumbnail/artwork */}
       {mediaSrc && (
         <div
-          className="absolute left-0 top-0 w-[1px] h-[1px] overflow-hidden"
+          className="absolute left-0 top-0 w-px h-px overflow-hidden"
           style={{ opacity: 0.01, pointerEvents: "none" }}
         >
-          {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
-          <ReactPlayer
-            ref={playerRef as any}
+          <ReactPlayerAny
+            ref={playerRef}
             src={mediaSrc}
             playing={isPlaying}
             volume={volume}
             muted={false}
             loop={repeat === "one"}
             onReady={() => {
-              console.log("[SongPlayer] hidden Player ready ->", {
-                mediaSrc,
-                youtubeVideoId,
-                playerRefCurrent: playerRef.current,
-              });
               setPlayerReady(true);
             }}
-            onError={(e: Error) => {
+            onError={(e: unknown) => {
               console.error("[SongPlayer] hidden Playback error:", e);
               setIsPlaying(false);
             }}
             onPlay={() => {
-              console.log("[SongPlayer] hidden Playback started");
               setIsPlaying(true);
               setHasUserInteracted(true);
             }}
-            onPause={() => console.log("[SongPlayer] hidden Playback paused")}
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            onProgress={(prog: any) => {
+            onPause={() => {}}
+            onProgress={(prog: { playedSeconds?: number; played?: number }) => {
               const secondsRaw = prog?.playedSeconds ?? prog?.played ?? 0;
               const seconds = Number(secondsRaw);
               if (!isSeeking && Number.isFinite(seconds)) {
                 setCurrentTime(seconds);
               }
             }}
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            onDuration={(dur: any) => {
+            onDuration={(dur: number) => {
               const parsed = Number(dur);
               if (Number.isFinite(parsed) && parsed > 0) {
                 setDuration(parsed);
@@ -325,7 +330,10 @@ export default function SongPlayer({
                   typeof playerRef.current.seekTo === "function"
                 ) {
                   playerRef.current.seekTo(0);
+                  setIsPlaying(true);
                 }
+              } else if (repeat === "all") {
+                if (onNext) onNext();
               } else {
                 if (onNext) onNext();
                 else setIsPlaying(false);
@@ -333,43 +341,43 @@ export default function SongPlayer({
             }}
             width="100%"
             height="100%"
-            config={{
-              youtube: {
-                playerVars: {
-                  autoplay: 1,
-                  controls: 0,
-                  modestbranding: 1,
-                  rel: 0,
-                  playsinline: 1,
-                  origin:
-                    typeof window !== "undefined" ? window.location.origin : "",
+            config={
+              {
+                youtube: {
+                  playerVars: {
+                    autoplay: 1,
+                    controls: 0,
+                    modestbranding: 1,
+                    rel: 0,
+                    playsinline: 1,
+                    origin:
+                      typeof window !== "undefined"
+                        ? window.location.origin
+                        : "",
+                  },
                 },
-              },
-              file: {
-                forceAudio: true,
-                attributes: { crossOrigin: "anonymous" },
-              },
-            }}
+                file: {
+                  forceAudio: true,
+                  attributes: { crossOrigin: "anonymous" },
+                },
+              } as unknown as Record<string, unknown>
+            }
           />
         </div>
       )}
 
       {/* glass overlay */}
-      <div className="absolute inset-0 bg-gradient-to-l from-[rgba(0,0,0,0.85)] via-[rgba(0,0,0,0.4)] to-[rgba(0,0,0,0.7)] backdrop-blur-[2px]" />
+      <div className="absolute inset-0 bg-linear-to-l from-[rgba(0,0,0,0.85)] via-[rgba(0,0,0,0.4)] to-[rgba(0,0,0,0.7)] backdrop-blur-[2px]" />
 
       {/* content */}
       <div className="relative flex flex-col md:flex-row gap-6 h-full p-6 md:p-8">
         {/* left: song info + thumbnail/video */}
-        <div className="md:w-64 self-start md:self-center">
-          <div className="w-40 h-40 rounded-2xl overflow-hidden mb-4 shadow-lg">
+        <div className="w-full md:w-64 self-start md:self-center shrink-0">
+          <div className="relative w-32 h-32 sm:w-40 sm:h-40 md:w-48 md:h-48 rounded-2xl overflow-hidden mb-4 shadow-lg">
             {coverUrl ? (
-              <img
-                src={coverUrl}
-                alt={title}
-                className="w-full h-full object-cover"
-              />
+              <Image src={coverUrl} alt={title} fill className="object-cover" />
             ) : (
-              <div className="w-full h-full bg-gradient-to-br from-cyan-900 to-gray-900 flex items-center justify-center">
+              <div className="w-full h-full bg-linear-to-br from-cyan-900 to-gray-900 flex items-center justify-center">
                 <span className="text-4xl">🎵</span>
               </div>
             )}
@@ -480,7 +488,13 @@ export default function SongPlayer({
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-4 sm:gap-6">
                 <button
-                  onClick={() => setShuffle((s) => !s)}
+                  onClick={() =>
+                    setShuffle((s) => {
+                      const next = !s;
+                      onShuffleChange?.(next);
+                      return next;
+                    })
+                  }
                   className={`transition-all ${shuffle ? "text-cyan-400 scale-110 drop-shadow-[0_0_8px_rgba(34,211,238,0.8)]" : "text-white/60 hover:text-white"}`}
                   aria-label="Shuffle"
                 >
@@ -513,35 +527,39 @@ export default function SongPlayer({
                 </button>
                 <button
                   onClick={() =>
-                    setRepeat((r) => (r === "off" ? "one" : "off"))
+                    setRepeat((r) =>
+                      r === "off" ? "all" : r === "all" ? "one" : "off",
+                    )
                   }
-                  className={`transition-all ${repeat === "one" ? "text-cyan-400 scale-110 drop-shadow-[0_0_8px_rgba(34,211,238,0.8)]" : "text-white/60 hover:text-white"}`}
+                  className={`relative transition-all ${repeat !== "off" ? "text-cyan-400 scale-110 drop-shadow-[0_0_8px_rgba(34,211,238,0.8)]" : "text-white/60 hover:text-white"}`}
                   aria-label="Repeat"
                 >
                   <IoRepeat size={20} />
+                  {repeat === "one" && (
+                    <span className="absolute -top-1.5 -right-1.5 text-[9px] font-bold bg-cyan-400 text-black rounded-full w-3.5 h-3.5 flex items-center justify-center leading-none">
+                      1
+                    </span>
+                  )}
                 </button>
               </div>
 
-              <div className="flex items-center gap-3 group/volume relative">
+              <div className="flex items-center gap-2 group/volume">
                 <button
-                  onClick={() => setShowVolume(!showVolume)}
+                  onClick={toggleMute}
                   className="text-white/60 hover:text-white transition-colors"
+                  aria-label={volume === 0 ? "Unmute" : "Mute"}
                 >
                   <VolumeIcon />
                 </button>
-                <div
-                  className={`flex items-center transition-all duration-300 ${showVolume ? "w-20 sm:w-24 opacity-100" : "w-0 opacity-0 pointer-events-none"} overflow-hidden`}
-                >
-                  <input
-                    type="range"
-                    min={0}
-                    max={1}
-                    step={0.01}
-                    value={volume}
-                    onChange={(e) => changeVolume(Number(e.target.value))}
-                    className="w-full accent-cyan-400 h-1 cursor-pointer"
-                  />
-                </div>
+                <input
+                  type="range"
+                  min={0}
+                  max={1}
+                  step={0.01}
+                  value={volume}
+                  onChange={(e) => changeVolume(Number(e.target.value))}
+                  className="w-20 sm:w-24 accent-cyan-400 h-1 cursor-pointer"
+                />
               </div>
             </div>
           </div>

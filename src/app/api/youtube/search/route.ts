@@ -1,6 +1,32 @@
 import { NextRequest, NextResponse } from "next/server";
 
-type CachedEntry = { data: any; timestamp: number };
+type YouTubeItem = {
+  id: { videoId: string };
+  snippet: {
+    title: string;
+    thumbnails?: {
+      high?: { url?: string };
+      default?: { url?: string };
+    };
+    channelTitle: string;
+  };
+};
+
+type YouTubeResponse = {
+  items: YouTubeItem[];
+};
+
+type Payload = {
+  videoId: string;
+  results: {
+    videoId: string;
+    title: string;
+    thumbnail: string | null;
+    channelTitle: string;
+  }[];
+};
+
+type CachedEntry = { data: Payload; timestamp: number };
 
 const cache = new Map<string, CachedEntry>();
 const CACHE_TTL = 1000 * 60 * 60; // 1 hour
@@ -43,14 +69,14 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: "YouTube API error" }, { status: 502 });
     }
 
-    const data = await res.json();
-    if (!data.items || data.items.length === 0) {
+    const data = (await res.json()) as YouTubeResponse;
+    if (!data?.items || data.items.length === 0) {
       return NextResponse.json({ error: "Not found" }, { status: 404 });
     }
 
-    const payload = {
+    const payload: Payload = {
       videoId: data.items[0].id.videoId,
-      results: data.items.map((item: any) => ({
+      results: data.items.map((item) => ({
         videoId: item.id.videoId,
         title: item.snippet.title,
         thumbnail:
