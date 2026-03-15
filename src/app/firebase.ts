@@ -23,8 +23,9 @@ const firebaseConfig = {
 // and similar errors when env vars are missing or invalid in CI).
 let app: ReturnType<typeof initializeApp> | undefined = undefined;
 let authInstance: ReturnType<typeof getAuth> | undefined = undefined;
-let googleProviderInstance: InstanceType<typeof GoogleAuthProvider> | undefined =
-  undefined;
+let googleProviderInstance:
+  | InstanceType<typeof GoogleAuthProvider>
+  | undefined = undefined;
 
 if (typeof window !== "undefined" && process.env.NEXT_PUBLIC_FIREBASE_API_KEY) {
   try {
