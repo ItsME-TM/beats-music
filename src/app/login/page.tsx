@@ -34,6 +34,11 @@ export default function Login() {
 
   const handleLogin = async () => {
     try {
+      if (!auth) {
+        alert("Authentication is currently unavailable. Try again in the browser.");
+        return;
+      }
+
       await setPersistence(
         auth,
         rememberMe ? browserLocalPersistence : browserSessionPersistence
@@ -69,6 +74,11 @@ export default function Login() {
 
   const handleGoogleLogin = async () => {
     try {
+      if (!auth || !googleProvider) {
+        alert("Authentication is currently unavailable. Try again in the browser.");
+        return;
+      }
+
       await setPersistence(auth, browserLocalPersistence);
       await signInWithPopup(auth, googleProvider);
       //console.log("Google user:", result.user);

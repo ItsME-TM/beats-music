@@ -18,8 +18,10 @@ export default function SideBar() {
   const router = useRouter();
   const pathname = usePathname();
 
-  const handleLogout = () => {
-    auth.signOut();
+  const handleLogout = async () => {
+    if (auth) {
+      await auth.signOut();
+    }
     localStorage.clear();
     router.push("/login");
   };

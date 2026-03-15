@@ -32,6 +32,11 @@ export default function RegisterPage() {
   }, [user, router]);
 
   const handleSignUp = async () => {
+    if (!auth) {
+      alert("Authentication is currently unavailable. Try again in the browser.");
+      return;
+    }
+
     if (!agreeOurPolicy) {
       alert("You must agree to our policy to create an account.");
       return;
@@ -66,6 +71,11 @@ export default function RegisterPage() {
 
   const handleGoogleLogin = async () => {
     try {
+      if (!auth || !googleProvider) {
+        alert("Authentication is currently unavailable. Try again in the browser.");
+        return;
+      }
+
       await signInWithPopup(auth, googleProvider);
       //console.log("Google user:", result.user);
       router.push("/home");

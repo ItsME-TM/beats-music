@@ -36,7 +36,13 @@ export default function ProfilePage() {
   }, [user]);
 
   const handleLogout = async () => {
-    await auth.signOut();
+    if (auth && typeof auth.signOut === "function") {
+      try {
+        await auth.signOut();
+      } catch (err) {
+        console.error("Sign out failed:", err);
+      }
+    }
     router.push("/login");
   };
 
