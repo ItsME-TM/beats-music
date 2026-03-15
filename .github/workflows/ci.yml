@@ -8,9 +8,9 @@ on:
   workflow_dispatch:
     inputs:
       branch:
-        description: "Branch to run against (for manual runs)"
+        description: "Exact branch to run against (no wildcards)"
         required: false
-        default: "main"
+        default: "master"
       skip_tests:
         description: "Skip tests during manual run"
         required: false
@@ -23,10 +23,19 @@ jobs:
     outputs:
       node-version: "20"
     steps:
+      - name: Validate branch input
+        if: ${{ github.event_name == 'workflow_dispatch' }}
+        run: |
+          BRANCH="${{ github.event.inputs.branch }}"
+          if echo "$BRANCH" | grep -Eq '[*?\[\]]'; then
+            echo "Invalid branch input '$BRANCH'. Use an exact branch name (for example: master)."
+            exit 1
+          fi
+
       - name: Checkout repo
         uses: actions/checkout@v4
         with:
-          ref: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.branch || github.ref }}
+          ref: ${{ github.event_name == 'workflow_dispatch' && format('refs/heads/{0}', github.event.inputs.branch) || github.ref }}
 
       - name: Use Node.js
         uses: actions/setup-node@v4
@@ -45,10 +54,19 @@ jobs:
     needs: lint-and-check
     runs-on: ubuntu-latest
     steps:
+      - name: Validate branch input
+        if: ${{ github.event_name == 'workflow_dispatch' }}
+        run: |
+          BRANCH="${{ github.event.inputs.branch }}"
+          if echo "$BRANCH" | grep -Eq '[*?\[\]]'; then
+            echo "Invalid branch input '$BRANCH'. Use an exact branch name (for example: master)."
+            exit 1
+          fi
+
       - name: Checkout repo
         uses: actions/checkout@v4
         with:
-          ref: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.branch || github.ref }}
+          ref: ${{ github.event_name == 'workflow_dispatch' && format('refs/heads/{0}', github.event.inputs.branch) || github.ref }}
 
       - name: Use Node.js
         uses: actions/setup-node@v4
@@ -93,6 +111,15 @@ jobs:
           context: .
           push: true
           tags: ${{ secrets.DOCKER_USERNAME }}/beat-music:latest
+          build-args: |
+            NEXT_PUBLIC_FIREBASE_API_KEY=${{ secrets.NEXT_PUBLIC_FIREBASE_API_KEY }}
+            NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=${{ secrets.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN }}
+            NEXT_PUBLIC_FIREBASE_PROJECT_ID=${{ secrets.NEXT_PUBLIC_FIREBASE_PROJECT_ID }}
+            NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET=${{ secrets.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET }}
+            NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=${{ secrets.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID }}
+            NEXT_PUBLIC_FIREBASE_APP_ID=${{ secrets.NEXT_PUBLIC_FIREBASE_APP_ID }}
+            NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID=${{ secrets.NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID }}
+            YOUTUBE_API_KEY=${{ secrets.YOUTUBE_API_KEY }}
 
   deploy:
     name: Trigger Render Deployment
