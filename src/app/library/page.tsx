@@ -47,7 +47,7 @@ interface PlaylistCardProps {
 export function LikedSongsCard({ count }: { count: number }) {
   return (
     <div
-      className="bg-gradient-to-br from-cyan-400 via-blue-500 to-purple-600 rounded-2xl p-8 w-full flex flex-col justify-end gap-2"
+      className="bg-linear-to-br from-cyan-400 via-blue-500 to-purple-600 rounded-2xl p-8 w-full flex flex-col justify-end gap-2"
       style={{ minHeight: "160px" }}
     >
       <MdFavorite className="text-white text-5xl" />
@@ -133,7 +133,7 @@ export function PlaylistCard({
       onClick={() => onSelect(playlist)}
       className="group relative w-full aspect-square rounded-xl overflow-hidden hover:scale-105 hover:brightness-110 transition-transform duration-200"
     >
-      <div className={`absolute inset-0 bg-gradient-to-br ${gradientClass}`}>
+      <div className={`absolute inset-0 bg-linear-to-br ${gradientClass}`}>
         <div className="flex items-center justify-center h-full">
           <MdMusicNote className="text-white/60 text-4xl" />
         </div>
@@ -222,7 +222,7 @@ export default function LibraryPage() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-[#0a0a0a] text-white px-4 md:pl-8 lg:pl-12 md:pr-[70px] lg:pr-[100px] pt-6 pb-24 md:pb-8">
+      <div className="min-h-screen bg-[#0a0a0a] text-white px-4 md:pl-8 lg:pl-12 md:pr-17.5 lg:pr-25 pt-6 pb-24 md:pb-8">
         <h1 className="text-2xl sm:text-3xl font-bold mb-8">Your Library</h1>
         <LibrarySkeleton />
       </div>
@@ -230,7 +230,7 @@ export default function LibraryPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[#0a0a0a] text-white px-4 md:pl-8 lg:pl-12 md:pr-[70px] lg:pr-[100px] pt-6 pb-24 md:pb-8">
+    <div className="min-h-screen bg-[#0a0a0a] text-white px-4 md:pl-8 lg:pl-12 md:pr-17.5 lg:pr-25 pt-6 pb-24 md:pb-8">
       <h1 className="text-2xl sm:text-3xl font-bold mb-8">Your Library</h1>
 
       {/* Liked Songs */}

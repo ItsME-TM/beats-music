@@ -8,8 +8,6 @@ import {
   SearchIcon,
   MusicNoteIcon,
   UserIcon,
-  MicIcon,
-  RadioIcon,
   LogoutIcon,
 } from "@/components/ui/Icons";
 import Popup from "@/components/ui/PopUp";
@@ -38,7 +36,7 @@ export default function SideBar() {
 
   return (
     <>
-      <div className="hidden md:flex fixed right-0 top-0 h-full w-[52px] lg:w-[60px] bg-neutral-900 flex-col items-center justify-center space-y-8 lg:space-y-10 py-6 lg:py-8 z-50 shadow-xl border-l border-white/5">
+      <div className="hidden md:flex fixed right-0 top-0 h-full w-13 lg:w-15 bg-neutral-900 flex-col items-center justify-center space-y-8 lg:space-y-10 py-6 lg:py-8 z-50 shadow-xl border-l border-white/5">
         <HomeIcon
           onClick={() => go("/home")}
           aria-current={isActive("/home") ? "page" : undefined}
@@ -84,7 +82,7 @@ export default function SideBar() {
               : "text-gray-400 hover:text-white"
           } cursor-pointer`}
         />
-      
+
         <div className="mt-auto">
           <LogoutIcon
             className="h-6 w-6 text-gray-400 hover:text-red-500 cursor-pointer transition-colors"

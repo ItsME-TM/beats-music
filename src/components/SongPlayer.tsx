@@ -1,8 +1,11 @@
 "use client";
 
 import React, { useMemo, useState, useRef, useEffect } from "react";
+import Image from "next/image";
 
 import ReactPlayer from "react-player";
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const ReactPlayerAny: any = ReactPlayer;
 import AddPlaylistButton from "./AddPlaylistButton";
 import { AiOutlineHeart, AiFillHeart } from "react-icons/ai";
 import {
@@ -208,7 +211,7 @@ export default function SongPlayer({
     ) {
       try {
         playerRef.current.setVolume(volume);
-      } catch (e) {
+      } catch {
         // ignore
       }
     }
@@ -278,8 +281,8 @@ export default function SongPlayer({
       className={`relative rounded-3xl text-white shadow-2xl overflow-hidden ${
         coverUrl
           ? "bg-center bg-cover"
-          : "bg-gradient-to-br from-[#0b0f14] to-[#131a21]"
-      } w-full h-auto min-h-[320px] sm:min-h-[360px] md:min-h-[75vh] transition-all duration-700 ease-in-out border border-white/10`}
+          : "bg-linear-to-br from-[#0b0f14] to-[#131a21]"
+      } w-full h-auto min-h-80 sm:min-h-90 md:min-h-[75vh] transition-all duration-700 ease-in-out border border-white/10`}
       style={coverUrl ? { backgroundImage: `url(${coverUrl})` } : undefined}
     >
       {/* Hidden media player: keeps playback running while UI shows thumbnail/artwork */}
@@ -288,32 +291,26 @@ export default function SongPlayer({
           className="absolute left-0 top-0 w-px h-px overflow-hidden"
           style={{ opacity: 0.01, pointerEvents: "none" }}
         >
-          {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
-          <ReactPlayer
-            ref={playerRef as any}
+          <ReactPlayerAny
+            ref={playerRef}
             src={mediaSrc}
             playing={isPlaying}
             volume={volume}
             muted={false}
             loop={repeat === "one"}
             onReady={() => {
-              console.log("[SongPlayer] hidden Player ready ->", {
-                mediaSrc,
-                youtubeVideoId,
-                playerRefCurrent: playerRef.current,
-              });
               setPlayerReady(true);
             }}
-            onError={(e: Error) => {
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            onError={(e: any) => {
               console.error("[SongPlayer] hidden Playback error:", e);
               setIsPlaying(false);
             }}
             onPlay={() => {
-              console.log("[SongPlayer] hidden Playback started");
               setIsPlaying(true);
               setHasUserInteracted(true);
             }}
-            onPause={() => console.log("[SongPlayer] hidden Playback paused")}
+            onPause={() => {}}
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
             onProgress={(prog: any) => {
               const secondsRaw = prog?.playedSeconds ?? prog?.played ?? 0;
@@ -341,50 +338,50 @@ export default function SongPlayer({
               } else if (repeat === "all") {
                 if (onNext) onNext();
               } else {
-                // repeat === "off": call onNext only if provided; else stop
                 if (onNext) onNext();
                 else setIsPlaying(false);
               }
             }}
             width="100%"
             height="100%"
-            config={{
-              youtube: {
-                playerVars: {
-                  autoplay: 1,
-                  controls: 0,
-                  modestbranding: 1,
-                  rel: 0,
-                  playsinline: 1,
-                  origin:
-                    typeof window !== "undefined" ? window.location.origin : "",
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            config={
+              {
+                youtube: {
+                  playerVars: {
+                    autoplay: 1,
+                    controls: 0,
+                    modestbranding: 1,
+                    rel: 0,
+                    playsinline: 1,
+                    origin:
+                      typeof window !== "undefined"
+                        ? window.location.origin
+                        : "",
+                  },
                 },
-              },
-              file: {
-                forceAudio: true,
-                attributes: { crossOrigin: "anonymous" },
-              },
-            }}
+                file: {
+                  forceAudio: true,
+                  attributes: { crossOrigin: "anonymous" },
+                },
+              } as any
+            }
           />
         </div>
       )}
 
       {/* glass overlay */}
-      <div className="absolute inset-0 bg-gradient-to-l from-[rgba(0,0,0,0.85)] via-[rgba(0,0,0,0.4)] to-[rgba(0,0,0,0.7)] backdrop-blur-[2px]" />
+      <div className="absolute inset-0 bg-linear-to-l from-[rgba(0,0,0,0.85)] via-[rgba(0,0,0,0.4)] to-[rgba(0,0,0,0.7)] backdrop-blur-[2px]" />
 
       {/* content */}
       <div className="relative flex flex-col md:flex-row gap-6 h-full p-6 md:p-8">
         {/* left: song info + thumbnail/video */}
         <div className="w-full md:w-64 self-start md:self-center shrink-0">
-          <div className="w-32 h-32 sm:w-40 sm:h-40 md:w-48 md:h-48 rounded-2xl overflow-hidden mb-4 shadow-lg">
+          <div className="relative w-32 h-32 sm:w-40 sm:h-40 md:w-48 md:h-48 rounded-2xl overflow-hidden mb-4 shadow-lg">
             {coverUrl ? (
-              <img
-                src={coverUrl}
-                alt={title}
-                className="w-full h-full object-cover"
-              />
+              <Image src={coverUrl} alt={title} fill className="object-cover" />
             ) : (
-              <div className="w-full h-full bg-gradient-to-br from-cyan-900 to-gray-900 flex items-center justify-center">
+              <div className="w-full h-full bg-linear-to-br from-cyan-900 to-gray-900 flex items-center justify-center">
                 <span className="text-4xl">🎵</span>
               </div>
             )}

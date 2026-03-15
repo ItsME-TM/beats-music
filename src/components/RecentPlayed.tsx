@@ -25,7 +25,9 @@ export default function RecentPlayed({ songs }: RecentPlayedProps) {
     <div className="bg-[#111] rounded-xl py-2 px-3 sm:px-4 md:px-6 text-white w-full">
       {/* Header */}
       <div className="flex items-center mb-2">
-        <span className="text-sm sm:text-md font-semibold">Recently Played</span>
+        <span className="text-sm sm:text-md font-semibold">
+          Recently Played
+        </span>
         <button
           className="ml-3 cursor-pointer text-[#00eaff] text-lg sm:text-xl hover:opacity-80 focus:outline-none"
           aria-label="Pause"
@@ -86,10 +88,10 @@ export default function RecentPlayed({ songs }: RecentPlayedProps) {
                 </div>
               </div>
               {/* Album - hidden on mobile */}
-              <div className="hidden sm:block w-[100px] md:w-[120px] text-left text-[10px] sm:text-xs truncate text-gray-400">
+              <div className="hidden sm:block w-25 md:w-30 text-left text-[10px] sm:text-xs truncate text-gray-400">
                 {song.album || "Album"}
               </div>
-              <div className="w-10 sm:w-[60px] text-center text-[10px] sm:text-xs text-gray-400">
+              <div className="w-10 sm:w-15 text-center text-[10px] sm:text-xs text-gray-400">
                 {song.duration}
               </div>
               <button
