@@ -32,9 +32,55 @@ function SongPlayContent() {
 
   useEffect(() => {
     const fetchTopSongs = async () => {
-      const results = await searchSongs("Global Top 100", 20);
-      if (results) {
-        const mappedSongs: TopSong[] = results.map((s) => ({
+      const preferredArtists = [
+        "Jada Facer",
+        "Against the Current",
+        "The Chainsmokers",
+        "Ariana Grande",
+        "Selena Gomez",
+        "Kiger",
+        "Coldplay",
+        "Maroon 5",
+        "OneRepublic",
+        "Halsey",
+        "Taylor Swift",
+        "Zedd",
+        "Dua Lipa",
+        "Imagine Dragons",
+        "Kygo",
+        "Bebe Rexha",
+        "Marshmello",
+        "Chvrches",
+        "Lauv",
+        "Troye Sivan",
+        "Hailee Steinfeld",
+        "5 Seconds of Summer",
+        "Clean Bandit",
+        "Griffin",
+        "Alessia Cara",
+        "Shawn Mendes",
+        "Olivia Rodrigo",
+        "Paramore",
+        "The Weeknd",
+        "Ellie Goulding",
+      ];
+
+      try {
+        // Fetch a few songs for each artist in parallel
+        const fetchPromises = preferredArtists.map((artist) =>
+          searchSongs(artist, 5),
+        );
+        const allResultsChunks = await Promise.all(fetchPromises);
+
+        // Flatten and filter out nulls
+        const combinedResults = allResultsChunks
+          .flat()
+          .filter((s): s is SaavnSong => s !== null);
+
+        // Optional: Shuffle the list so it's not grouped strictly by artist
+        const shuffled = combinedResults.sort(() => Math.random() - 0.5);
+
+        const mappedSongs: TopSong[] = shuffled.map((s) => ({
           id: s.id,
           title: s.name
             .replace(/&quot;/g, '"')
@@ -46,6 +92,24 @@ function SongPlayContent() {
           isFavorite: false,
         }));
         setTopSongs(mappedSongs);
+      } catch (error) {
+        console.error("[SongPlay] Failed to fetch custom artist queue:", error);
+        // Fallback to Global Top 100 if the custom fetch fails
+        const results = await searchSongs("Global Top 100", 20);
+        if (results) {
+          const mappedSongs: TopSong[] = results.map((s) => ({
+            id: s.id,
+            title: s.name
+              .replace(/&quot;/g, '"')
+              .replace(/&#039;/g, "'")
+              .replace(/&amp;/g, "&"),
+            artist: s.primaryArtists || "",
+            duration: formatDuration(s.duration),
+            image: getSongImage(s),
+            isFavorite: false,
+          }));
+          setTopSongs(mappedSongs);
+        }
       }
     };
     fetchTopSongs();

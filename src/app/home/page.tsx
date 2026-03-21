@@ -3,7 +3,7 @@ import { getSongImage } from "@/utils/imageUtils";
 
 // ... existing imports ...
 import { useEffect, useState } from "react";
-import { useDebounce } from "@/hooks/useDebounce";
+// import { useDebounce } from "@/hooks/useDebounce";
 import { useRouter } from "next/navigation";
 import useAuth from "@/hooks/useAuth";
 // import { MdLibraryMusic } from "react-icons/md";
@@ -16,7 +16,7 @@ export default function HomePage() {
   const user = useAuth();
   const router = useRouter();
   const [searchSongDetails, setSearchSongDetails] = useState("");
-  const debouncedSearch = useDebounce(searchSongDetails, 400);
+  // const debouncedSearch = useDebounce(searchSongDetails, 400);
   // Using 'any' for now to quickly map the API response, ideally should use the interface
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [songs, setSongs] = useState<any[]>([]);
@@ -29,21 +29,38 @@ export default function HomePage() {
   }, [user, router]);
 
   useEffect(() => {
-    const fetchNewReleases = async () => {
+    const fetchHomeSongs = async () => {
       setIsLoading(true);
+      const preferredQueries = [
+        "Jada Facer",
+        "Against the Current",
+        "The Chainsmokers",
+        "Ariana Grande",
+        "Selena Gomez",
+        "Kiger",
+      ];
       try {
-        // Fetching 10 songs to show 7/8 in grid and use 10th for featured
-        const results = await searchSongs("English Top Hits", 10);
-        if (results && results.length > 0) {
-          setSongs(results);
+        // Fetch a mix from multiple artists
+        const fetchPromises = preferredQueries.map((q) => searchSongs(q, 3));
+        const allResults = await Promise.all(fetchPromises);
+        const combined = allResults.flat().filter(Boolean);
+
+        // Shuffle and set
+        const shuffled = combined.sort(() => Math.random() - 0.5);
+        if (shuffled.length > 0) {
+          setSongs(shuffled);
+        } else {
+          // Fallback
+          const fallback = await searchSongs("English Top Hits", 10);
+          setSongs(fallback);
         }
       } catch (error) {
-        console.error("Failed to fetch songs", error);
+        console.error("Failed to fetch home songs", error);
       } finally {
         setIsLoading(false);
       }
     };
-    fetchNewReleases();
+    fetchHomeSongs();
   }, []);
 
   const handleSongClick = (songId: string) => {

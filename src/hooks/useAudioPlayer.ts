@@ -118,7 +118,7 @@ export default function useAudioPlayer({
     }, 250);
 
     return () => window.clearInterval(id);
-  }, [isPlaying, duration, currentTime, repeat, audioSrc]);
+  }, [isPlaying, duration, currentTime, repeat, audioSrc, onNext]);
 
   function togglePlayPause() {
     if (audioRef.current) {

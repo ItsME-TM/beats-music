@@ -1,4 +1,5 @@
 "use client";
+/* eslint-disable @next/next/no-img-element */
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
@@ -17,8 +18,6 @@ const GENRE_GRADIENTS: Record<string, string> = {
   Jazz: "from-amber-600 to-yellow-700",
   "R&B": "from-purple-600 to-violet-500",
 };
-
-const GENRES = Object.keys(GENRE_GRADIENTS);
 
 function decodeEntities(str: string): string {
   return str
@@ -159,26 +158,6 @@ function SplitLayoutSkeleton() {
           </div>
         ))}
       </div>
-    </div>
-  );
-}
-
-function SearchSkeleton() {
-  return (
-    <div className="flex flex-col gap-3 mt-4">
-      {[...Array(6)].map((_, i) => (
-        <div
-          key={i}
-          className="flex items-center gap-4 p-3 rounded-xl bg-neutral-900"
-        >
-          <Skeleton className="w-14 h-14 rounded-xl flex-shrink-0" />
-          <div className="flex-1 min-w-0">
-            <Skeleton className="h-4 w-3/4 mb-2" />
-            <Skeleton className="h-3 w-1/2" />
-          </div>
-          <Skeleton className="h-3 w-10 flex-shrink-0" />
-        </div>
-      ))}
     </div>
   );
 }
