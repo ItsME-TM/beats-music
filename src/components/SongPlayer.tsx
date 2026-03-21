@@ -85,6 +85,7 @@ export default function SongPlayer({
 
   // react-player v3 ref callback — the ref points to the underlying
   // custom element (e.g. <youtube-video-element>) which extends HTMLVideoElement
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const handlePlayerRef = useCallback((node: any) => {
     playerRef.current = node;
     console.log("[SongPlayer] 🔍 ReactPlayer v3 ref callback:", {
