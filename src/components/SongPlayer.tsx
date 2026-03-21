@@ -592,8 +592,8 @@ export default function SongPlayer({
             </div>
 
             {/* main buttons */}
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-4 sm:gap-6">
+            <div className="flex items-center justify-between w-full px-2 md:px-0">
+              <div className="flex items-center space-x-4 md:space-x-6">
                 <button
                   onClick={() =>
                     setShuffle((s) => {
@@ -618,7 +618,7 @@ export default function SongPlayer({
                 <button
                   onClick={togglePlayPause}
                   disabled={!mediaSrc}
-                  className="w-12 h-12 sm:w-14 sm:h-14 bg-white text-black rounded-full flex items-center justify-center hover:scale-110 active:scale-95 transition-all shadow-xl shadow-white/10 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
+                  className="w-12 h-12 mr-8 sm:mr-6 sm:w-14 sm:h-14 bg-white text-black rounded-full flex items-center justify-center hover:scale-110 active:scale-95 transition-all shadow-xl shadow-white/10 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
                   aria-label={isPlaying ? "Pause" : "Play"}
                 >
                   {isPlaying ? (
