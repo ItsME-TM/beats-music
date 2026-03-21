@@ -431,7 +431,7 @@ export default function SongPlayer({
       {/* content */}
       <div className="relative flex flex-col md:flex-row gap-6 h-full p-6 md:p-8">
         {/* left: song info + thumbnail/video */}
-        <div className="w-full md:w-64 self-start md:self-center shrink-0">
+        <div className="w-full md:w-50 self-start md:self-center shrink-0">
           <div className="relative w-32 h-32 sm:w-40 sm:h-40 md:w-48 md:h-48 rounded-2xl overflow-hidden mb-4 shadow-lg">
             {coverUrl ? (
               <Image src={coverUrl} alt={title} fill className="object-cover" />
@@ -447,7 +447,7 @@ export default function SongPlayer({
               Now Streaming
             </p>
           </div>
-          <h1 className="text-xl sm:text-2xl md:text-3xl font-extrabold leading-tight drop-shadow-lg line-clamp-2">
+          <h1 className="text-xl sm:text-xl md:text-xl font-extrabold leading-tight drop-shadow-lg line-clamp-2">
             {title}
           </h1>
           <p className="mt-2 text-xs sm:text-sm md:text-base opacity-75 font-medium text-cyan-50">
@@ -481,7 +481,7 @@ export default function SongPlayer({
         {/* right: lyrics & controls */}
         <div className="flex-1 flex flex-col justify-between py-2">
           {/* Lyrics section */}
-          <div className="flex-1 overflow-hidden flex flex-col items-center justify-center mask-fade">
+          <div className="hidden flex-1 overflow-hidden md:flex flex-col items-center justify-center mask-fade">
             {visibleLyrics.length ? (
               <div className="flex flex-col items-center gap-3 sm:gap-4 transition-all duration-500">
                 {visibleLyrics.map((l) => (
@@ -653,7 +653,7 @@ export default function SongPlayer({
                 </button>
               </div>
 
-              <div className="flex items-center gap-2 ml-8 group/volume">
+              <div className="hidden md:flex items-center gap-2 ml-8 group/volume">
                 <button
                   onClick={toggleMute}
                   className="text-white/60 hover:text-white transition-colors"
