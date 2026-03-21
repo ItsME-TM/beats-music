@@ -373,7 +373,7 @@ export default function SongPlayer({
         coverUrl
           ? "bg-center bg-cover"
           : "bg-linear-to-br from-[#0b0f14] to-[#131a21]"
-      } w-full h-auto min-h-80 sm:min-h-90 md:min-h-[75vh] transition-all duration-700 ease-in-out border border-white/10`}
+      } w-full h-auto min-h-80 sm:min-h-90 md:min-h-[75vh] transition-all duration-700 ease-in-out border-2 border-cyan-400`}
       style={coverUrl ? { backgroundImage: `url(${coverUrl})` } : undefined}
     >
       {/* Hidden media player: react-player v3 renders a custom element (e.g. youtube-video-element) */}
