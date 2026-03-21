@@ -1,6 +1,12 @@
 "use client";
 
-import React, { useMemo, useState, useRef, useEffect } from "react";
+import React, {
+  useMemo,
+  useState,
+  useRef,
+  useEffect,
+  useCallback,
+} from "react";
 import Image from "next/image";
 
 import ReactPlayer from "react-player";
@@ -68,7 +74,7 @@ export default function SongPlayer({
   const [repeat, setRepeat] = useState<"off" | "all" | "one">("off");
   const [shuffle, setShuffle] = useState(false);
   const [volume, setVolume] = useState(0.8);
-  const [isSeeking, setIsSeeking] = useState(false);
+  const isSeekingRef = useRef(false);
   const [seekPreviewTime, setSeekPreviewTime] = useState<number | null>(null);
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -76,6 +82,20 @@ export default function SongPlayer({
 
   const [playerReady, setPlayerReady] = useState(false);
   const [hasUserInteracted, setHasUserInteracted] = useState(false);
+
+  // react-player v3 ref callback — the ref points to the underlying
+  // custom element (e.g. <youtube-video-element>) which extends HTMLVideoElement
+  const handlePlayerRef = useCallback((node: any) => {
+    playerRef.current = node;
+    console.log("[SongPlayer] 🔍 ReactPlayer v3 ref callback:", {
+      node: !!node,
+      tagName: node?.tagName,
+      hasCurrentTime: "currentTime" in (node || {}),
+      hasDuration: "duration" in (node || {}),
+      hasPlay: typeof node?.play,
+      hasPause: typeof node?.pause,
+    });
+  }, []);
 
   // Reset player state when audioSrc or youtubeVideoId changes
   useEffect(() => {
@@ -86,8 +106,6 @@ export default function SongPlayer({
     if (audioSrc || youtubeVideoId) {
       setCurrentTime(0);
       setPlayerReady(false);
-      // Don't auto-play - browser blocks it without user interaction
-      // User must click play button (togglePlayPause) to start playback
     }
   }, [audioSrc, youtubeVideoId]);
 
@@ -97,6 +115,12 @@ export default function SongPlayer({
     if (playerReady && hasSource && hasUserInteracted) {
       console.log("[SongPlayer] auto-play allowed, starting playback");
       setIsPlaying(true);
+      // In v3, control via the ref's native .play() method
+      try {
+        playerRef.current?.play();
+      } catch (err) {
+        console.error("[SongPlayer] auto-play via ref failed:", err);
+      }
     } else if (playerReady && hasSource && !hasUserInteracted) {
       console.log(
         "[SongPlayer] player ready but waiting for user interaction to play",
@@ -107,6 +131,18 @@ export default function SongPlayer({
   useEffect(() => {
     if (durationProp) setDuration(durationProp);
   }, [durationProp]);
+
+  // Sync volume to the player element when it changes
+  useEffect(() => {
+    console.log("[SongPlayer] volume changed ->", volume);
+    if (playerRef.current) {
+      try {
+        playerRef.current.volume = volume;
+      } catch {
+        /* ignore */
+      }
+    }
+  }, [volume]);
 
   const effectiveCurrentTime = seekPreviewTime ?? currentTime;
   const safeDuration = Number.isFinite(duration) && duration > 0 ? duration : 1;
@@ -120,102 +156,73 @@ export default function SongPlayer({
     console.log("[SongPlayer] user toggled play/pause ->", {
       wasPlaying: isPlaying,
       next,
+      hasRef: !!playerRef.current,
     });
     setHasUserInteracted(true);
     setIsPlaying(next);
 
-    // For YouTube, also invoke the internal IFrame API directly in the user gesture.
-    if (youtubeVideoId && next) {
+    // In react-player v3, control playback via the underlying element
+    if (playerRef.current) {
       try {
-        const internal = playerRef.current?.getInternalPlayer?.();
-        if (internal) {
-          if (typeof internal.unMute === "function") internal.unMute();
-          if (typeof internal.setVolume === "function")
-            internal.setVolume(Math.round(volume * 100));
-          if (typeof internal.playVideo === "function") internal.playVideo();
-          const state =
-            typeof internal.getPlayerState === "function"
-              ? internal.getPlayerState()
-              : "unknown";
-          console.log("[SongPlayer] forced youtube play via internal player", {
-            hasInternal: !!internal,
-            state,
-          });
+        if (next) {
+          playerRef.current.play();
         } else {
-          console.log("[SongPlayer] internal youtube player not ready yet");
+          playerRef.current.pause();
         }
       } catch (err) {
-        console.error("[SongPlayer] internal youtube play failed", err);
+        console.error("[SongPlayer] play/pause via ref failed:", err);
       }
     }
   }
 
-  useEffect(() => {
-    if (!youtubeVideoId) return;
-    const t = window.setTimeout(() => {
-      try {
-        const internal = playerRef.current?.getInternalPlayer?.();
-        const state =
-          typeof internal?.getPlayerState === "function"
-            ? internal.getPlayerState()
-            : "unknown";
-        const muted =
-          typeof internal?.isMuted === "function"
-            ? internal.isMuted()
-            : "unknown";
-        console.log("[SongPlayer] youtube internal state snapshot", {
-          state,
-          muted,
-          isPlaying,
-          currentTime,
-        });
-      } catch (err) {
-        console.error("[SongPlayer] youtube state snapshot failed", err);
-      }
-    }, 1200);
-    return () => window.clearTimeout(t);
-  }, [youtubeVideoId, isPlaying, currentTime]);
-
+  // Seek using native HTMLMediaElement API (currentTime property)
   function seekTo(t: number) {
     const numeric = Number.isFinite(t) ? t : 0;
     const clamped = Math.max(0, Math.min(duration || 0, numeric));
-    console.log("[SongPlayer] seekTo ->", clamped);
+    console.log("[SongPlayer] 🎯 SEEKTO CALLED:", {
+      input: t,
+      numeric,
+      clamped,
+      duration,
+      playerRef: !!playerRef.current,
+      tagName: playerRef.current?.tagName,
+    });
+
     setCurrentTime(clamped);
     setSeekPreviewTime(null);
-    if (playerRef.current && typeof playerRef.current.seekTo === "function") {
-      try {
-        playerRef.current.seekTo(clamped);
-      } catch {
-        const fraction = duration > 0 ? clamped / duration : 0;
-        playerRef.current.seekTo(fraction, "fraction");
-      }
+
+    if (!playerRef.current) {
+      console.error(
+        "[SongPlayer] ❌ Cannot seek - playerRef.current is null/undefined",
+      );
+      isSeekingRef.current = false;
+      return;
     }
+
+    // react-player v3: Seek via the native .currentTime property
+    try {
+      console.log("[SongPlayer] 🎯 Setting currentTime to:", clamped);
+      playerRef.current.currentTime = clamped;
+      console.log(
+        "[SongPlayer] ✅ seek successful, currentTime is now:",
+        playerRef.current.currentTime,
+      );
+    } catch (err) {
+      console.error("[SongPlayer] ❌ seek failed:", err);
+    }
+
+    // NOTE: isSeekingRef is reset by the caller (onMouseUp/onTouchEnd)
   }
 
   function handleSeekPreview(next: number) {
     const value = Number.isFinite(next) ? next : 0;
     setSeekPreviewTime(value);
-    setCurrentTime(value);
   }
 
   function changeVolume(val: number) {
     const v = Math.max(0, Math.min(1, val));
     setVolume(v);
   }
-
-  useEffect(() => {
-    console.log("[SongPlayer] volume changed ->", volume);
-    if (
-      playerRef.current &&
-      typeof playerRef.current.setVolume === "function"
-    ) {
-      try {
-        playerRef.current.setVolume(volume);
-      } catch {
-        // ignore
-      }
-    }
-  }, [volume]);
 
   const [liked, setLiked] = useState(false);
   const prevVolumeRef = useRef(0.8);
@@ -276,6 +283,90 @@ export default function SongPlayer({
     ? `https://www.youtube.com/watch?v=${youtubeVideoId}`
     : audioSrc;
 
+  // ---- react-player v3 event handlers (HTML5 media events) ----
+
+  // onReady is handled specially by react-player v3 (fires on loadstart)
+  const handleReady = useCallback(() => {
+    console.log("[SongPlayer] 🎵 ReactPlayer v3 READY (loadstart)", {
+      mediaSrc,
+      hasRef: !!playerRef.current,
+      tagName: playerRef.current?.tagName,
+    });
+    setPlayerReady(true);
+  }, [mediaSrc]);
+
+  // onDurationChange: standard HTML5 media event, fires when duration is available
+  const handleDurationChange = useCallback(
+    (e: React.SyntheticEvent<HTMLVideoElement>) => {
+      const el = e.currentTarget;
+      const dur = el.duration;
+      console.log("[SongPlayer] 🎵 durationchange:", {
+        duration: dur,
+        isFinite: Number.isFinite(dur),
+        currentDuration: duration,
+      });
+      if (Number.isFinite(dur) && dur > 0) {
+        setDuration(dur);
+      }
+    },
+    [duration],
+  );
+
+  // onTimeUpdate: standard HTML5 media event, fires as playback advances
+  const handleTimeUpdate = useCallback(
+    (e: React.SyntheticEvent<HTMLVideoElement>) => {
+      if (isSeekingRef.current) return;
+      const el = e.currentTarget;
+      const secs = el.currentTime;
+      if (Number.isFinite(secs) && secs >= 0) {
+        setCurrentTime(secs);
+      }
+    },
+    [],
+  );
+
+  // onPlay: standard HTML5 media event
+  const handlePlay = useCallback(() => {
+    console.log("[SongPlayer] 🎵 onPlay fired");
+    setIsPlaying(true);
+    setHasUserInteracted(true);
+  }, []);
+
+  // onPause: standard HTML5 media event
+  const handlePause = useCallback(() => {
+    console.log("[SongPlayer] 🎵 onPause fired");
+    // Only update if we're not in the middle of a seek
+    if (!isSeekingRef.current) {
+      setIsPlaying(false);
+    }
+  }, []);
+
+  // onEnded: standard HTML5 media event
+  const handleEnded = useCallback(() => {
+    console.log("[SongPlayer] 🎵 onEnded fired, repeat:", repeat);
+    if (repeat === "one") {
+      // Restart the same track
+      if (playerRef.current) {
+        playerRef.current.currentTime = 0;
+        playerRef.current.play();
+      }
+    } else if (repeat === "all") {
+      if (onNext) onNext();
+    } else {
+      if (onNext) onNext();
+      else setIsPlaying(false);
+    }
+  }, [repeat, onNext]);
+
+  // onError: standard HTML5 media event
+  const handleError = useCallback(
+    (e: React.SyntheticEvent<HTMLVideoElement>) => {
+      console.error("[SongPlayer] ❌ Playback error:", e);
+      setIsPlaying(false);
+    },
+    [],
+  );
+
   return (
     <div
       className={`relative rounded-3xl text-white shadow-2xl overflow-hidden ${
@@ -285,84 +376,52 @@ export default function SongPlayer({
       } w-full h-auto min-h-80 sm:min-h-90 md:min-h-[75vh] transition-all duration-700 ease-in-out border border-white/10`}
       style={coverUrl ? { backgroundImage: `url(${coverUrl})` } : undefined}
     >
-      {/* Hidden media player: keeps playback running while UI shows thumbnail/artwork */}
+      {/* Hidden media player: react-player v3 renders a custom element (e.g. youtube-video-element) */}
       {mediaSrc && (
         <div
-          className="absolute left-0 top-0 w-px h-px overflow-hidden"
-          style={{ opacity: 0.01, pointerEvents: "none" }}
+          className="absolute left-0 top-0 w-0 h-0"
+          style={{ visibility: "hidden", pointerEvents: "none" }}
         >
-          <ReactPlayerAny
-            ref={playerRef}
-            src={mediaSrc}
-            playing={isPlaying}
-            volume={volume}
-            muted={false}
-            loop={repeat === "one"}
-            onReady={() => {
-              setPlayerReady(true);
+          <div
+            style={{
+              width: 480,
+              height: 270,
+              position: "absolute",
+              left: 0,
+              top: 0,
             }}
-            onError={(e: unknown) => {
-              console.error("[SongPlayer] hidden Playback error:", e);
-              setIsPlaying(false);
-            }}
-            onPlay={() => {
-              setIsPlaying(true);
-              setHasUserInteracted(true);
-            }}
-            onPause={() => {}}
-            onProgress={(prog: { playedSeconds?: number; played?: number }) => {
-              const secondsRaw = prog?.playedSeconds ?? prog?.played ?? 0;
-              const seconds = Number(secondsRaw);
-              if (!isSeeking && Number.isFinite(seconds)) {
-                setCurrentTime(seconds);
+          >
+            <ReactPlayerAny
+              ref={handlePlayerRef}
+              src={mediaSrc}
+              autoPlay={false}
+              volume={volume}
+              muted={false}
+              loop={repeat === "one"}
+              playsInline
+              onReady={handleReady}
+              onDurationChange={handleDurationChange}
+              onTimeUpdate={handleTimeUpdate}
+              onPlay={handlePlay}
+              onPause={handlePause}
+              onEnded={handleEnded}
+              onError={handleError}
+              width="480"
+              height="270"
+              config={
+                youtubeVideoId
+                  ? {
+                      youtube: {
+                        origin:
+                          typeof window !== "undefined"
+                            ? window.location.origin
+                            : "",
+                      },
+                    }
+                  : undefined
               }
-            }}
-            onDuration={(dur: number) => {
-              const parsed = Number(dur);
-              if (Number.isFinite(parsed) && parsed > 0) {
-                setDuration(parsed);
-              }
-            }}
-            onEnded={() => {
-              if (repeat === "one") {
-                if (
-                  playerRef.current &&
-                  typeof playerRef.current.seekTo === "function"
-                ) {
-                  playerRef.current.seekTo(0);
-                  setIsPlaying(true);
-                }
-              } else if (repeat === "all") {
-                if (onNext) onNext();
-              } else {
-                if (onNext) onNext();
-                else setIsPlaying(false);
-              }
-            }}
-            width="100%"
-            height="100%"
-            config={
-              {
-                youtube: {
-                  playerVars: {
-                    autoplay: 1,
-                    controls: 0,
-                    modestbranding: 1,
-                    rel: 0,
-                    playsinline: 1,
-                    origin:
-                      typeof window !== "undefined"
-                        ? window.location.origin
-                        : "",
-                  },
-                },
-                file: {
-                  forceAudio: true,
-                  attributes: { crossOrigin: "anonymous" },
-                },
-              } as unknown as Record<string, unknown>
-            }
-          />
+            />
+          </div>
         </div>
       )}
 
@@ -450,26 +509,74 @@ export default function SongPlayer({
 
           {/* controls */}
           <div className="mt-6 flex flex-col gap-5 px-2">
-            {/* progress */}
+            {/* progress / seek bar */}
             <div className="group/progress relative pt-2">
               <input
                 type="range"
                 min={0}
                 max={Math.max(duration, 1)}
                 step={0.1}
-                value={Math.min(effectiveCurrentTime, duration || 0)}
-                onMouseDown={() => setIsSeeking(true)}
-                onTouchStart={() => setIsSeeking(true)}
-                onChange={(e) => handleSeekPreview(Number(e.target.value))}
+                value={seekPreviewTime ?? currentTime}
+                disabled={!mediaSrc || !playerReady}
+                onInput={(e) => {
+                  const newTime = Number((e.target as HTMLInputElement).value);
+                  if (!isSeekingRef.current) {
+                    isSeekingRef.current = true;
+                  }
+                  handleSeekPreview(newTime);
+                }}
+                onChange={(e) => {
+                  // In React, onChange fires on every value change (same as onInput).
+                  // We only use this to update the preview — actual seek happens on mouse/touch up.
+                  const newTime = Number(e.target.value);
+                  handleSeekPreview(newTime);
+                }}
+                onMouseDown={() => {
+                  console.log("[SongPlayer] 🎯 SEEK MOUSEDOWN - Starting seek");
+                  isSeekingRef.current = true;
+                }}
+                onTouchStart={() => {
+                  console.log(
+                    "[SongPlayer] 🎯 SEEK TOUCHSTART - Starting seek (touch)",
+                  );
+                  isSeekingRef.current = true;
+                }}
                 onMouseUp={(e) => {
-                  setIsSeeking(false);
-                  seekTo(Number((e.target as HTMLInputElement).value));
+                  const newTime = Number((e.target as HTMLInputElement).value);
+                  console.log(
+                    "[SongPlayer] 🎯 SEEK MOUSEUP - Committing seek:",
+                    {
+                      newTime,
+                      duration,
+                      playerRef: !!playerRef.current,
+                    },
+                  );
+                  seekTo(newTime);
+                  setTimeout(() => {
+                    isSeekingRef.current = false;
+                    console.log(
+                      "[SongPlayer] 🎯 Seek complete, resuming progress tracking",
+                    );
+                  }, 250);
                 }}
                 onTouchEnd={(e) => {
-                  setIsSeeking(false);
-                  seekTo(Number((e.target as HTMLInputElement).value));
+                  const newTime = Number((e.target as HTMLInputElement).value);
+                  console.log(
+                    "[SongPlayer] 🎯 SEEK TOUCHEND - Committing seek:",
+                    {
+                      newTime,
+                      duration,
+                    },
+                  );
+                  seekTo(newTime);
+                  setTimeout(() => {
+                    isSeekingRef.current = false;
+                    console.log(
+                      "[SongPlayer] 🎯 Touch seek complete, resuming progress tracking",
+                    );
+                  }, 250);
                 }}
-                className="w-full appearance-none h-1.5 rounded-full outline-none cursor-pointer group-hover/progress:h-2 transition-all bg-white/20"
+                className="w-full appearance-none h-1.5 rounded-full outline-none cursor-pointer group-hover/progress:h-2 transition-all bg-white/20 disabled:cursor-not-allowed disabled:opacity-50"
                 style={{
                   background: `linear-gradient(to right, #22d3ee ${progressPct}%, rgba(255,255,255,0.15) ${progressPct}%)`,
                 }}
@@ -502,14 +609,16 @@ export default function SongPlayer({
                 </button>
                 <button
                   onClick={onPrev}
-                  className="text-white/80 hover:text-white transition-all active:scale-90"
+                  disabled={!onPrev}
+                  className="text-white/80 hover:text-white transition-all active:scale-90 disabled:opacity-30 disabled:cursor-not-allowed disabled:hover:text-white/80"
                   aria-label="Previous"
                 >
                   <IoPlaySkipBack size={20} />
                 </button>
                 <button
                   onClick={togglePlayPause}
-                  className="w-12 h-12 sm:w-14 sm:h-14 bg-white text-black rounded-full flex items-center justify-center hover:scale-110 active:scale-95 transition-all shadow-xl shadow-white/10"
+                  disabled={!mediaSrc}
+                  className="w-12 h-12 sm:w-14 sm:h-14 bg-white text-black rounded-full flex items-center justify-center hover:scale-110 active:scale-95 transition-all shadow-xl shadow-white/10 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
                   aria-label={isPlaying ? "Pause" : "Play"}
                 >
                   {isPlaying ? (
@@ -520,7 +629,8 @@ export default function SongPlayer({
                 </button>
                 <button
                   onClick={onNext}
-                  className="text-white/80 hover:text-white transition-all active:scale-90"
+                  disabled={!onNext}
+                  className="text-white/80 hover:text-white transition-all active:scale-90 disabled:opacity-30 disabled:cursor-not-allowed disabled:hover:text-white/80"
                   aria-label="Next"
                 >
                   <IoPlaySkipForward size={20} />
@@ -543,7 +653,7 @@ export default function SongPlayer({
                 </button>
               </div>
 
-              <div className="flex items-center gap-2 group/volume">
+              <div className="flex items-center gap-2 ml-8 group/volume">
                 <button
                   onClick={toggleMute}
                   className="text-white/60 hover:text-white transition-colors"
