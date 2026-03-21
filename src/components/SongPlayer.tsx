@@ -145,6 +145,38 @@ export default function SongPlayer({
     }
   }, [volume]);
 
+  // Setup Media Session API for background playback and lockscreen controls
+  useEffect(() => {
+    if ("mediaSession" in navigator) {
+      navigator.mediaSession.metadata = new window.MediaMetadata({
+        title: title || "Unknown Track",
+        artist: artists?.join(", ") || "Unknown Artist",
+        album: "Beats Music",
+        artwork: coverUrl
+          ? [{ src: coverUrl, sizes: "512x512", type: "image/png" }]
+          : [],
+      });
+
+      navigator.mediaSession.setActionHandler("play", () => {
+        setHasUserInteracted(true);
+        setIsPlaying(true);
+        playerRef.current?.play();
+      });
+      navigator.mediaSession.setActionHandler("pause", () => {
+        setIsPlaying(false);
+        playerRef.current?.pause();
+      });
+      navigator.mediaSession.setActionHandler(
+        "previoustrack",
+        onPrev ? () => onPrev() : null,
+      );
+      navigator.mediaSession.setActionHandler(
+        "nexttrack",
+        onNext ? () => onNext() : null,
+      );
+    }
+  }, [title, artists, coverUrl, onPrev, onNext]);
+
   const effectiveCurrentTime = seekPreviewTime ?? currentTime;
   const safeDuration = Number.isFinite(duration) && duration > 0 ? duration : 1;
   const progressPct = Math.min(
@@ -409,18 +441,19 @@ export default function SongPlayer({
               onError={handleError}
               width="480"
               height="270"
-              config={
-                youtubeVideoId
-                  ? {
-                      youtube: {
-                        origin:
-                          typeof window !== "undefined"
-                            ? window.location.origin
-                            : "",
-                      },
-                    }
-                  : undefined
-              }
+              config={{
+                youtube: {
+                  playerVars: {
+                    origin:
+                      typeof window !== "undefined"
+                        ? window.location.origin
+                        : "",
+                  },
+                },
+                file: {
+                  forceAudio: true,
+                },
+              }}
             />
           </div>
         </div>
