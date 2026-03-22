@@ -10,7 +10,6 @@ import React, {
 import Image from "next/image";
 
 import ReactPlayer from "react-player";
-import NoSleep from "nosleep.js";
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const ReactPlayerAny: any = ReactPlayer;
 import AddPlaylistButton from "./AddPlaylistButton";
@@ -84,16 +83,6 @@ export default function SongPlayer({
   const [playerReady, setPlayerReady] = useState(false);
   const [hasUserInteracted, setHasUserInteracted] = useState(false);
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const noSleepRef = useRef<any>(null);
-
-  useEffect(() => {
-    noSleepRef.current = new NoSleep();
-    return () => {
-      noSleepRef.current?.disable();
-    };
-  }, []);
-
   // react-player v3 ref callback — the ref points to the underlying
   // custom element (e.g. <youtube-video-element>) which extends HTMLVideoElement
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -127,11 +116,6 @@ export default function SongPlayer({
     if (playerReady && hasSource && hasUserInteracted) {
       console.log("[SongPlayer] auto-play allowed, starting playback");
       setIsPlaying(true);
-      try {
-        noSleepRef.current?.enable();
-      } catch (err) {
-        console.warn("NoSleep enable failed:", err);
-      }
       // In v3, control via the ref's native .play() method
       try {
         playerRef.current?.play();
@@ -176,16 +160,10 @@ export default function SongPlayer({
       navigator.mediaSession.setActionHandler("play", () => {
         setHasUserInteracted(true);
         setIsPlaying(true);
-        try {
-          noSleepRef.current?.enable();
-        } catch {}
         playerRef.current?.play();
       });
       navigator.mediaSession.setActionHandler("pause", () => {
         setIsPlaying(false);
-        try {
-          noSleepRef.current?.disable();
-        } catch {}
         playerRef.current?.pause();
       });
       navigator.mediaSession.setActionHandler(
@@ -215,16 +193,6 @@ export default function SongPlayer({
     });
     setHasUserInteracted(true);
     setIsPlaying(next);
-
-    try {
-      if (next) {
-        noSleepRef.current?.enable();
-      } else {
-        noSleepRef.current?.disable();
-      }
-    } catch (err) {
-      console.warn("NoSleep failed", err);
-    }
 
     // In react-player v3, control playback via the underlying element
     if (playerRef.current) {
