@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, Suspense } from "react";
+import React, { useEffect, useState, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import useAuth from "@/hooks/useAuth";
 import SongPlayer from "@/components/SongPlayer";
@@ -9,6 +9,57 @@ import { TopSong } from "@/components/TopGlobalSongs";
 import { searchSongs, getSongDetails, SaavnSong } from "@/services/jioSaavnApi";
 import { getSongImage, getDownloadUrl } from "@/utils/imageUtils";
 import { searchYouTube } from "@/services/youtubeService";
+import Skeleton from "@/components/skeleton/Skeleton";
+
+function SongPlaySkeleton() {
+  return (
+    <div className="w-full max-w-[1200px] mx-auto p-6 md:p-10">
+      <div className="flex flex-col md:flex-row gap-8">
+        <div className="w-full md:w-1/3 flex flex-col items-center md:items-start">
+          <Skeleton className="w-[220px] h-[220px] sm:w-[260px] sm:h-[260px] md:w-[300px] md:h-[300px] rounded-full" />
+          <Skeleton className="h-8 w-48 mt-5" />
+          <Skeleton className="h-4 w-32 mt-2" />
+          <div className="flex items-center gap-3 mt-4">
+            <Skeleton className="w-10 h-10 rounded-full" />
+            <Skeleton className="w-10 h-10 rounded-full" />
+            <Skeleton className="w-10 h-10 rounded-full" />
+          </div>
+        </div>
+
+        <div className="flex-1 flex flex-col">
+          <div className="mb-6">
+            <Skeleton className="h-8 w-3/4" />
+            <Skeleton className="h-4 w-1/2 mt-3" />
+          </div>
+
+          <div className="mb-6">
+            <Skeleton className="h-3 w-full mb-2" />
+            <Skeleton className="h-3 w-full mb-2" />
+            <Skeleton className="h-3 w-3/4 mb-2" />
+          </div>
+
+          <div className="mb-6">
+            <Skeleton className="h-12 w-full rounded-full" />
+          </div>
+
+          <div className="flex-1 overflow-auto">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              {Array.from({ length: 6 }).map((_, i) => (
+                <div key={i} className="flex items-center gap-3">
+                  <Skeleton className="w-16 h-16 rounded-md" />
+                  <div className="flex-1">
+                    <Skeleton className="h-4 w-3/4" />
+                    <Skeleton className="h-3 w-1/2 mt-2" />
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
 
 function SongPlayContent() {
   const user = useAuth();
@@ -66,18 +117,15 @@ function SongPlayContent() {
       ];
 
       try {
-        // Fetch a few songs for each artist in parallel
         const fetchPromises = preferredArtists.map((artist) =>
           searchSongs(artist, 5),
         );
         const allResultsChunks = await Promise.all(fetchPromises);
 
-        // Flatten and filter out nulls
         const combinedResults = allResultsChunks
           .flat()
           .filter((s): s is SaavnSong => s !== null);
 
-        // Optional: Shuffle the list so it's not grouped strictly by artist
         const shuffled = combinedResults.sort(() => Math.random() - 0.5);
 
         const mappedSongs: TopSong[] = shuffled.map((s) => ({
@@ -94,7 +142,6 @@ function SongPlayContent() {
         setTopSongs(mappedSongs);
       } catch (error) {
         console.error("[SongPlay] Failed to fetch custom artist queue:", error);
-        // Fallback to Global Top 100 if the custom fetch fails
         const results = await searchSongs("Global Top 100", 20);
         if (results) {
           const mappedSongs: TopSong[] = results.map((s) => ({
@@ -260,7 +307,7 @@ function formatDuration(seconds: number): string {
 
 export default function SongPlayPage() {
   return (
-    <Suspense fallback={<div className="text-white p-10">Loading...</div>}>
+    <Suspense fallback={<SongPlaySkeleton />}>
       <SongPlayContent />
     </Suspense>
   );
