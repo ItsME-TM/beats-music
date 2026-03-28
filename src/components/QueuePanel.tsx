@@ -27,7 +27,7 @@ export default function QueuePanel({
   onSelect,
 }: QueuePanelProps) {
   return (
-    <div className="flex flex-col max-h-[50vh] sm:max-h-[60vh] lg:max-h-[75vh] bg-[#0b0b0b] rounded-xl border border-cyan-400/50 px-3 pt-3 pb-3 text-white">
+    <div className="flex flex-col min-h-[50vh] sm:min-h-[60vh] lg:min-h-[75vh] max-h-[50vh] sm:max-h-[60vh] lg:max-h-[75vh] bg-[#0b0b0b] rounded-xl border border-cyan-400/50 px-3 pt-3 pb-3 text-white">
       <h2 className="text-sm font-semibold mb-3 text-white/90">Up Next</h2>
       <div className="overflow-y-auto flex-1 divide-y divide-[#151515]">
         {songs.map((song) => {

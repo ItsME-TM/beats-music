@@ -256,7 +256,44 @@ function SongPlayContent() {
   };
 
   const currentImage = getSongImage(currentSong, "");
-  const displayCover = youtubeThumb || currentImage;
+  // Prefer album artwork (currentImage). If it fails to load, fallback to youtubeThumb.
+  const [displayCoverUrl, setDisplayCoverUrl] = useState<string | null>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    // Helper to safely set the cover URL only if component is still mounted
+    const safeSet = (url: string | null) => {
+      if (!cancelled) setDisplayCoverUrl(url);
+    };
+
+    // If we have an album image, try to preload it first
+    if (currentImage) {
+      try {
+        const img = new Image();
+        img.onload = () => safeSet(currentImage);
+        img.onerror = () => safeSet(youtubeThumb || currentImage);
+        img.src = currentImage;
+        return () => {
+          cancelled = true;
+          // break reference
+          img.onload = null;
+          img.onerror = null;
+        };
+      } catch {
+        safeSet(youtubeThumb || currentImage);
+      }
+    }
+
+    // If no album image, use youtube thumbnail if available
+    if (!currentImage && youtubeThumb) {
+      safeSet(youtubeThumb);
+    }
+
+    return () => {
+      cancelled = true;
+    };
+  }, [currentImage, youtubeThumb]);
   const cleanTitle = currentSong?.name
     ? currentSong.name
         .replace(/&quot;/g, '"')
@@ -276,7 +313,7 @@ function SongPlayContent() {
           }
           audioSrc={audioSource}
           youtubeVideoId={youtubeVideoId || undefined}
-          coverUrl={displayCover}
+          coverUrl={displayCoverUrl || undefined}
           duration={currentSong?.duration ? Number(currentSong.duration) : 0}
           lyrics={[]}
           onAddToPlaylist={() => console.log("Add to playlist clicked")}

@@ -12,7 +12,6 @@ import Image from "next/image";
 import ReactPlayer from "react-player";
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const ReactPlayerAny: any = ReactPlayer;
-// @ts-ignore
 import NoSleep from "nosleep.js";
 import AddPlaylistButton from "./AddPlaylistButton";
 import { AiOutlineHeart, AiFillHeart } from "react-icons/ai";
