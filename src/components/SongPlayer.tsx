@@ -12,6 +12,7 @@ import Image from "next/image";
 import ReactPlayer from "react-player";
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const ReactPlayerAny: any = ReactPlayer;
+import NoSleep from "nosleep.js";
 import AddPlaylistButton from "./AddPlaylistButton";
 import { AiOutlineHeart, AiFillHeart } from "react-icons/ai";
 import {
@@ -79,9 +80,24 @@ export default function SongPlayer({
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const playerRef = useRef<any>(null);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const noSleepRef = useRef<any>(null);
 
   const [playerReady, setPlayerReady] = useState(false);
   const [hasUserInteracted, setHasUserInteracted] = useState(false);
+
+  useEffect(() => {
+    try {
+      noSleepRef.current = new NoSleep();
+    } catch (err) {
+      console.warn("[SongPlayer] NoSleep init failed:", err);
+    }
+    return () => {
+      try {
+        noSleepRef.current?.disable();
+      } catch {}
+    };
+  }, []);
 
   // react-player v3 ref callback — the ref points to the underlying
   // custom element (e.g. <youtube-video-element>) which extends HTMLVideoElement
@@ -118,6 +134,11 @@ export default function SongPlayer({
       setIsPlaying(true);
       // In v3, control via the ref's native .play() method
       try {
+        try {
+          noSleepRef.current?.enable();
+        } catch (err) {
+          console.warn("[SongPlayer] NoSleep enable failed:", err);
+        }
         playerRef.current?.play();
       } catch (err) {
         console.error("[SongPlayer] auto-play via ref failed:", err);
@@ -160,10 +181,18 @@ export default function SongPlayer({
       navigator.mediaSession.setActionHandler("play", () => {
         setHasUserInteracted(true);
         setIsPlaying(true);
+        try {
+          noSleepRef.current?.enable();
+        } catch (err) {
+          console.warn("[SongPlayer] NoSleep enable failed:", err);
+        }
         playerRef.current?.play();
       });
       navigator.mediaSession.setActionHandler("pause", () => {
         setIsPlaying(false);
+        try {
+          noSleepRef.current?.disable();
+        } catch {}
         playerRef.current?.pause();
       });
       navigator.mediaSession.setActionHandler(
@@ -198,8 +227,16 @@ export default function SongPlayer({
     if (playerRef.current) {
       try {
         if (next) {
+          try {
+            noSleepRef.current?.enable();
+          } catch (err) {
+            console.warn("[SongPlayer] NoSleep enable failed:", err);
+          }
           playerRef.current.play();
         } else {
+          try {
+            noSleepRef.current?.disable();
+          } catch {}
           playerRef.current.pause();
         }
       } catch (err) {
