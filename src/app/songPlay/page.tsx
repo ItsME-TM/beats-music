@@ -74,6 +74,9 @@ function SongPlayContent() {
   const [youtubeThumb, setYoutubeThumb] = useState<string | null>(null);
   const [isAudioLoading, setIsAudioLoading] = useState(false);
   const [shuffle, setShuffle] = useState(false);
+  const [selectedTab, setSelectedTab] = useState<
+    "oldgold" | "slowed" | "latest" | "sinhala"
+  >("oldgold");
 
   useEffect(() => {
     if (!user) {
@@ -81,70 +84,54 @@ function SongPlayContent() {
     }
   }, [user, router]);
 
+  // Fetch songs for each tab
   useEffect(() => {
-    const fetchTopSongs = async () => {
-      const preferredArtists = [
-        "Jada Facer",
-        "Against the Current",
-        "The Chainsmokers",
-        "Ariana Grande",
-        "Selena Gomez",
-        "Kiger",
-        "Coldplay",
-        "Maroon 5",
-        "OneRepublic",
-        "Halsey",
-        "Taylor Swift",
-        "Zedd",
-        "Dua Lipa",
-        "Imagine Dragons",
-        "Kygo",
-        "Bebe Rexha",
-        "Marshmello",
-        "Chvrches",
-        "Lauv",
-        "Troye Sivan",
-        "Hailee Steinfeld",
-        "5 Seconds of Summer",
-        "Clean Bandit",
-        "Griffin",
-        "Alessia Cara",
-        "Shawn Mendes",
-        "Olivia Rodrigo",
-        "Paramore",
-        "The Weeknd",
-        "Ellie Goulding",
-      ];
-
+    const fetchTabSongs = async () => {
+      let mappedSongs: TopSong[] = [];
       try {
-        const fetchPromises = preferredArtists.map((artist) =>
-          searchSongs(artist, 5),
-        );
-        const allResultsChunks = await Promise.all(fetchPromises);
-
-        const combinedResults = allResultsChunks
-          .flat()
-          .filter((s): s is SaavnSong => s !== null);
-
-        const shuffled = combinedResults.sort(() => Math.random() - 0.5);
-
-        const mappedSongs: TopSong[] = shuffled.map((s) => ({
-          id: s.id,
-          title: s.name
-            .replace(/&quot;/g, '"')
-            .replace(/&#039;/g, "'")
-            .replace(/&amp;/g, "&"),
-          artist: s.primaryArtists || "",
-          duration: formatDuration(s.duration),
-          image: getSongImage(s),
-          isFavorite: false,
-        }));
-        setTopSongs(mappedSongs);
-      } catch (error) {
-        console.error("[SongPlay] Failed to fetch custom artist queue:", error);
-        const results = await searchSongs("Global Top 100", 20);
-        if (results) {
-          const mappedSongs: TopSong[] = results.map((s) => ({
+        if (selectedTab === "oldgold") {
+          // Old Gold: Use current logic (preferred artists)
+          const preferredArtists = [
+            "Jada Facer",
+            "Against the Current",
+            "The Chainsmokers",
+            "Ariana Grande",
+            "Selena Gomez",
+            "Kiger",
+            "Coldplay",
+            "Maroon 5",
+            "OneRepublic",
+            "Halsey",
+            "Taylor Swift",
+            "Zedd",
+            "Dua Lipa",
+            "Imagine Dragons",
+            "Kygo",
+            "Bebe Rexha",
+            "Marshmello",
+            "Chvrches",
+            "Lauv",
+            "Troye Sivan",
+            "Hailee Steinfeld",
+            "5 Seconds of Summer",
+            "Clean Bandit",
+            "Griffin",
+            "Alessia Cara",
+            "Shawn Mendes",
+            "Olivia Rodrigo",
+            "Paramore",
+            "The Weeknd",
+            "Ellie Goulding",
+          ];
+          const fetchPromises = preferredArtists.map((artist) =>
+            searchSongs(artist, 5),
+          );
+          const allResultsChunks = await Promise.all(fetchPromises);
+          const combinedResults = allResultsChunks
+            .flat()
+            .filter((s): s is SaavnSong => s !== null);
+          const shuffled = combinedResults.sort(() => Math.random() - 0.5);
+          mappedSongs = shuffled.map((s) => ({
             id: s.id,
             title: s.name
               .replace(/&quot;/g, '"')
@@ -155,12 +142,57 @@ function SongPlayContent() {
             image: getSongImage(s),
             isFavorite: false,
           }));
-          setTopSongs(mappedSongs);
+        } else if (selectedTab === "slowed") {
+          // Slowed Reverb: Search for popular slowed reverb songs
+          const results = await searchSongs("slowed reverb", 100);
+          mappedSongs = results.map((s) => ({
+            id: s.id,
+            title: s.name
+              .replace(/&quot;/g, '"')
+              .replace(/&#039;/g, "'")
+              .replace(/&amp;/g, "&"),
+            artist: s.primaryArtists || "",
+            duration: formatDuration(s.duration),
+            image: getSongImage(s),
+            isFavorite: false,
+          }));
+        } else if (selectedTab === "latest") {
+          // Latest: Latest English songs
+          const results = await searchSongs("latest english songs", 100);
+          mappedSongs = results.map((s) => ({
+            id: s.id,
+            title: s.name
+              .replace(/&quot;/g, '"')
+              .replace(/&#039;/g, "'")
+              .replace(/&amp;/g, "&"),
+            artist: s.primaryArtists || "",
+            duration: formatDuration(s.duration),
+            image: getSongImage(s),
+            isFavorite: false,
+          }));
+        } else if (selectedTab === "sinhala") {
+          // Sinhala: Latest Sinhala hits
+          const results = await searchSongs("latest sinhala songs", 100);
+          mappedSongs = results.map((s) => ({
+            id: s.id,
+            title: s.name
+              .replace(/&quot;/g, '"')
+              .replace(/&#039;/g, "'")
+              .replace(/&amp;/g, "&"),
+            artist: s.primaryArtists || "",
+            duration: formatDuration(s.duration),
+            image: getSongImage(s),
+            isFavorite: false,
+          }));
         }
+        setTopSongs(mappedSongs);
+      } catch (error) {
+        console.error("[SongPlay] Failed to fetch tab songs:", error);
+        setTopSongs([]);
       }
     };
-    fetchTopSongs();
-  }, []);
+    fetchTabSongs();
+  }, [selectedTab]);
 
   useEffect(() => {
     const handleSearchQuery = async () => {
@@ -324,6 +356,33 @@ function SongPlayContent() {
       </div>
 
       <div className="flex flex-col lg:w-[38%] min-w-0 mt-4 lg:mt-0">
+        {/* Tabs above Up Next */}
+        <div className="flex gap-2 mb-2">
+          <button
+            className={`px-3 py-1 rounded-md text-xs font-semibold border transition-colors ${selectedTab === "oldgold" ? "bg-cyan-400 text-black border-cyan-400" : "bg-[#181818] text-white border-[#222] hover:bg-cyan-900/30"}`}
+            onClick={() => setSelectedTab("oldgold")}
+          >
+            Old Gold
+          </button>
+          <button
+            className={`px-3 py-1 rounded-md text-xs font-semibold border transition-colors ${selectedTab === "slowed" ? "bg-cyan-400 text-black border-cyan-400" : "bg-[#181818] text-white border-[#222] hover:bg-cyan-900/30"}`}
+            onClick={() => setSelectedTab("slowed")}
+          >
+            Slowed Reverb
+          </button>
+          <button
+            className={`px-3 py-1 rounded-md text-xs font-semibold border transition-colors ${selectedTab === "latest" ? "bg-cyan-400 text-black border-cyan-400" : "bg-[#181818] text-white border-[#222] hover:bg-cyan-900/30"}`}
+            onClick={() => setSelectedTab("latest")}
+          >
+            Latest
+          </button>
+          <button
+            className={`px-3 py-1 rounded-md text-xs font-semibold border transition-colors ${selectedTab === "sinhala" ? "bg-cyan-400 text-black border-cyan-400" : "bg-[#181818] text-white border-[#222] hover:bg-cyan-900/30"}`}
+            onClick={() => setSelectedTab("sinhala")}
+          >
+            Sinhala
+          </button>
+        </div>
         <QueuePanel
           songs={topSongs}
           currentSongId={songId}

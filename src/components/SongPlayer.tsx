@@ -443,7 +443,7 @@ export default function SongPlayer({
         coverUrl
           ? "bg-center bg-cover"
           : "bg-linear-to-br from-[#0b0f14] to-[#131a21]"
-      } w-full h-auto min-h-80 sm:min-h-90 md:min-h-[75vh] transition-all duration-700 ease-in-out border-2 border-cyan-400`}
+      } w-full h-auto min-h-80 sm:min-h-90 md:min-h-[40vh] lg:min-h-[80vh] transition-all duration-700 ease-in-out border-2 border-cyan-400`}
       style={coverUrl ? { backgroundImage: `url(${coverUrl})` } : undefined}
     >
       {/* Hidden media player: react-player v3 renders a custom element (e.g. youtube-video-element) */}
@@ -502,7 +502,7 @@ export default function SongPlayer({
       {/* content */}
       <div className="relative flex flex-col md:flex-row gap-6 h-full p-6 md:p-8">
         {/* left: song info + thumbnail/video */}
-        <div className="w-full md:w-50 self-start md:self-center shrink-0">
+        <div className="relative w-full md:w-50 self-start md:self-stretch shrink-0 md:flex md:flex-col">
           <div className="relative w-32 h-32 sm:w-40 sm:h-40 md:w-48 md:h-48 rounded-2xl overflow-hidden mb-4 shadow-lg">
             {coverUrl ? (
               <Image src={coverUrl} alt={title} fill className="object-cover" />
@@ -525,7 +525,7 @@ export default function SongPlayer({
             {artists.join(" & ")}
           </p>
 
-          <div className="flex items-center gap-4 mt-6">
+          <div className="mt-6 flex items-center gap-4 lg:absolute lg:left-0 lg:top-90">
             <button
               aria-label="Like"
               className="p-2.5 rounded-full bg-white/5 hover:bg-white/10 transition-colors shadow-inner"
@@ -550,7 +550,7 @@ export default function SongPlayer({
         </div>
 
         {/* right: lyrics & controls */}
-        <div className="flex-1 flex flex-col justify-between py-2">
+        <div className="flex-1 flex flex-col justify-between py-2 relative">
           {/* Lyrics section */}
           <div className="hidden flex-1 overflow-hidden md:flex flex-col items-center justify-center mask-fade">
             {visibleLyrics.length ? (
@@ -579,7 +579,7 @@ export default function SongPlayer({
           </div>
 
           {/* controls */}
-          <div className="mt-6 flex flex-col gap-5 px-2">
+          <div className="mt-6 flex flex-col gap-5 px-2 lg:pb-10">
             {/* progress / seek bar */}
             <div className="group/progress relative pt-2">
               <input
@@ -663,8 +663,8 @@ export default function SongPlayer({
             </div>
 
             {/* main buttons */}
-            <div className="flex items-center justify-between w-full px-2 md:px-0">
-              <div className="flex items-center space-x-4 md:space-x-6">
+            <div className="flex items-center justify-between w-full min-w-0 px-2 md:px-0 lg:absolute lg:top-93 lg:left-5 lg:w-full">
+              <div className="flex items-center space-x-3 sm:space-x-4 md:space-x-4 lg:space-x-6 min-w-0">
                 <button
                   onClick={() =>
                     setShuffle((s) => {
@@ -689,7 +689,7 @@ export default function SongPlayer({
                 <button
                   onClick={togglePlayPause}
                   disabled={!mediaSrc}
-                  className="w-12 h-12 mr-8 sm:mr-6 sm:w-14 sm:h-14 bg-white text-black rounded-full flex items-center justify-center hover:scale-110 active:scale-95 transition-all shadow-xl shadow-white/10 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
+                  className="w-12 h-12 sm:w-14 sm:h-14 lg:mr-6 bg-white text-black rounded-full flex items-center justify-center hover:scale-110 active:scale-95 transition-all shadow-xl shadow-white/10 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
                   aria-label={isPlaying ? "Pause" : "Play"}
                 >
                   {isPlaying ? (
@@ -724,7 +724,7 @@ export default function SongPlayer({
                 </button>
               </div>
 
-              <div className="hidden md:flex items-center gap-2 ml-8 group/volume">
+              <div className="hidden md:flex items-center gap-2 ml-2 lg:ml-8 group/volume shrink-0">
                 <button
                   onClick={toggleMute}
                   className="text-white/60 hover:text-white transition-colors"
@@ -739,7 +739,7 @@ export default function SongPlayer({
                   step={0.01}
                   value={volume}
                   onChange={(e) => changeVolume(Number(e.target.value))}
-                  className="w-20 sm:w-24 accent-cyan-400 h-1 cursor-pointer"
+                  className="hidden lg:block w-20 xl:w-24 accent-cyan-400 h-1 cursor-pointer"
                 />
               </div>
             </div>
