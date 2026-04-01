@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useEffect, useState, Suspense } from "react";
+import { useRef } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import useAuth from "@/hooks/useAuth";
 import SongPlayer from "@/components/SongPlayer";
@@ -77,6 +78,8 @@ function SongPlayContent() {
   const [selectedTab, setSelectedTab] = useState<
     "oldgold" | "slowed" | "latest" | "sinhala"
   >("oldgold");
+  const fetchIdRef = useRef(0);
+  const [isTabLoading, setIsTabLoading] = useState(false);
 
   useEffect(() => {
     if (!user) {
@@ -86,11 +89,15 @@ function SongPlayContent() {
 
   // Fetch songs for each tab
   useEffect(() => {
+    let isActive = true;
+    const thisFetchId = ++fetchIdRef.current;
+
     const fetchTabSongs = async () => {
+      setIsTabLoading(true);
+      setTopSongs([]); // clear immediately
       let mappedSongs: TopSong[] = [];
       try {
         if (selectedTab === "oldgold") {
-          // Old Gold: Use current logic (preferred artists)
           const preferredArtists = [
             "Jada Facer",
             "Against the Current",
@@ -143,7 +150,6 @@ function SongPlayContent() {
             isFavorite: false,
           }));
         } else if (selectedTab === "slowed") {
-          // Slowed Reverb: Search for popular slowed reverb songs
           const results = await searchSongs("slowed reverb", 100);
           mappedSongs = results.map((s) => ({
             id: s.id,
@@ -157,7 +163,6 @@ function SongPlayContent() {
             isFavorite: false,
           }));
         } else if (selectedTab === "latest") {
-          // Latest: Latest English songs
           const results = await searchSongs("latest english songs", 100);
           mappedSongs = results.map((s) => ({
             id: s.id,
@@ -171,8 +176,7 @@ function SongPlayContent() {
             isFavorite: false,
           }));
         } else if (selectedTab === "sinhala") {
-          // Sinhala: Latest Sinhala hits
-          const results = await searchSongs("latest sinhala songs", 100);
+          const results = await searchSongs("sinhala songs", 100);
           mappedSongs = results.map((s) => ({
             id: s.id,
             title: s.name
@@ -185,13 +189,24 @@ function SongPlayContent() {
             isFavorite: false,
           }));
         }
+
+        // ignore stale responses
+        if (!isActive || thisFetchId !== fetchIdRef.current) return;
         setTopSongs(mappedSongs);
       } catch (error) {
+        if (!isActive || thisFetchId !== fetchIdRef.current) return;
         console.error("[SongPlay] Failed to fetch tab songs:", error);
         setTopSongs([]);
+      } finally {
+        if (!isActive || thisFetchId !== fetchIdRef.current) return;
+        setIsTabLoading(false);
       }
     };
     fetchTabSongs();
+
+    return () => {
+      isActive = false;
+    };
   }, [selectedTab]);
 
   useEffect(() => {
@@ -360,25 +375,37 @@ function SongPlayContent() {
         <div className="flex gap-2 mb-2">
           <button
             className={`px-3 py-1 rounded-md text-xs font-semibold border transition-colors ${selectedTab === "oldgold" ? "bg-cyan-400 text-black border-cyan-400" : "bg-[#181818] text-white border-[#222] hover:bg-cyan-900/30"}`}
-            onClick={() => setSelectedTab("oldgold")}
+            onClick={() => {
+              setTopSongs([]);
+              setSelectedTab("oldgold");
+            }}
           >
             Old Gold
           </button>
           <button
             className={`px-3 py-1 rounded-md text-xs font-semibold border transition-colors ${selectedTab === "slowed" ? "bg-cyan-400 text-black border-cyan-400" : "bg-[#181818] text-white border-[#222] hover:bg-cyan-900/30"}`}
-            onClick={() => setSelectedTab("slowed")}
+            onClick={() => {
+              setTopSongs([]);
+              setSelectedTab("slowed");
+            }}
           >
             Slowed Reverb
           </button>
           <button
             className={`px-3 py-1 rounded-md text-xs font-semibold border transition-colors ${selectedTab === "latest" ? "bg-cyan-400 text-black border-cyan-400" : "bg-[#181818] text-white border-[#222] hover:bg-cyan-900/30"}`}
-            onClick={() => setSelectedTab("latest")}
+            onClick={() => {
+              setTopSongs([]);
+              setSelectedTab("latest");
+            }}
           >
             Latest
           </button>
           <button
             className={`px-3 py-1 rounded-md text-xs font-semibold border transition-colors ${selectedTab === "sinhala" ? "bg-cyan-400 text-black border-cyan-400" : "bg-[#181818] text-white border-[#222] hover:bg-cyan-900/30"}`}
-            onClick={() => setSelectedTab("sinhala")}
+            onClick={() => {
+              setTopSongs([]);
+              setSelectedTab("sinhala");
+            }}
           >
             Sinhala
           </button>
@@ -387,6 +414,7 @@ function SongPlayContent() {
           songs={topSongs}
           currentSongId={songId}
           loadingSongId={isAudioLoading ? songId : null}
+          isLoading={isTabLoading}
           onSelect={handleSongSelect}
         />
       </div>
