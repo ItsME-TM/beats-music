@@ -31,29 +31,31 @@ export default function HomePage() {
   useEffect(() => {
     const fetchHomeSongs = async () => {
       setIsLoading(true);
-      const preferredQueries = [
-        "Jada Facer",
-        "Against the Current",
-        "The Chainsmokers",
-        "Ariana Grande",
-        "Selena Gomez",
-        "Kiger",
-      ];
+      // const preferredQueries = [
+      //   "Jada Facer",
+      //   "Against the Current",
+      //   "The Chainsmokers",
+      //   "Ariana Grande",
+      //   "Selena Gomez",
+      //   "Kiger",
+      // ];
       try {
         // Fetch a mix from multiple artists
-        const fetchPromises = preferredQueries.map((q) => searchSongs(q, 3));
-        const allResults = await Promise.all(fetchPromises);
-        const combined = allResults.flat().filter(Boolean);
+        //const fetchPromises = preferredQueries.map((q) => searchSongs(q, 3));
+        //const allResults = await Promise.all(fetchPromises);
+        //const combined = allResults.flat().filter(Boolean);
 
         // Shuffle and set
-        const shuffled = combined.sort(() => Math.random() - 0.5);
-        if (shuffled.length > 0) {
-          setSongs(shuffled);
-        } else {
-          // Fallback
-          const fallback = await searchSongs("English Top Hits", 10);
-          setSongs(fallback);
-        }
+        //const shuffled = combined.sort(() => Math.random() - 0.5);
+        const fallback = await searchSongs("English Top Hits", 10);
+        setSongs(fallback);
+        // if (shuffled.length > 0) {
+        //   setSongs(shuffled);
+        // } else {
+        //   // Fallback
+        //   const fallback = await searchSongs("English Top Hits", 10);
+        //   setSongs(fallback);
+        // }
       } catch (error) {
         console.error("Failed to fetch home songs", error);
       } finally {

@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useEffect, useState, Suspense } from "react";
+import { useRef } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import useAuth from "@/hooks/useAuth";
 import SongPlayer from "@/components/SongPlayer";
@@ -74,6 +75,11 @@ function SongPlayContent() {
   const [youtubeThumb, setYoutubeThumb] = useState<string | null>(null);
   const [isAudioLoading, setIsAudioLoading] = useState(false);
   const [shuffle, setShuffle] = useState(false);
+  const [selectedTab, setSelectedTab] = useState<
+    "oldgold" | "slowed" | "latest" | "sinhala"
+  >("oldgold");
+  const fetchIdRef = useRef(0);
+  const [isTabLoading, setIsTabLoading] = useState(false);
 
   useEffect(() => {
     if (!user) {
@@ -81,70 +87,58 @@ function SongPlayContent() {
     }
   }, [user, router]);
 
+  // Fetch songs for each tab
   useEffect(() => {
-    const fetchTopSongs = async () => {
-      const preferredArtists = [
-        "Jada Facer",
-        "Against the Current",
-        "The Chainsmokers",
-        "Ariana Grande",
-        "Selena Gomez",
-        "Kiger",
-        "Coldplay",
-        "Maroon 5",
-        "OneRepublic",
-        "Halsey",
-        "Taylor Swift",
-        "Zedd",
-        "Dua Lipa",
-        "Imagine Dragons",
-        "Kygo",
-        "Bebe Rexha",
-        "Marshmello",
-        "Chvrches",
-        "Lauv",
-        "Troye Sivan",
-        "Hailee Steinfeld",
-        "5 Seconds of Summer",
-        "Clean Bandit",
-        "Griffin",
-        "Alessia Cara",
-        "Shawn Mendes",
-        "Olivia Rodrigo",
-        "Paramore",
-        "The Weeknd",
-        "Ellie Goulding",
-      ];
+    let isActive = true;
+    const thisFetchId = ++fetchIdRef.current;
 
+    const fetchTabSongs = async () => {
+      setIsTabLoading(true);
+      setTopSongs([]); // clear immediately
+      let mappedSongs: TopSong[] = [];
       try {
-        const fetchPromises = preferredArtists.map((artist) =>
-          searchSongs(artist, 5),
-        );
-        const allResultsChunks = await Promise.all(fetchPromises);
-
-        const combinedResults = allResultsChunks
-          .flat()
-          .filter((s): s is SaavnSong => s !== null);
-
-        const shuffled = combinedResults.sort(() => Math.random() - 0.5);
-
-        const mappedSongs: TopSong[] = shuffled.map((s) => ({
-          id: s.id,
-          title: s.name
-            .replace(/&quot;/g, '"')
-            .replace(/&#039;/g, "'")
-            .replace(/&amp;/g, "&"),
-          artist: s.primaryArtists || "",
-          duration: formatDuration(s.duration),
-          image: getSongImage(s),
-          isFavorite: false,
-        }));
-        setTopSongs(mappedSongs);
-      } catch (error) {
-        console.error("[SongPlay] Failed to fetch custom artist queue:", error);
-        const results = await searchSongs("Global Top 100", 20);
-        if (results) {
-          const mappedSongs: TopSong[] = results.map((s) => ({
+        if (selectedTab === "oldgold") {
+          const preferredArtists = [
+            "Jada Facer",
+            "Against the Current",
+            "The Chainsmokers",
+            "Ariana Grande",
+            "Selena Gomez",
+            "Kiger",
+            "Coldplay",
+            "Maroon 5",
+            "OneRepublic",
+            "Halsey",
+            "Taylor Swift",
+            "Zedd",
+            "Dua Lipa",
+            "Imagine Dragons",
+            "Kygo",
+            "Bebe Rexha",
+            "Marshmello",
+            "Chvrches",
+            "Lauv",
+            "Troye Sivan",
+            "Hailee Steinfeld",
+            "5 Seconds of Summer",
+            "Clean Bandit",
+            "Griffin",
+            "Alessia Cara",
+            "Shawn Mendes",
+            "Olivia Rodrigo",
+            "Paramore",
+            "The Weeknd",
+            "Ellie Goulding",
+          ];
+          const fetchPromises = preferredArtists.map((artist) =>
+            searchSongs(artist, 5),
+          );
+          const allResultsChunks = await Promise.all(fetchPromises);
+          const combinedResults = allResultsChunks
+            .flat()
+            .filter((s): s is SaavnSong => s !== null);
+          const shuffled = combinedResults.sort(() => Math.random() - 0.5);
+          mappedSongs = shuffled.map((s) => ({
             id: s.id,
             title: s.name
               .replace(/&quot;/g, '"')
@@ -155,12 +149,65 @@ function SongPlayContent() {
             image: getSongImage(s),
             isFavorite: false,
           }));
-          setTopSongs(mappedSongs);
+        } else if (selectedTab === "slowed") {
+          const results = await searchSongs("slowed reverb", 100);
+          mappedSongs = results.map((s) => ({
+            id: s.id,
+            title: s.name
+              .replace(/&quot;/g, '"')
+              .replace(/&#039;/g, "'")
+              .replace(/&amp;/g, "&"),
+            artist: s.primaryArtists || "",
+            duration: formatDuration(s.duration),
+            image: getSongImage(s),
+            isFavorite: false,
+          }));
+        } else if (selectedTab === "latest") {
+          const results = await searchSongs("latest english songs", 100);
+          mappedSongs = results.map((s) => ({
+            id: s.id,
+            title: s.name
+              .replace(/&quot;/g, '"')
+              .replace(/&#039;/g, "'")
+              .replace(/&amp;/g, "&"),
+            artist: s.primaryArtists || "",
+            duration: formatDuration(s.duration),
+            image: getSongImage(s),
+            isFavorite: false,
+          }));
+        } else if (selectedTab === "sinhala") {
+          const results = await searchSongs("sinhala songs", 100);
+          mappedSongs = results.map((s) => ({
+            id: s.id,
+            title: s.name
+              .replace(/&quot;/g, '"')
+              .replace(/&#039;/g, "'")
+              .replace(/&amp;/g, "&"),
+            artist: s.primaryArtists || "",
+            duration: formatDuration(s.duration),
+            image: getSongImage(s),
+            isFavorite: false,
+          }));
         }
+
+        // ignore stale responses
+        if (!isActive || thisFetchId !== fetchIdRef.current) return;
+        setTopSongs(mappedSongs);
+      } catch (error) {
+        if (!isActive || thisFetchId !== fetchIdRef.current) return;
+        console.error("[SongPlay] Failed to fetch tab songs:", error);
+        setTopSongs([]);
+      } finally {
+        if (!isActive || thisFetchId !== fetchIdRef.current) return;
+        setIsTabLoading(false);
       }
     };
-    fetchTopSongs();
-  }, []);
+    fetchTabSongs();
+
+    return () => {
+      isActive = false;
+    };
+  }, [selectedTab]);
 
   useEffect(() => {
     const handleSearchQuery = async () => {
@@ -324,10 +371,50 @@ function SongPlayContent() {
       </div>
 
       <div className="flex flex-col lg:w-[38%] min-w-0 mt-4 lg:mt-0">
+        {/* Tabs above Up Next */}
+        <div className="flex gap-2 mb-2">
+          <button
+            className={`px-3 py-1 rounded-md text-xs font-semibold border transition-colors ${selectedTab === "oldgold" ? "bg-cyan-400 text-black border-cyan-400" : "bg-[#181818] text-white border-[#222] hover:bg-cyan-900/30"}`}
+            onClick={() => {
+              setTopSongs([]);
+              setSelectedTab("oldgold");
+            }}
+          >
+            Old Gold
+          </button>
+          <button
+            className={`px-3 py-1 rounded-md text-xs font-semibold border transition-colors ${selectedTab === "slowed" ? "bg-cyan-400 text-black border-cyan-400" : "bg-[#181818] text-white border-[#222] hover:bg-cyan-900/30"}`}
+            onClick={() => {
+              setTopSongs([]);
+              setSelectedTab("slowed");
+            }}
+          >
+            Slowed Reverb
+          </button>
+          <button
+            className={`px-3 py-1 rounded-md text-xs font-semibold border transition-colors ${selectedTab === "latest" ? "bg-cyan-400 text-black border-cyan-400" : "bg-[#181818] text-white border-[#222] hover:bg-cyan-900/30"}`}
+            onClick={() => {
+              setTopSongs([]);
+              setSelectedTab("latest");
+            }}
+          >
+            Latest
+          </button>
+          <button
+            className={`px-3 py-1 rounded-md text-xs font-semibold border transition-colors ${selectedTab === "sinhala" ? "bg-cyan-400 text-black border-cyan-400" : "bg-[#181818] text-white border-[#222] hover:bg-cyan-900/30"}`}
+            onClick={() => {
+              setTopSongs([]);
+              setSelectedTab("sinhala");
+            }}
+          >
+            Sinhala
+          </button>
+        </div>
         <QueuePanel
           songs={topSongs}
           currentSongId={songId}
           loadingSongId={isAudioLoading ? songId : null}
+          isLoading={isTabLoading}
           onSelect={handleSongSelect}
         />
       </div>
