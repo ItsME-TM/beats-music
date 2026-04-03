@@ -71,6 +71,9 @@ function SongPlayContent() {
   const [currentSong, setCurrentSong] = useState<SaavnSong | null>(null);
   const [topSongs, setTopSongs] = useState<TopSong[]>([]);
   const [audioSource, setAudioSource] = useState<string>("");
+  const [autoplayRequestAt, setAutoplayRequestAt] = useState<number | null>(
+    null,
+  );
   const [youtubeVideoId, setYoutubeVideoId] = useState<string | null>(null);
   const [youtubeThumb, setYoutubeThumb] = useState<string | null>(null);
   const [isAudioLoading, setIsAudioLoading] = useState(false);
@@ -270,6 +273,9 @@ function SongPlayContent() {
   }, [songId]);
 
   const handleSongSelect = async (song: TopSong) => {
+    // mark that this selection was initiated by a user interaction so the
+    // player can attempt autoplay when the media becomes available
+    setAutoplayRequestAt(Date.now());
     router.push(`/songPlay?id=${song.id}`);
   };
 
@@ -360,6 +366,7 @@ function SongPlayContent() {
           }
           audioSrc={audioSource}
           youtubeVideoId={youtubeVideoId || undefined}
+          autoplayRequestAt={autoplayRequestAt ?? undefined}
           coverUrl={displayCoverUrl || undefined}
           duration={currentSong?.duration ? Number(currentSong.duration) : 0}
           lyrics={[]}

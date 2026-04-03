@@ -40,6 +40,7 @@ type SongPlayerProps = {
   coverUrl?: string;
   audioSrc?: string;
   youtubeVideoId?: string;
+  autoplayRequestAt?: number;
   lyrics?: LyricLine[];
   duration?: number;
   onAddToPlaylist?: () => void;
@@ -54,6 +55,7 @@ export default function SongPlayer({
   coverUrl,
   audioSrc,
   youtubeVideoId,
+  autoplayRequestAt,
   lyrics = [],
   duration: durationProp,
   onAddToPlaylist,
@@ -149,6 +151,18 @@ export default function SongPlayer({
       );
     }
   }, [playerReady, audioSrc, youtubeVideoId, hasUserInteracted]);
+
+  // If the parent signals a recent user-initiated selection, consider that
+  // as an interaction so autoplay can proceed once the media is ready.
+  useEffect(() => {
+    if (autoplayRequestAt) {
+      console.log(
+        "[SongPlayer] autoplay requested by parent/user at",
+        autoplayRequestAt,
+      );
+      setHasUserInteracted(true);
+    }
+  }, [autoplayRequestAt]);
 
   useEffect(() => {
     if (durationProp) setDuration(durationProp);
