@@ -20,7 +20,19 @@ export default function useAudioPlayer({
   const [duration, setDuration] = useState<number>(durationProp || 0);
   const [repeat, setRepeat] = useState<"off" | "all" | "one">("off");
   const [shuffle, setShuffle] = useState(false);
-  const [volume, setVolume] = useState(0.8);
+  const [volume, setVolume] = useState<number>(() => {
+    try {
+      if (typeof window === "undefined") return 0.8;
+      const v = localStorage.getItem("beats:volume");
+      if (v !== null) {
+        const n = Number.parseFloat(v);
+        if (!Number.isNaN(n)) return n;
+      }
+    } catch {
+      /* ignore */
+    }
+    return 0.8;
+  });
 
   useEffect(() => {
     durationPropRef.current = durationProp;
@@ -30,6 +42,13 @@ export default function useAudioPlayer({
     volumeRef.current = volume;
     if (audioRef.current) {
       audioRef.current.volume = volume;
+    }
+    try {
+      if (typeof window !== "undefined") {
+        localStorage.setItem("beats:volume", String(volume));
+      }
+    } catch {
+      /* ignore */
     }
   }, [volume]);
 

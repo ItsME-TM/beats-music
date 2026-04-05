@@ -29,6 +29,8 @@ import {
 } from "react-icons/io5";
 import { BsThreeDots } from "react-icons/bs";
 
+const LS_VOLUME_KEY = "beats:volume";
+
 type LyricLine = {
   time: number;
   text: string;
@@ -76,7 +78,23 @@ export default function SongPlayer({
   const [duration, setDuration] = useState<number>(durationProp || 0);
   const [repeat, setRepeat] = useState<"off" | "all" | "one">("off");
   const [shuffle, setShuffle] = useState(false);
-  const [volume, setVolume] = useState(0.8);
+  // Initialize volume synchronously from localStorage so refresh shows the
+  // saved level immediately instead of reverting to the default briefly.
+  const initialVolume = (() => {
+    try {
+      if (typeof window === "undefined") return 0.8;
+      const v = localStorage.getItem(LS_VOLUME_KEY);
+      if (v !== null) {
+        const n = Number.parseFloat(v);
+        if (!Number.isNaN(n)) return n;
+      }
+    } catch (err) {
+      /* ignore */
+    }
+    return 0.8;
+  })();
+
+  const [volume, setVolume] = useState<number>(initialVolume);
   const isSeekingRef = useRef(false);
   const [seekPreviewTime, setSeekPreviewTime] = useState<number | null>(null);
 
@@ -168,9 +186,17 @@ export default function SongPlayer({
     if (durationProp) setDuration(durationProp);
   }, [durationProp]);
 
-  // Sync volume to the player element when it changes
+  // Sync volume to the player element when it changes and persist to localStorage
   useEffect(() => {
     console.log("[SongPlayer] volume changed ->", volume);
+    try {
+      if (typeof window !== "undefined") {
+        localStorage.setItem(LS_VOLUME_KEY, String(volume));
+      }
+    } catch {
+      /* ignore localStorage errors */
+    }
+
     if (playerRef.current) {
       try {
         playerRef.current.volume = volume;
