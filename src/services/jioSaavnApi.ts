@@ -38,10 +38,10 @@ const PROXY_BASE = "/api/saavn";
 export const searchSongs = async (query: string, limit: number = 10): Promise<SaavnSong[]> => {
   try {
     const url = `${PROXY_BASE}/search?query=${encodeURIComponent(query)}&page=1&limit=${limit}`;
-    console.log("Fetching songs via proxy:", url);
+    //console.log("Fetching songs via proxy:", url);
     const response = await fetch(url);
     const data: SaavnSearchResponse = await response.json();
-    console.log("Search response:", data);
+    //console.log("Search response:", data);
     
     if (data.status === "SUCCESS" && data.data.results) {
       return data.data.results;
@@ -56,10 +56,10 @@ export const searchSongs = async (query: string, limit: number = 10): Promise<Sa
 export const getSongDetails = async (id: string): Promise<SaavnSong | null> => {
     try {
         const url = `${PROXY_BASE}/songs?id=${id}`;
-        console.log("Fetching song details via proxy:", url);
+        //console.log("Fetching song details via proxy:", url);
         const response = await fetch(url);
         const data = await response.json();
-        console.log("Song details response:", data);
+        //console.log("Song details response:", data);
 
         if(data.status === "SUCCESS" && data.data) {
              if(Array.isArray(data.data)) return data.data[0];

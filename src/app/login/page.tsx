@@ -45,12 +45,8 @@ export default function Login() {
         auth,
         rememberMe ? browserLocalPersistence : browserSessionPersistence,
       );
-      const userCredential = await signInWithEmailAndPassword(
-        auth,
-        email,
-        password,
-      );
-      console.log("User Logged in:", userCredential.user);
+      await signInWithEmailAndPassword(auth, email, password);
+      //console.log("User Logged in:", userCredential.user);
       router.push("/home");
     } catch (error: unknown) {
       console.error("Login error:", error);

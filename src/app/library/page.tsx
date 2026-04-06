@@ -315,9 +315,7 @@ export default function LibraryPage() {
                 gradientClass={
                   PLAYLIST_GRADIENTS[pl.id % PLAYLIST_GRADIENTS.length]
                 }
-                onSelect={(selected) =>
-                  console.log("Selected playlist:", selected.name)
-                }
+                onSelect={() => {}}
               />
             ))}
           </div>

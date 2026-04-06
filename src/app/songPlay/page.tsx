@@ -258,10 +258,10 @@ function SongPlayContent() {
 
           try {
             const query = `${songWrapper.name} ${songWrapper.primaryArtists}`;
-            console.log(`[YouTube] Searching for: ${query}`);
+            //console.log(`[YouTube] Searching for: ${query}`);
             const vid = await searchYouTube(query);
             if (vid) {
-              console.log(`[YouTube] Video ID: ${vid.videoId}`);
+              //console.log(`[YouTube] Video ID: ${vid.videoId}`);
               setYoutubeThumb(vid.thumbnail ?? null);
 
               const activeTrack = playerTrackRef.current;
@@ -288,10 +288,10 @@ function SongPlayContent() {
             console.error("YouTube lookup failed", e);
           }
 
-          console.log(
-            `[YouTube] Fallback to preview audio. previewUrl=`,
-            getDownloadUrl(songWrapper),
-          );
+          //console.log(
+          //  `[YouTube] Fallback to preview audio. previewUrl=`,
+          //  getDownloadUrl(songWrapper),
+          //);
           setYoutubeThumb(null);
 
           const previewUrl = getDownloadUrl(songWrapper);
@@ -418,7 +418,7 @@ function SongPlayContent() {
             (currentSong?.duration ? Number(currentSong.duration) : 0)
           }
           lyrics={[]}
-          onAddToPlaylist={() => console.log("Add to playlist clicked")}
+          onAddToPlaylist={() => {}}
           onPrev={handlePrev}
           onNext={handleNext}
           onShuffleChange={(s) => setShuffle(s)}

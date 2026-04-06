@@ -13,7 +13,6 @@ export async function GET(request: NextRequest) {
 
   // Use iTunes lookup
   try {
-    console.log(`[API Proxy] Trying iTunes lookup for ID: ${id}`);
     const url = `https://itunes.apple.com/lookup?id=${id}`;
     const response = await fetch(url);
     const data = await response.json();
