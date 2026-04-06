@@ -372,6 +372,30 @@ export default function SongPlayer({
 
   const [liked, setLiked] = useState(false);
   const prevVolumeRef = useRef(0.8);
+  const [showPlaylistSoonHint, setShowPlaylistSoonHint] = useState(false);
+  const playlistSoonTimerRef = useRef<ReturnType<typeof setTimeout> | null>(
+    null,
+  );
+
+  const handleAddPlaylistClick = useCallback(() => {
+    if (onAddToPlaylist) onAddToPlaylist();
+
+    setShowPlaylistSoonHint(true);
+    if (playlistSoonTimerRef.current) {
+      clearTimeout(playlistSoonTimerRef.current);
+    }
+    playlistSoonTimerRef.current = setTimeout(() => {
+      setShowPlaylistSoonHint(false);
+    }, 1700);
+  }, [onAddToPlaylist]);
+
+  useEffect(() => {
+    return () => {
+      if (playlistSoonTimerRef.current) {
+        clearTimeout(playlistSoonTimerRef.current);
+      }
+    };
+  }, []);
 
   function toggleMute() {
     if (volume > 0) {
@@ -623,12 +647,25 @@ export default function SongPlayer({
             <button className="p-2.5 rounded-full bg-white/5 hover:bg-white/10 transition-colors text-white/80">
               <BsThreeDots size={20} />
             </button>
-            <AddPlaylistButton
-              text="ADD +"
-              width="w-24 sm:w-28"
-              height="h-9 sm:h-10"
-              onClick={onAddToPlaylist}
-            />
+            <div className="relative">
+              <AddPlaylistButton
+                text="ADD +"
+                width="w-24 sm:w-28"
+                height="h-9 sm:h-10"
+                onClick={handleAddPlaylistClick}
+              />
+              <span
+                role="status"
+                aria-live="polite"
+                className={`pointer-events-none absolute left-1/2 top-full z-20 mt-2 -translate-x-1/2 whitespace-nowrap rounded-md border border-white/15 bg-black/35 px-2 py-1 text-[10px] font-medium text-cyan-100 shadow-lg backdrop-blur-sm transition-all duration-300 ${
+                  showPlaylistSoonHint
+                    ? "translate-y-0 opacity-100"
+                    : "-translate-y-1 opacity-0"
+                }`}
+              >
+                Playlist support coming soon
+              </span>
+            </div>
           </div>
         </div>
 
