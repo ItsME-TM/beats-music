@@ -172,7 +172,7 @@ npm run lint
 ### 6. Run Tests
 
 ```bash
-npx vitest run
+npm test
 ```
 
 The repository currently includes 27 property-style test files under `src/__tests__`.
@@ -187,8 +187,9 @@ The repository currently includes 27 property-style test files under `src/__test
 | `build` | Production compile + optimize                |
 | `start` | Launch built app on Node server              |
 | `lint`  | Run ESLint over source                       |
+| `test`  | Run Vitest test suite                        |
 
-Testing is available via Vitest CLI (`npx vitest run`) even though a `test` npm script is not yet defined.
+CI runs the same command (`npm test`) in the test step.
 
 ---
 
@@ -215,7 +216,7 @@ Testing is available via Vitest CLI (`npx vitest run`) even though a `test` npm 
 - Implement full custom playlist lifecycle (create, rename, delete, track assignment).
 - Improve background playback resilience across browser throttling scenarios.
 - Add stronger auth UX (replace alerts with inline/toast feedback).
-- Add `npm test` script and CI test workflow.
+- Add CI test reports/coverage publishing.
 - Accessibility pass and theme strategy (currently dark-leaning visual style).
 
 ### 🔜 Next Version (Planned)
@@ -238,7 +239,6 @@ Testing is available via Vitest CLI (`npx vitest run`) even though a `test` npm 
 - Next.js config enables standalone output and SVG component imports via SVGR.
 
 ---
-
 
 ## 🤝 Contributing
 
