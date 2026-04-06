@@ -186,6 +186,7 @@ function LibrarySkeleton() {
 export default function LibraryPage() {
   const user = useAuth();
   const router = useRouter();
+  const [isDevelopmentMode] = useState(true);
   const [likedSongs, setLikedSongs] = useState<LikedSong[]>([]);
   const [playlists, setPlaylists] = useState<Playlist[]>([]);
   const [sortOrder, setSortOrder] = useState<SortOrder>("recents");
@@ -224,6 +225,21 @@ export default function LibraryPage() {
       <div className="min-h-screen bg-[#0a0a0a] text-white px-4 md:pl-8 lg:pl-12 md:pr-17.5 lg:pr-25 pt-6 pb-24 md:pb-8">
         <h1 className="text-2xl sm:text-3xl font-bold mb-8">Your Library</h1>
         <LibrarySkeleton />
+      </div>
+    );
+  }
+
+  if (isDevelopmentMode) {
+    return (
+      <div className="min-h-screen bg-[#0a0a0a] text-white px-4 md:pl-8 lg:pl-12 md:pr-17.5 lg:pr-25 pt-6 pb-24 md:pb-8">
+        <div className="h-[70vh] flex flex-col items-center justify-center text-center">
+          <h1 className="text-3xl sm:text-4xl font-bold text-cyan-400 mb-3">
+            Coming Soon...
+          </h1>
+          <p className="text-gray-300 text-sm sm:text-base">
+            Library page is under development.
+          </p>
+        </div>
       </div>
     );
   }

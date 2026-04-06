@@ -79,7 +79,7 @@ jobs:
 
       - name: Run tests
         if: ${{ github.event.inputs.skip_tests != 'true' }}
-        run: npm test --if-present
+        run: npm test
 
       - name: Build
         env:
