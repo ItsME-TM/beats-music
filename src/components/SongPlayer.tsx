@@ -43,12 +43,16 @@ type SongPlayerProps = {
   audioSrc?: string;
   youtubeVideoId?: string;
   autoplayRequestAt?: number;
+  initialSeekTime?: number;
   lyrics?: LyricLine[];
   duration?: number;
   onAddToPlaylist?: () => void;
   onPrev?: () => void;
   onNext?: () => void;
   onShuffleChange?: (shuffle: boolean) => void;
+  onPlayingChange?: (playing: boolean) => void;
+  onTimeChange?: (seconds: number) => void;
+  onVolumeChange?: (value: number) => void;
 };
 
 export default function SongPlayer({
@@ -58,12 +62,16 @@ export default function SongPlayer({
   audioSrc,
   youtubeVideoId,
   autoplayRequestAt,
+  initialSeekTime,
   lyrics = [],
   duration: durationProp,
   onAddToPlaylist,
   onPrev,
   onNext,
   onShuffleChange,
+  onPlayingChange,
+  onTimeChange,
+  onVolumeChange,
 }: SongPlayerProps) {
   console.log("[SongPlayer] init props:", {
     title,
@@ -88,7 +96,7 @@ export default function SongPlayer({
         const n = Number.parseFloat(v);
         if (!Number.isNaN(n)) return n;
       }
-    } catch (err) {
+    } catch {
       /* ignore */
     }
     return 0.8;
@@ -96,6 +104,7 @@ export default function SongPlayer({
 
   const [volume, setVolume] = useState<number>(initialVolume);
   const isSeekingRef = useRef(false);
+  const initialSeekAppliedRef = useRef(false);
   const [seekPreviewTime, setSeekPreviewTime] = useState<number | null>(null);
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -143,6 +152,7 @@ export default function SongPlayer({
     if (audioSrc || youtubeVideoId) {
       setCurrentTime(0);
       setPlayerReady(false);
+      initialSeekAppliedRef.current = false;
     }
   }, [audioSrc, youtubeVideoId]);
 
@@ -204,7 +214,8 @@ export default function SongPlayer({
         /* ignore */
       }
     }
-  }, [volume]);
+    if (onVolumeChange) onVolumeChange(volume);
+  }, [volume, onVolumeChange]);
 
   // Setup Media Session API for background playback and lockscreen controls
   useEffect(() => {
@@ -221,6 +232,7 @@ export default function SongPlayer({
       navigator.mediaSession.setActionHandler("play", () => {
         setHasUserInteracted(true);
         setIsPlaying(true);
+        if (onPlayingChange) onPlayingChange(true);
         try {
           noSleepRef.current?.enable();
         } catch (err) {
@@ -230,6 +242,7 @@ export default function SongPlayer({
       });
       navigator.mediaSession.setActionHandler("pause", () => {
         setIsPlaying(false);
+        if (onPlayingChange) onPlayingChange(false);
         try {
           noSleepRef.current?.disable();
         } catch {}
@@ -244,7 +257,7 @@ export default function SongPlayer({
         onNext ? () => onNext() : null,
       );
     }
-  }, [title, artists, coverUrl, onPrev, onNext]);
+  }, [title, artists, coverUrl, onPrev, onNext, onPlayingChange]);
 
   const effectiveCurrentTime = seekPreviewTime ?? currentTime;
   const safeDuration = Number.isFinite(duration) && duration > 0 ? duration : 1;
@@ -262,6 +275,7 @@ export default function SongPlayer({
     });
     setHasUserInteracted(true);
     setIsPlaying(next);
+    if (onPlayingChange) onPlayingChange(next);
 
     // In react-player v3, control playback via the underlying element
     if (playerRef.current) {
@@ -323,6 +337,28 @@ export default function SongPlayer({
 
     // NOTE: isSeekingRef is reset by the caller (onMouseUp/onTouchEnd)
   }
+
+  useEffect(() => {
+    if (!playerReady) return;
+    if (initialSeekAppliedRef.current) return;
+    if (!initialSeekTime || initialSeekTime <= 0) return;
+
+    const numeric = Number.isFinite(initialSeekTime) ? initialSeekTime : 0;
+    const clamped = Math.max(0, Math.min(duration || 0, numeric));
+
+    setCurrentTime(clamped);
+    setSeekPreviewTime(null);
+
+    if (playerRef.current) {
+      try {
+        playerRef.current.currentTime = clamped;
+      } catch (err) {
+        console.error("[SongPlayer] initial seek failed:", err);
+      }
+    }
+
+    initialSeekAppliedRef.current = true;
+  }, [playerReady, initialSeekTime, duration]);
 
   function handleSeekPreview(next: number) {
     const value = Number.isFinite(next) ? next : 0;
@@ -430,9 +466,10 @@ export default function SongPlayer({
       const secs = el.currentTime;
       if (Number.isFinite(secs) && secs >= 0) {
         setCurrentTime(secs);
+        if (onTimeChange) onTimeChange(secs);
       }
     },
-    [],
+    [onTimeChange],
   );
 
   // onPlay: standard HTML5 media event
@@ -440,7 +477,8 @@ export default function SongPlayer({
     console.log("[SongPlayer] 🎵 onPlay fired");
     setIsPlaying(true);
     setHasUserInteracted(true);
-  }, []);
+    if (onPlayingChange) onPlayingChange(true);
+  }, [onPlayingChange]);
 
   // onPause: standard HTML5 media event
   const handlePause = useCallback(() => {
@@ -448,8 +486,9 @@ export default function SongPlayer({
     // Only update if we're not in the middle of a seek
     if (!isSeekingRef.current) {
       setIsPlaying(false);
+      if (onPlayingChange) onPlayingChange(false);
     }
-  }, []);
+  }, [onPlayingChange]);
 
   // onEnded: standard HTML5 media event
   const handleEnded = useCallback(() => {
@@ -464,17 +503,21 @@ export default function SongPlayer({
       if (onNext) onNext();
     } else {
       if (onNext) onNext();
-      else setIsPlaying(false);
+      else {
+        setIsPlaying(false);
+        if (onPlayingChange) onPlayingChange(false);
+      }
     }
-  }, [repeat, onNext]);
+  }, [repeat, onNext, onPlayingChange]);
 
   // onError: standard HTML5 media event
   const handleError = useCallback(
     (e: React.SyntheticEvent<HTMLVideoElement>) => {
       console.error("[SongPlayer] ❌ Playback error:", e);
       setIsPlaying(false);
+      if (onPlayingChange) onPlayingChange(false);
     },
-    [],
+    [onPlayingChange],
   );
 
   return (
@@ -581,7 +624,7 @@ export default function SongPlayer({
               <BsThreeDots size={20} />
             </button>
             <AddPlaylistButton
-              text="Save To"
+              text="ADD +"
               width="w-24 sm:w-28"
               height="h-9 sm:h-10"
               onClick={onAddToPlaylist}
