@@ -64,6 +64,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const playerRef = useRef<any>(null);
   const keepAliveAudioRef = useRef<HTMLAudioElement | null>(null);
   const lastTimeRef = useRef<number>(-1);
+  const initialSeekAppliedRef = useRef(false);
 
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
@@ -131,6 +132,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     setEngineReady(false);
+    initialSeekAppliedRef.current = false;
   }, [mediaSrc]);
 
   useEffect(() => {
@@ -280,8 +282,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
                 try {
                   if (playerRef.current) {
                     playerRef.current.volume = volume;
-                    if (Number.isFinite(currentTime) && currentTime > 0) {
+                    if (
+                      !initialSeekAppliedRef.current &&
+                      Number.isFinite(currentTime) &&
+                      currentTime > 0
+                    ) {
                       playerRef.current.currentTime = currentTime;
+                      initialSeekAppliedRef.current = true;
                     }
                     if (isPlaying) playerRef.current.play();
                     else playerRef.current.pause();
