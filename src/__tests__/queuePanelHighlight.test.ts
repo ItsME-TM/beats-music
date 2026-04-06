@@ -39,7 +39,7 @@ describe("Queue panel reflects current song (Property 11)", () => {
   it("exactly one row is highlighted when currentSongId matches one of the songs", () => {
     fc.assert(
       fc.property(
-        fc.array(songArb, { minLength: 1 }),
+        fc.uniqueArray(songArb, { minLength: 1, selector: (s) => s.id }),
         fc.nat(),
         (songs, pickIndex) => {
           // Pick a valid song from the queue as the current song
