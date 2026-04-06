@@ -1,17 +1,19 @@
 "use client";
 
 import { useRouter, usePathname } from "next/navigation";
-import { 
-  HomeIcon, 
-  PlayIcon, 
-  SearchIcon, 
-  LibraryIcon, 
-  UserIcon 
+import {
+  HomeIcon,
+  PlayIcon,
+  SearchIcon,
+  LibraryIcon,
+  UserIcon,
 } from "@/components/ui/Icons";
+import { usePlayer } from "@/hooks/useAuth";
 
 export default function MobileNavBar() {
   const router = useRouter();
   const pathname = usePathname();
+  const { isPlaying } = usePlayer();
 
   const go = (path: string) => {
     if (pathname !== path) router.push(path);
@@ -59,12 +61,18 @@ export default function MobileNavBar() {
             key={item.path}
             onClick={() => go(item.path)}
             className={`flex flex-col items-center justify-center py-2 px-3 min-w-[60px] transition-all duration-300 ${
-              active ? "text-cyan-400 scale-105" : "text-gray-400 hover:text-white"
+              active
+                ? "text-cyan-400 scale-105"
+                : "text-gray-400 hover:text-white"
             }`}
             aria-current={active ? "page" : undefined}
           >
-            <Icon className="h-6 w-6" />
-            <span className="text-[10px] mt-1 font-medium tracking-wide">{item.label}</span>
+            <Icon
+              className={`h-6 w-6 ${item.path === "/songPlay" && isPlaying ? "play-icon-playing" : ""}`}
+            />
+            <span className="text-[10px] mt-1 font-medium tracking-wide">
+              {item.label}
+            </span>
           </button>
         );
       })}

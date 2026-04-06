@@ -3,7 +3,7 @@
 import React, { useEffect, useState, Suspense } from "react";
 import { useRef } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import useAuth from "@/hooks/useAuth";
+import useAuth, { usePlayer } from "@/hooks/useAuth";
 import SongPlayer from "@/components/SongPlayer";
 import QueuePanel from "@/components/QueuePanel";
 import { TopSong } from "@/components/TopGlobalSongs";
@@ -64,17 +64,15 @@ function SongPlaySkeleton() {
 
 function SongPlayContent() {
   const user = useAuth();
+  const player = usePlayer();
+  const { setTrack } = player;
   const router = useRouter();
   const searchParams = useSearchParams();
   const songId = searchParams.get("id");
+  const playerTrackRef = useRef(player.track);
 
   const [currentSong, setCurrentSong] = useState<SaavnSong | null>(null);
   const [topSongs, setTopSongs] = useState<TopSong[]>([]);
-  const [audioSource, setAudioSource] = useState<string>("");
-  const [autoplayRequestAt, setAutoplayRequestAt] = useState<number | null>(
-    null,
-  );
-  const [youtubeVideoId, setYoutubeVideoId] = useState<string | null>(null);
   const [youtubeThumb, setYoutubeThumb] = useState<string | null>(null);
   const [isAudioLoading, setIsAudioLoading] = useState(false);
   const [shuffle, setShuffle] = useState(false);
@@ -89,6 +87,10 @@ function SongPlayContent() {
       router.push("/login");
     }
   }, [user, router]);
+
+  useEffect(() => {
+    playerTrackRef.current = player.track;
+  }, [player.track]);
 
   // Fetch songs for each tab
   useEffect(() => {
@@ -236,11 +238,23 @@ function SongPlayContent() {
     const loadSongAndYTPlay = async () => {
       if (songId) {
         setIsAudioLoading(true);
-        setAudioSource("");
 
         const songWrapper = await getSongDetails(songId);
         if (songWrapper) {
           setCurrentSong(songWrapper);
+
+          const nextBaseTrack = {
+            id: String(songWrapper.id),
+            title: songWrapper.name
+              .replace(/&quot;/g, '"')
+              .replace(/&#039;/g, "'")
+              .replace(/&amp;/g, "&"),
+            artists: songWrapper.primaryArtists
+              ? songWrapper.primaryArtists.split(", ")
+              : ["Unknown Artist"],
+            coverUrl: getSongImage(songWrapper, ""),
+            duration: songWrapper.duration ? Number(songWrapper.duration) : 0,
+          };
 
           try {
             const query = `${songWrapper.name} ${songWrapper.primaryArtists}`;
@@ -248,9 +262,25 @@ function SongPlayContent() {
             const vid = await searchYouTube(query);
             if (vid) {
               console.log(`[YouTube] Video ID: ${vid.videoId}`);
-              setYoutubeVideoId(vid.videoId);
               setYoutubeThumb(vid.thumbnail ?? null);
-              setAudioSource("");
+
+              const activeTrack = playerTrackRef.current;
+              const shouldReplaceTrack =
+                !activeTrack ||
+                activeTrack.id !== String(songWrapper.id) ||
+                activeTrack.youtubeVideoId !== vid.videoId;
+
+              if (shouldReplaceTrack) {
+                setTrack(
+                  {
+                    ...nextBaseTrack,
+                    youtubeVideoId: vid.videoId,
+                    audioSrc: "",
+                  },
+                  true,
+                );
+              }
+
               setIsAudioLoading(false);
               return;
             }
@@ -262,20 +292,34 @@ function SongPlayContent() {
             `[YouTube] Fallback to preview audio. previewUrl=`,
             getDownloadUrl(songWrapper),
           );
-          setYoutubeVideoId(null);
           setYoutubeThumb(null);
-          setAudioSource(getDownloadUrl(songWrapper));
+
+          const previewUrl = getDownloadUrl(songWrapper);
+          const activeTrack = playerTrackRef.current;
+          const shouldReplaceTrack =
+            !activeTrack ||
+            activeTrack.id !== String(songWrapper.id) ||
+            activeTrack.audioSrc !== previewUrl ||
+            !!activeTrack.youtubeVideoId;
+
+          if (shouldReplaceTrack) {
+            setTrack(
+              {
+                ...nextBaseTrack,
+                audioSrc: previewUrl,
+                youtubeVideoId: undefined,
+              },
+              true,
+            );
+          }
         }
         setIsAudioLoading(false);
       }
     };
     loadSongAndYTPlay();
-  }, [songId]);
+  }, [songId, setTrack]);
 
   const handleSongSelect = async (song: TopSong) => {
-    // mark that this selection was initiated by a user interaction so the
-    // player can attempt autoplay when the media becomes available
-    setAutoplayRequestAt(Date.now());
     router.push(`/songPlay?id=${song.id}`);
   };
 
@@ -364,16 +408,23 @@ function SongPlayContent() {
               ? currentSong.primaryArtists.split(", ")
               : ["Unknown Artist"]
           }
-          audioSrc={audioSource}
-          youtubeVideoId={youtubeVideoId || undefined}
-          autoplayRequestAt={autoplayRequestAt ?? undefined}
-          coverUrl={displayCoverUrl || undefined}
-          duration={currentSong?.duration ? Number(currentSong.duration) : 0}
+          audioSrc={player.track?.audioSrc}
+          youtubeVideoId={player.track?.youtubeVideoId}
+          autoplayRequestAt={player.autoplayRequestAt ?? undefined}
+          initialSeekTime={player.currentTime}
+          coverUrl={player.track?.coverUrl || displayCoverUrl || undefined}
+          duration={
+            player.track?.duration ||
+            (currentSong?.duration ? Number(currentSong.duration) : 0)
+          }
           lyrics={[]}
           onAddToPlaylist={() => console.log("Add to playlist clicked")}
           onPrev={handlePrev}
           onNext={handleNext}
           onShuffleChange={(s) => setShuffle(s)}
+          onPlayingChange={(playing) => player.setIsPlaying(playing)}
+          onTimeChange={(seconds) => player.setCurrentTime(seconds)}
+          onVolumeChange={(value) => player.setVolume(value)}
         />
       </div>
 

@@ -12,11 +12,13 @@ import {
 } from "@/components/ui/Icons";
 import Popup from "@/components/ui/PopUp";
 import { auth } from "@/app/firebase";
+import { usePlayer } from "@/hooks/useAuth";
 
 export default function SideBar() {
   const [showPopup, setShowPopup] = useState(false);
   const router = useRouter();
   const pathname = usePathname();
+  const { isPlaying } = usePlayer();
 
   const handleLogout = async () => {
     if (auth) {
@@ -53,7 +55,7 @@ export default function SideBar() {
             isActive("/songPlay")
               ? "text-cyan-400"
               : "text-gray-400 hover:text-white"
-          } cursor-pointer`}
+          } ${isPlaying ? "play-icon-playing" : ""} cursor-pointer`}
           onClick={() => go("/songPlay")}
           aria-current={isActive("/songPlay") ? "page" : undefined}
         />
