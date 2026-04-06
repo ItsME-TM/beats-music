@@ -73,14 +73,7 @@ export default function SongPlayer({
   onTimeChange,
   onVolumeChange,
 }: SongPlayerProps) {
-  console.log("[SongPlayer] init props:", {
-    title,
-    artists,
-    coverUrl,
-    audioSrc,
-    durationProp,
-    youtubeVideoId,
-  });
+  // console.log("[SongPlayer] init props:", { title, artists, ... });
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState<number>(durationProp || 0);
@@ -118,8 +111,8 @@ export default function SongPlayer({
   useEffect(() => {
     try {
       noSleepRef.current = new NoSleep();
-    } catch (err) {
-      console.warn("[SongPlayer] NoSleep init failed:", err);
+    } catch {
+      // console.warn("[SongPlayer] NoSleep init failed:", err);
     }
     return () => {
       try {
@@ -133,22 +126,22 @@ export default function SongPlayer({
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const handlePlayerRef = useCallback((node: any) => {
     playerRef.current = node;
-    console.log("[SongPlayer] 🔍 ReactPlayer v3 ref callback:", {
-      node: !!node,
-      tagName: node?.tagName,
-      hasCurrentTime: "currentTime" in (node || {}),
-      hasDuration: "duration" in (node || {}),
-      hasPlay: typeof node?.play,
-      hasPause: typeof node?.pause,
-    });
+    // console.log("[SongPlayer] 🔍 ReactPlayer v3 ref callback:", {
+    //   node: !!node,
+    //   tagName: node?.tagName,
+    //   hasCurrentTime: "currentTime" in (node || {}),
+    //   hasDuration: "duration" in (node || {}),
+    //   hasPlay: typeof node?.play,
+    //   hasPause: typeof node?.pause,
+    // });
   }, []);
 
   // Reset player state when audioSrc or youtubeVideoId changes
   useEffect(() => {
-    console.log("[SongPlayer] media source changed ->", {
-      audioSrc,
-      youtubeVideoId,
-    });
+    // console.log("[SongPlayer] media source changed ->", {
+    //   audioSrc,
+    //   youtubeVideoId,
+    // });
     if (audioSrc || youtubeVideoId) {
       setCurrentTime(0);
       setPlayerReady(false);
@@ -160,23 +153,23 @@ export default function SongPlayer({
   useEffect(() => {
     const hasSource = !!(audioSrc || youtubeVideoId);
     if (playerReady && hasSource && hasUserInteracted) {
-      console.log("[SongPlayer] auto-play allowed, starting playback");
+      // console.log("[SongPlayer] auto-play allowed, starting playback");
       setIsPlaying(true);
       // In v3, control via the ref's native .play() method
       try {
         try {
           noSleepRef.current?.enable();
-        } catch (err) {
-          console.warn("[SongPlayer] NoSleep enable failed:", err);
+        } catch {
+          // console.warn("[SongPlayer] NoSleep enable failed:", err);
         }
         playerRef.current?.play();
-      } catch (err) {
-        console.error("[SongPlayer] auto-play via ref failed:", err);
+      } catch {
+        // console.error("[SongPlayer] auto-play via ref failed:", err);
       }
     } else if (playerReady && hasSource && !hasUserInteracted) {
-      console.log(
-        "[SongPlayer] player ready but waiting for user interaction to play",
-      );
+      // console.log(
+      //   "[SongPlayer] player ready but waiting for user interaction to play",
+      // );
     }
   }, [playerReady, audioSrc, youtubeVideoId, hasUserInteracted]);
 
@@ -184,10 +177,10 @@ export default function SongPlayer({
   // as an interaction so autoplay can proceed once the media is ready.
   useEffect(() => {
     if (autoplayRequestAt) {
-      console.log(
-        "[SongPlayer] autoplay requested by parent/user at",
-        autoplayRequestAt,
-      );
+      // console.log(
+      //   "[SongPlayer] autoplay requested by parent/user at",
+      //   autoplayRequestAt,
+      // );
       setHasUserInteracted(true);
     }
   }, [autoplayRequestAt]);
@@ -198,7 +191,7 @@ export default function SongPlayer({
 
   // Sync volume to the player element when it changes and persist to localStorage
   useEffect(() => {
-    console.log("[SongPlayer] volume changed ->", volume);
+    // console.log("[SongPlayer] volume changed ->", volume);
     try {
       if (typeof window !== "undefined") {
         localStorage.setItem(LS_VOLUME_KEY, String(volume));
@@ -235,8 +228,8 @@ export default function SongPlayer({
         if (onPlayingChange) onPlayingChange(true);
         try {
           noSleepRef.current?.enable();
-        } catch (err) {
-          console.warn("[SongPlayer] NoSleep enable failed:", err);
+        } catch {
+          // console.warn("[SongPlayer] NoSleep enable failed:", err);
         }
         playerRef.current?.play();
       });
@@ -268,11 +261,11 @@ export default function SongPlayer({
 
   function togglePlayPause() {
     const next = !isPlaying;
-    console.log("[SongPlayer] user toggled play/pause ->", {
-      wasPlaying: isPlaying,
-      next,
-      hasRef: !!playerRef.current,
-    });
+    // console.log("[SongPlayer] user toggled play/pause ->", {
+    //   wasPlaying: isPlaying,
+    //   next,
+    //   hasRef: !!playerRef.current,
+    // });
     setHasUserInteracted(true);
     setIsPlaying(next);
     if (onPlayingChange) onPlayingChange(next);
@@ -283,8 +276,8 @@ export default function SongPlayer({
         if (next) {
           try {
             noSleepRef.current?.enable();
-          } catch (err) {
-            console.warn("[SongPlayer] NoSleep enable failed:", err);
+          } catch {
+            // console.warn("[SongPlayer] NoSleep enable failed:", err);
           }
           playerRef.current.play();
         } else {
@@ -293,8 +286,8 @@ export default function SongPlayer({
           } catch {}
           playerRef.current.pause();
         }
-      } catch (err) {
-        console.error("[SongPlayer] play/pause via ref failed:", err);
+      } catch {
+        // console.error("[SongPlayer] play/pause via ref failed:", err);
       }
     }
   }
@@ -303,36 +296,36 @@ export default function SongPlayer({
   function seekTo(t: number) {
     const numeric = Number.isFinite(t) ? t : 0;
     const clamped = Math.max(0, Math.min(duration || 0, numeric));
-    console.log("[SongPlayer] 🎯 SEEKTO CALLED:", {
-      input: t,
-      numeric,
-      clamped,
-      duration,
-      playerRef: !!playerRef.current,
-      tagName: playerRef.current?.tagName,
-    });
+    // console.log("[SongPlayer] 🎯 SEEKTO CALLED:", {
+    //   input: t,
+    //   numeric,
+    //   clamped,
+    //   duration,
+    //   playerRef: !!playerRef.current,
+    //   tagName: playerRef.current?.tagName,
+    // });
 
     setCurrentTime(clamped);
     setSeekPreviewTime(null);
 
     if (!playerRef.current) {
-      console.error(
-        "[SongPlayer] ❌ Cannot seek - playerRef.current is null/undefined",
-      );
+      // console.error(
+      //   "[SongPlayer] ❌ Cannot seek - playerRef.current is null/undefined",
+      // );
       isSeekingRef.current = false;
       return;
     }
 
     // react-player v3: Seek via the native .currentTime property
     try {
-      console.log("[SongPlayer] 🎯 Setting currentTime to:", clamped);
+      // console.log("[SongPlayer] 🎯 Setting currentTime to:", clamped);
       playerRef.current.currentTime = clamped;
-      console.log(
-        "[SongPlayer] ✅ seek successful, currentTime is now:",
-        playerRef.current.currentTime,
-      );
-    } catch (err) {
-      console.error("[SongPlayer] ❌ seek failed:", err);
+      // console.log(
+      //   "[SongPlayer] ✅ seek successful, currentTime is now:",
+      //   playerRef.current.currentTime,
+      // );
+    } catch {
+      // console.error("[SongPlayer] ❌ seek failed:", err);
     }
 
     // NOTE: isSeekingRef is reset by the caller (onMouseUp/onTouchEnd)
@@ -352,8 +345,8 @@ export default function SongPlayer({
     if (playerRef.current) {
       try {
         playerRef.current.currentTime = clamped;
-      } catch (err) {
-        console.error("[SongPlayer] initial seek failed:", err);
+      } catch {
+        // console.error("[SongPlayer] initial seek failed:", err);
       }
     }
 
@@ -457,29 +450,29 @@ export default function SongPlayer({
 
   // onReady is handled specially by react-player v3 (fires on loadstart)
   const handleReady = useCallback(() => {
-    console.log("[SongPlayer] 🎵 ReactPlayer v3 READY (loadstart)", {
-      mediaSrc,
-      hasRef: !!playerRef.current,
-      tagName: playerRef.current?.tagName,
-    });
+    // console.log("[SongPlayer] 🎵 ReactPlayer v3 READY (loadstart)", {
+    //   mediaSrc,
+    //   hasRef: !!playerRef.current,
+    //   tagName: playerRef.current?.tagName,
+    // });
     setPlayerReady(true);
-  }, [mediaSrc]);
+  }, []);
 
   // onDurationChange: standard HTML5 media event, fires when duration is available
   const handleDurationChange = useCallback(
     (e: React.SyntheticEvent<HTMLVideoElement>) => {
       const el = e.currentTarget;
       const dur = el.duration;
-      console.log("[SongPlayer] 🎵 durationchange:", {
-        duration: dur,
-        isFinite: Number.isFinite(dur),
-        currentDuration: duration,
-      });
+      // console.log("[SongPlayer] 🎵 durationchange:", {
+      //   duration: dur,
+      //   isFinite: Number.isFinite(dur),
+      //   currentDuration: duration,
+      // });
       if (Number.isFinite(dur) && dur > 0) {
         setDuration(dur);
       }
     },
-    [duration],
+    [],
   );
 
   // onTimeUpdate: standard HTML5 media event, fires as playback advances
@@ -498,7 +491,7 @@ export default function SongPlayer({
 
   // onPlay: standard HTML5 media event
   const handlePlay = useCallback(() => {
-    console.log("[SongPlayer] 🎵 onPlay fired");
+    // console.log("[SongPlayer] 🎵 onPlay fired");
     setIsPlaying(true);
     setHasUserInteracted(true);
     if (onPlayingChange) onPlayingChange(true);
@@ -506,7 +499,7 @@ export default function SongPlayer({
 
   // onPause: standard HTML5 media event
   const handlePause = useCallback(() => {
-    console.log("[SongPlayer] 🎵 onPause fired");
+    // console.log("[SongPlayer] 🎵 onPause fired");
     // Only update if we're not in the middle of a seek
     if (!isSeekingRef.current) {
       setIsPlaying(false);
@@ -516,7 +509,7 @@ export default function SongPlayer({
 
   // onEnded: standard HTML5 media event
   const handleEnded = useCallback(() => {
-    console.log("[SongPlayer] 🎵 onEnded fired, repeat:", repeat);
+    // console.log("[SongPlayer] 🎵 onEnded fired, repeat:", repeat);
     if (repeat === "one") {
       // Restart the same track
       if (playerRef.current) {
@@ -535,14 +528,11 @@ export default function SongPlayer({
   }, [repeat, onNext, onPlayingChange]);
 
   // onError: standard HTML5 media event
-  const handleError = useCallback(
-    (e: React.SyntheticEvent<HTMLVideoElement>) => {
-      console.error("[SongPlayer] ❌ Playback error:", e);
-      setIsPlaying(false);
-      if (onPlayingChange) onPlayingChange(false);
-    },
-    [onPlayingChange],
-  );
+  const handleError = useCallback(() => {
+    // console.error("[SongPlayer] ❌ Playback error:", e);
+    setIsPlaying(false);
+    if (onPlayingChange) onPlayingChange(false);
+  }, [onPlayingChange]);
 
   return (
     <div
@@ -723,48 +713,48 @@ export default function SongPlayer({
                   handleSeekPreview(newTime);
                 }}
                 onMouseDown={() => {
-                  console.log("[SongPlayer] 🎯 SEEK MOUSEDOWN - Starting seek");
+                  // console.log("[SongPlayer] 🎯 SEEK MOUSEDOWN - Starting seek");
                   isSeekingRef.current = true;
                 }}
                 onTouchStart={() => {
-                  console.log(
-                    "[SongPlayer] 🎯 SEEK TOUCHSTART - Starting seek (touch)",
-                  );
+                  // console.log(
+                  //   "[SongPlayer] 🎯 SEEK TOUCHSTART - Starting seek (touch)",
+                  // );
                   isSeekingRef.current = true;
                 }}
                 onMouseUp={(e) => {
                   const newTime = Number((e.target as HTMLInputElement).value);
-                  console.log(
-                    "[SongPlayer] 🎯 SEEK MOUSEUP - Committing seek:",
-                    {
-                      newTime,
-                      duration,
-                      playerRef: !!playerRef.current,
-                    },
-                  );
+                  // console.log(
+                  //   "[SongPlayer] 🎯 SEEK MOUSEUP - Committing seek:",
+                  //   {
+                  //     newTime,
+                  //     duration,
+                  //     playerRef: !!playerRef.current,
+                  //   },
+                  // );
                   seekTo(newTime);
                   setTimeout(() => {
                     isSeekingRef.current = false;
-                    console.log(
-                      "[SongPlayer] 🎯 Seek complete, resuming progress tracking",
-                    );
+                    // console.log(
+                    //   "[SongPlayer] 🎯 Seek complete, resuming progress tracking",
+                    // );
                   }, 250);
                 }}
                 onTouchEnd={(e) => {
                   const newTime = Number((e.target as HTMLInputElement).value);
-                  console.log(
-                    "[SongPlayer] 🎯 SEEK TOUCHEND - Committing seek:",
-                    {
-                      newTime,
-                      duration,
-                    },
-                  );
+                  // console.log(
+                  //   "[SongPlayer] 🎯 SEEK TOUCHEND - Committing seek:",
+                  //   {
+                  //     newTime,
+                  //     duration,
+                  //   },
+                  // );
                   seekTo(newTime);
                   setTimeout(() => {
                     isSeekingRef.current = false;
-                    console.log(
-                      "[SongPlayer] 🎯 Touch seek complete, resuming progress tracking",
-                    );
+                    // console.log(
+                    //   "[SongPlayer] 🎯 Touch seek complete, resuming progress tracking",
+                    // );
                   }, 250);
                 }}
                 className="w-full appearance-none h-1.5 rounded-full outline-none cursor-pointer group-hover/progress:h-2 transition-all bg-white/20 disabled:cursor-not-allowed disabled:opacity-50"

@@ -16,12 +16,6 @@ export async function GET(request: NextRequest) {
   try {
     const iTunesData = await fetchITunesData(query, Number(limit));
     if (iTunesData.length > 0) {
-      console.log(
-        `[API Proxy] Success from iTunes. Sample track:`,
-        iTunesData[0].name,
-        "by",
-        iTunesData[0].primaryArtists,
-      );
       return NextResponse.json({
         status: "SUCCESS",
         message: null,
@@ -37,9 +31,6 @@ export async function GET(request: NextRequest) {
   }
 
   // Absolute last resort - static mock data
-  console.log(
-    "[API Proxy] All mirrors and iTunes failed, returning static mock data",
-  );
   return NextResponse.json({
     status: "SUCCESS",
     message: null,

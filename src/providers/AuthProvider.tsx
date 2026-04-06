@@ -63,6 +63,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const playerRef = useRef<any>(null);
   const keepAliveAudioRef = useRef<HTMLAudioElement | null>(null);
+  const lastTimeRef = useRef<number>(-1);
 
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
@@ -154,8 +155,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     // Keep it effectively silent to users while still being an active audio element.
     keepAlive.volume = 0.0001;
 
-    const shouldKeepAlivePlaying =
-      shouldRunBackgroundEngine && !!mediaSrc && isPlaying;
+    // Only use keep-alive if the app needs to NOT sleep while idle.
+    // If mediaSrc is playing, we DO NOT need a concurrent keep-alive track.
+    const shouldKeepAlivePlaying = false;
 
     if (shouldKeepAlivePlaying) {
       void keepAlive.play().catch(() => {
@@ -190,6 +192,33 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     });
     return () => unsubscribe();
   }, []);
+
+  const playerConfig = useMemo(
+    () => ({
+      youtube: {
+        playerVars: {
+          origin: typeof window !== "undefined" ? window.location.origin : "",
+        },
+      },
+      file: {
+        forceAudio: true,
+      },
+    }),
+    [],
+  );
+
+  const hiddenStyle = useMemo(
+    () => ({
+      position: "fixed" as const,
+      left: -9999,
+      top: -9999,
+      width: 480,
+      height: 270,
+      opacity: 0.01,
+      pointerEvents: "none" as const,
+    }),
+    [],
+  );
 
   const playerValue = useMemo<PlayerContextValue>(
     () => ({
@@ -237,17 +266,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         />
 
         {shouldRunBackgroundEngine && mediaSrc ? (
-          <div
-            style={{
-              position: "fixed",
-              left: -9999,
-              top: -9999,
-              width: 480,
-              height: 270,
-              opacity: 0.01,
-              pointerEvents: "none",
-            }}
-          >
+          <div style={hiddenStyle}>
             <ReactPlayerAny
               ref={playerRef}
               src={mediaSrc}
@@ -277,22 +296,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
               onTimeUpdate={(e: any) => {
                 const secs = e?.currentTarget?.currentTime;
                 if (Number.isFinite(secs) && secs >= 0) {
-                  setCurrentTime(secs);
+                  // Throttle updates using a ref to avoid stale closure bugs
+                  // which cause the throttle to fail and fire 4+ times a second!
+                  const currentSecs = Math.floor(secs);
+                  if (currentSecs !== lastTimeRef.current) {
+                    lastTimeRef.current = currentSecs;
+                    setCurrentTime(secs);
+                  }
                 }
               }}
-              config={{
-                youtube: {
-                  playerVars: {
-                    origin:
-                      typeof window !== "undefined"
-                        ? window.location.origin
-                        : "",
-                  },
-                },
-                file: {
-                  forceAudio: true,
-                },
-              }}
+              config={playerConfig}
             />
           </div>
         ) : null}
